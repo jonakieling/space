@@ -60,42 +60,26 @@ impl Direction {
 
 struct Player {
     position: Position,
+    movement: Vec<Position>,
     direction: Direction
 }
 
-struct Wall {
-    
-}
-
-struct Scene {
-    movement: Vec<Position>,
-    movement_timer: Duration,
-    player: Player,
-    walls: HashMap<(i32, i32), Wall>
-}
-
-impl Scene {
-    fn new(_ctx: &mut Context) -> GameResult<Scene> {
-
-        let player = Player {
-            position: Position { x: 10, y: 10 },
-            direction: Direction::Down
-        };
-
-        let mut walls: HashMap<(i32, i32), Wall> = HashMap::new();
-        walls.insert((1,1), Wall {});
-        walls.insert((3,3), Wall {});
-        walls.insert((5,5), Wall {});
-        walls.insert((6,6), Wall {});
-
-        let scene = Scene {
-            movement: vec![],
-            movement_timer: Duration::from_millis(0),
-            player,
-            walls
-        };
-
-        Ok(scene)
+impl Player {
+    fn movement(&mut self, direction: Direction, reverse: Direction) {
+        if let Some(&current_movement) = self.movement.last() {
+            if current_movement == reverse.value() {
+                self.remove_movement(current_movement);
+            } else {
+                if current_movement == self.direction.value() {
+                    self.movement.push(direction.value());
+                }
+            }    
+        } else {
+            if direction.value() == self.direction.value() {
+                self.movement.push(direction.value());
+            }
+        }
+        self.direction = direction;
     }
 
     fn remove_movement(&mut self, direction: Position) {
@@ -111,13 +95,48 @@ impl Scene {
     }
 }
 
+struct Wall {
+    
+}
+
+struct Scene {
+    movement_timer: Duration,
+    player: Player,
+    walls: HashMap<(i32, i32), Wall>
+}
+
+impl Scene {
+    fn new(_ctx: &mut Context) -> GameResult<Scene> {
+
+        let player = Player {
+            position: Position { x: 10, y: 10 },
+            movement: vec![],
+            direction: Direction::Down
+        };
+
+        let mut walls: HashMap<(i32, i32), Wall> = HashMap::new();
+        walls.insert((1,1), Wall {});
+        walls.insert((3,3), Wall {});
+        walls.insert((5,5), Wall {});
+        walls.insert((6,6), Wall {});
+
+        let scene = Scene {
+            movement_timer: Duration::from_millis(0),
+            player,
+            walls
+        };
+
+        Ok(scene)
+    }
+}
+
 impl event::EventHandler for Scene {
     fn update(&mut self, _ctx: &mut Context, _dt: Duration) -> GameResult<()> {
         self.movement_timer += _dt;
 
         if self.movement_timer > Duration::from_millis(120) {
             self.movement_timer = Duration::from_millis(0);
-            if let Some(current_movement) = self.movement.last() {
+            if let Some(current_movement) = self.player.movement.last() {
                 self.player.position = &self.player.position + current_movement;
             };
         }
@@ -131,85 +150,33 @@ impl event::EventHandler for Scene {
 
             match keycode {
                 Keycode::Left => {
-                    if let Some(&current_movement) = self.movement.last() {
-                        if current_movement == Direction::Right.value() {
-                            self.remove_movement(current_movement);
-                        } else {
-                            if current_movement == self.player.direction.value() {
-                                self.movement.push(Direction::Left.value());
-                            }
-                        }    
-                    } else {
-                        if Direction::Left.value() == self.player.direction.value() {
-                            self.movement.push(Direction::Left.value());
-                        }
-                    }
-                    self.player.direction = Direction::Left;
+                    self.player.movement(Direction::Left, Direction::Right);
                 },
                 Keycode::Right => {
-                    if let Some(&current_movement) = self.movement.last() {
-                        if current_movement == Direction::Left.value() {
-                            self.remove_movement(current_movement);
-                        } else {
-                            if current_movement == self.player.direction.value() {
-                                self.movement.push(Direction::Right.value());
-                            }
-                        }    
-                    } else {
-                        if Direction::Right.value() == self.player.direction.value() {
-                            self.movement.push(Direction::Right.value());
-                        }
-                    }
-                    self.player.direction = Direction::Right;
+                    self.player.movement(Direction::Right, Direction::Left);
                 },
                 Keycode::Up => {
-                    if let Some(&current_movement) = self.movement.last() {
-                        if current_movement == Direction::Down.value() {
-                            self.remove_movement(current_movement);
-                        } else {
-                            if current_movement == self.player.direction.value() {
-                                self.movement.push(Direction::Up.value());
-                            }
-                        }    
-                    } else {
-                        if Direction::Up.value() == self.player.direction.value() {
-                            self.movement.push(Direction::Up.value());
-                        }
-                    }
-                    self.player.direction = Direction::Up;
+                    self.player.movement(Direction::Up, Direction::Down);
                 },
                 Keycode::Down => {
-                    if let Some(&current_movement) = self.movement.last() {
-                        if current_movement == Direction::Up.value() {
-                            self.remove_movement(current_movement);
-                        } else {
-                            if current_movement == self.player.direction.value() {
-                                self.movement.push(Direction::Down.value());
-                            }
-                        }    
-                    } else {
-                        if Direction::Down.value() == self.player.direction.value() {
-                            self.movement.push(Direction::Down.value());
-                        }
-                    }
-                    self.player.direction = Direction::Down;
+                    self.player.movement(Direction::Down, Direction::Up);
                 },
                 _ => ()
             }
         } else {
-            if let None = self.movement.last() {
+            if let None = self.player.movement.last() {
                 match keycode {
                     Keycode::Left => {
-                        self.movement.push(Direction::Left.value());
+                        self.player.movement.push(Direction::Left.value());
                     },
                     Keycode::Right => {
-                        self.movement.push(Direction::Right.value());
+                        self.player.movement.push(Direction::Right.value());
                     },
                     Keycode::Up => {
-                        self.movement.push(Direction::Up.value());
+                        self.player.movement.push(Direction::Up.value());
                     },
                     Keycode::Down => {
-                        self.movement.push(Direction::Down.value());
+                        self.player.movement.push(Direction::Down.value());
                     },
                     _ => ()
                 }
@@ -235,7 +202,7 @@ impl event::EventHandler for Scene {
             _ => ()
         }
 
-        self.remove_movement(key_direction);
+        self.player.remove_movement(key_direction);
 
     }
 
