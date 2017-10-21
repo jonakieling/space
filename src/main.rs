@@ -14,12 +14,12 @@ use ggez::event::*;
 const GRID_SIZE: i32 = 20;
 
 #[derive(PartialEq, Clone, Copy)]
-struct Vec2 {
+struct Position {
     x: i32,
     y: i32
 }
 
-impl Vec2 {
+impl Position {
     fn x(self) -> f32 {
         (self.x * GRID_SIZE) as f32
     }
@@ -29,11 +29,11 @@ impl Vec2 {
     }
 }
 
-impl<'a> Add for &'a Vec2 {
-    type Output = Vec2;
+impl<'a> Add for &'a Position {
+    type Output = Position;
 
-    fn add(self, other: &Vec2) -> Vec2 {
-        Vec2 {
+    fn add(self, other: &Position) -> Position {
+        Position {
             x: self.x + other.x,
             y: self.y + other.y
         }
@@ -48,18 +48,18 @@ enum Direction {
 }
 
 impl Direction {
-    fn value(&self) -> Vec2 {
+    fn value(&self) -> Position {
         match *self {
-            Direction::Up => Vec2 { x: 0, y: -1 },
-            Direction::Down => Vec2 { x: 0, y: 1 },
-            Direction::Left => Vec2 { x: -1, y: 0 },
-            Direction::Right => Vec2 { x: 1, y: 0 },
+            Direction::Up => Position { x: 0, y: -1 },
+            Direction::Down => Position { x: 0, y: 1 },
+            Direction::Left => Position { x: -1, y: 0 },
+            Direction::Right => Position { x: 1, y: 0 },
         }
     }
 }
 
 struct Player {
-    position: Vec2,
+    position: Position,
     direction: Direction
 }
 
@@ -68,7 +68,7 @@ struct Wall {
 }
 
 struct Scene {
-    movement: Vec<Vec2>,
+    movement: Vec<Position>,
     player: Player,
     walls: HashMap<(i32, i32), Wall>
 }
@@ -77,7 +77,7 @@ impl Scene {
     fn new(_ctx: &mut Context) -> GameResult<Scene> {
 
         let player = Player {
-            position: Vec2 { x: 10, y: 10 },
+            position: Position { x: 10, y: 10 },
             direction: Direction::Down
         };
 
@@ -128,7 +128,7 @@ impl event::EventHandler for Scene {
     }
 
     fn key_up_event(&mut self, keycode: Keycode, _keymod: Mod, _repeat: bool) {
-        let mut key_direction = Vec2 { x: 0, y: 0 };
+        let mut key_direction = Position { x: 0, y: 0 };
         match keycode {
             Keycode::Left => {
                 key_direction = Direction::Left.value()
