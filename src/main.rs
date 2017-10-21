@@ -132,6 +132,7 @@ impl event::EventHandler for Scene {
 
             match keycode {
                 Keycode::Left => {
+                    self.player.direction = Direction::Left;
                     if let Some(&current_movement) = self.movement.last() {
                         if current_movement == Direction::Right.value() {
                             self.remove_movement(current_movement);
@@ -143,6 +144,7 @@ impl event::EventHandler for Scene {
                     }
                 },
                 Keycode::Right => {
+                    self.player.direction = Direction::Right;
                     if let Some(&current_movement) = self.movement.last() {
                         if current_movement == Direction::Left.value() {
                             self.remove_movement(current_movement);
@@ -154,6 +156,7 @@ impl event::EventHandler for Scene {
                     }
                 },
                 Keycode::Up => {
+                    self.player.direction = Direction::Up;
                     if let Some(&current_movement) = self.movement.last() {
                         if current_movement == Direction::Down.value() {
                             self.remove_movement(current_movement);
@@ -165,6 +168,7 @@ impl event::EventHandler for Scene {
                     }
                 },
                 Keycode::Down => {
+                    self.player.direction = Direction::Down;
                     if let Some(&current_movement) = self.movement.last() {
                         if current_movement == Direction::Up.value() {
                             self.remove_movement(current_movement);
@@ -215,7 +219,7 @@ impl event::EventHandler for Scene {
         graphics::rectangle(ctx, graphics::DrawMode::Fill, player)?;
 
         graphics::set_color(ctx, graphics::WHITE)?;
-        let face = graphics::Rect::new(self.player.position.x() + (self.player.direction.value().x() * 0.1), self.player.position.y() + (self.player.direction.value().y() * 0.1), 10.0, 10.0);
+        let face = graphics::Rect::new(self.player.position.x() + (self.player.direction.value().x() * 0.2), self.player.position.y() + (self.player.direction.value().y() * 0.2), 10.0, 10.0);
         graphics::rectangle(ctx, graphics::DrawMode::Fill, face)?;
 
         graphics::present(ctx);
