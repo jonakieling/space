@@ -40,6 +40,7 @@ impl<'a> Add for &'a Position {
     }
 }
 
+#[derive(PartialEq, Clone, Copy)]
 enum Direction {
     Up,
     Down,
@@ -60,29 +61,30 @@ impl Direction {
 
 struct Player {
     position: Position,
-    movement: Vec<Position>,
+    movement: Vec<Direction>,
     direction: Direction
 }
 
 impl Player {
     fn movement(&mut self, direction: Direction, reverse: Direction) {
         if let Some(&current_movement) = self.movement.last() {
-            if current_movement == reverse.value() {
+            if current_movement == reverse {
                 self.remove_movement(current_movement);
             } else {
-                if current_movement == self.direction.value() {
-                    self.movement.push(direction.value());
+                if current_movement == self.direction {
+                    self.movement.push(direction);
                 }
             }    
         } else {
-            if direction.value() == self.direction.value() {
-                self.movement.push(direction.value());
+            if direction == self.direction {
+                self.movement.push(direction);
             }
         }
+
         self.direction = direction;
     }
 
-    fn remove_movement(&mut self, direction: Position) {
+    fn remove_movement(&mut self, direction: Direction) {
         let mut remove_indicies: Vec<usize> = vec![];
         for (index, movement) in self.movement.iter().enumerate() {
             if movement == &direction {
@@ -136,8 +138,8 @@ impl event::EventHandler for Scene {
 
         if self.movement_timer > Duration::from_millis(120) {
             self.movement_timer = Duration::from_millis(0);
-            if let Some(current_movement) = self.player.movement.last() {
-                self.player.position = &self.player.position + current_movement;
+            if let Some(&current_movement) = self.player.movement.last() {
+                self.player.position = &self.player.position + &current_movement.value();
             };
         }
 
@@ -167,16 +169,16 @@ impl event::EventHandler for Scene {
             if let None = self.player.movement.last() {
                 match keycode {
                     Keycode::Left => {
-                        self.player.movement.push(Direction::Left.value());
+                        self.player.movement.push(Direction::Left);
                     },
                     Keycode::Right => {
-                        self.player.movement.push(Direction::Right.value());
+                        self.player.movement.push(Direction::Right);
                     },
                     Keycode::Up => {
-                        self.player.movement.push(Direction::Up.value());
+                        self.player.movement.push(Direction::Up);
                     },
                     Keycode::Down => {
-                        self.player.movement.push(Direction::Down.value());
+                        self.player.movement.push(Direction::Down);
                     },
                     _ => ()
                 }
@@ -185,19 +187,19 @@ impl event::EventHandler for Scene {
     }
 
     fn key_up_event(&mut self, keycode: Keycode, _keymod: Mod, _repeat: bool) {
-        let mut key_direction = Position { x: 0, y: 0 };
+        let mut key_direction = Direction::Up;
         match keycode {
             Keycode::Left => {
-                key_direction = Direction::Left.value()
+                key_direction = Direction::Left
             },
             Keycode::Right => {
-                key_direction = Direction::Right.value()
+                key_direction = Direction::Right
             },
             Keycode::Up => {
-                key_direction = Direction::Up.value()
+                key_direction = Direction::Up
             },
             Keycode::Down => {
-                key_direction = Direction::Down.value()
+                key_direction = Direction::Down
             },
             _ => ()
         }
