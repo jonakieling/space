@@ -98,6 +98,18 @@ impl Scene {
 
         Ok(scene)
     }
+
+    fn remove_movement(&mut self, direction: Position) {
+        let mut remove_indicies: Vec<usize> = vec![];
+        for (index, movement) in self.movement.iter().enumerate() {
+            if movement == &direction {
+                remove_indicies.push(index);
+            }
+        }
+        for remove_index in remove_indicies.iter() {
+            self.movement.remove(*remove_index);
+        }
+    }
 }
 
 impl event::EventHandler for Scene {
@@ -117,18 +129,51 @@ impl event::EventHandler for Scene {
     fn key_down_event(&mut self, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         if !_repeat {
             self.movement_timer = Duration::from_millis(120);
+
             match keycode {
                 Keycode::Left => {
-                    self.movement.push(Direction::Left.value());
+                    if let Some(&current_movement) = self.movement.last() {
+                        if current_movement == Direction::Right.value() {
+                            self.remove_movement(current_movement);
+                        } else {
+                            self.movement.push(Direction::Left.value());
+                        }    
+                    } else {
+                        self.movement.push(Direction::Left.value());
+                    }
                 },
                 Keycode::Right => {
-                    self.movement.push(Direction::Right.value());
+                    if let Some(&current_movement) = self.movement.last() {
+                        if current_movement == Direction::Left.value() {
+                            self.remove_movement(current_movement);
+                        } else {
+                            self.movement.push(Direction::Right.value());
+                        }    
+                    } else {
+                        self.movement.push(Direction::Right.value());
+                    }
                 },
                 Keycode::Up => {
-                    self.movement.push(Direction::Up.value());
+                    if let Some(&current_movement) = self.movement.last() {
+                        if current_movement == Direction::Down.value() {
+                            self.remove_movement(current_movement);
+                        } else {
+                            self.movement.push(Direction::Up.value());
+                        }    
+                    } else {
+                        self.movement.push(Direction::Up.value());
+                    }
                 },
                 Keycode::Down => {
-                    self.movement.push(Direction::Down.value());
+                    if let Some(&current_movement) = self.movement.last() {
+                        if current_movement == Direction::Up.value() {
+                            self.remove_movement(current_movement);
+                        } else {
+                            self.movement.push(Direction::Down.value());
+                        }    
+                    } else {
+                        self.movement.push(Direction::Down.value());
+                    }
                 },
                 _ => ()
             }
@@ -153,15 +198,8 @@ impl event::EventHandler for Scene {
             _ => ()
         }
 
-        let mut remove_indicies: Vec<usize> = vec![];
-        for (index, movement) in self.movement.iter().enumerate() {
-            if movement == &key_direction {
-                remove_indicies.push(index);
-            }
-        }
-        for remove_index in remove_indicies.iter() {
-            self.movement.remove(*remove_index);
-        }
+        self.remove_movement(key_direction);
+
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
