@@ -34,14 +34,12 @@ impl CurrentDirection {
     }
 }
 
-#[derive(Debug)]
 struct Player {
     x: i32,
     y: i32,
     direction: CurrentDirection
 }
 
-#[derive(Debug)]
 struct Wall {
     
 }
