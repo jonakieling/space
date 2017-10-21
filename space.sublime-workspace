@@ -3,15 +3,63 @@
 	{
 		"selected_items":
 		[
+			[
+				"speed",
+				"speed_x"
+			],
+			[
+				"act",
+				"actor4"
+			],
+			[
+				"ac",
+				"actor4"
+			],
+			[
+				"actor",
+				"actors"
+			],
+			[
+				"play",
+				"player"
+			],
+			[
+				"pl",
+				"player"
+			],
+			[
+				"print",
+				"println\tprintln!(…)"
+			],
+			[
+				"ve",
+				"vel_x"
+			],
+			[
+				"y",
+				"y"
+			],
+			[
+				"Key",
+				"Keycode"
+			],
+			[
+				"K",
+				"Key"
+			],
+			[
+				"pin",
+				"println\tprintln!(…)"
+			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "/home/jonathan/Code/space.rust/src/main.rs",
+			"file": "src/main.rs",
 			"settings":
 			{
-				"buffer_size": 237,
+				"buffer_size": 4812,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -62,18 +110,24 @@
 	],
 	"file_history":
 	[
-		"/home/jonathan/Code/space.rust/README.md",
-		"/home/jonathan/Code/space.rust/src/main.rs"
+		"/home/jonathan/Code/space.rust/Cargo.toml",
+		"/home/jonathan/Code/space.rust/src/drop.rs",
+		"/home/jonathan/Code/space.rust/src/main.rs",
+		"/home/jonathan/Code/space.rust/space.sublime-project",
+		"/home/jonathan/Code/space.rust/space.sublime-workspace",
+		"/home/jonathan/Code/hello.rust/src/main.rs",
+		"/home/jonathan/Code/space.rust/README.md"
 	],
 	"find":
 	{
-		"height": 0.0
+		"height": 23.0
 	},
 	"find_in_files":
 	{
-		"height": 0.0,
+		"height": 98.0,
 		"where_history":
 		[
+			""
 		]
 	},
 	"find_state":
@@ -81,6 +135,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"hello"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -88,6 +143,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"space"
 		],
 		"reverse": false,
 		"show_context": true,
@@ -103,27 +159,29 @@
 			[
 				{
 					"buffer": 0,
-					"file": "/home/jonathan/Code/space.rust/src/main.rs",
+					"file": "src/main.rs",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 237,
+						"buffer_size": 4812,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								237,
-								237
+								3738,
+								3738
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Rust/Rust.sublime-syntax"
+							"syntax": "Packages/Rust/Rust.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 1821.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -134,7 +192,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 0.0
+		"height": 23.0
 	},
 	"input":
 	{
@@ -162,7 +220,7 @@
 			1.0
 		]
 	},
-	"menu_visible": true,
+	"menu_visible": false,
 	"output.find_results":
 	{
 		"height": 0.0
@@ -171,7 +229,7 @@
 	"project": "space.sublime-project",
 	"replace":
 	{
-		"height": 0.0
+		"height": 42.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -209,7 +267,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 150.0,
+	"side_bar_width": 50.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
