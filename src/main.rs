@@ -132,54 +132,88 @@ impl event::EventHandler for Scene {
 
             match keycode {
                 Keycode::Left => {
-                    self.player.direction = Direction::Left;
                     if let Some(&current_movement) = self.movement.last() {
                         if current_movement == Direction::Right.value() {
                             self.remove_movement(current_movement);
                         } else {
-                            self.movement.push(Direction::Left.value());
+                            if current_movement == self.player.direction.value() {
+                                self.movement.push(Direction::Left.value());
+                            }
                         }    
                     } else {
-                        self.movement.push(Direction::Left.value());
+                        if Direction::Left.value() == self.player.direction.value() {
+                            self.movement.push(Direction::Left.value());
+                        }
                     }
+                    self.player.direction = Direction::Left;
                 },
                 Keycode::Right => {
-                    self.player.direction = Direction::Right;
                     if let Some(&current_movement) = self.movement.last() {
                         if current_movement == Direction::Left.value() {
                             self.remove_movement(current_movement);
                         } else {
-                            self.movement.push(Direction::Right.value());
+                            if current_movement == self.player.direction.value() {
+                                self.movement.push(Direction::Right.value());
+                            }
                         }    
                     } else {
-                        self.movement.push(Direction::Right.value());
+                        if Direction::Right.value() == self.player.direction.value() {
+                            self.movement.push(Direction::Right.value());
+                        }
                     }
+                    self.player.direction = Direction::Right;
                 },
                 Keycode::Up => {
-                    self.player.direction = Direction::Up;
                     if let Some(&current_movement) = self.movement.last() {
                         if current_movement == Direction::Down.value() {
                             self.remove_movement(current_movement);
                         } else {
-                            self.movement.push(Direction::Up.value());
+                            if current_movement == self.player.direction.value() {
+                                self.movement.push(Direction::Up.value());
+                            }
                         }    
                     } else {
-                        self.movement.push(Direction::Up.value());
+                        if Direction::Up.value() == self.player.direction.value() {
+                            self.movement.push(Direction::Up.value());
+                        }
                     }
+                    self.player.direction = Direction::Up;
                 },
                 Keycode::Down => {
-                    self.player.direction = Direction::Down;
                     if let Some(&current_movement) = self.movement.last() {
                         if current_movement == Direction::Up.value() {
                             self.remove_movement(current_movement);
                         } else {
-                            self.movement.push(Direction::Down.value());
+                            if current_movement == self.player.direction.value() {
+                                self.movement.push(Direction::Down.value());
+                            }
                         }    
                     } else {
-                        self.movement.push(Direction::Down.value());
+                        if Direction::Down.value() == self.player.direction.value() {
+                            self.movement.push(Direction::Down.value());
+                        }
                     }
+                    self.player.direction = Direction::Down;
                 },
                 _ => ()
+            }
+        } else {
+            if let None = self.movement.last() {
+                match keycode {
+                    Keycode::Left => {
+                        self.movement.push(Direction::Left.value());
+                    },
+                    Keycode::Right => {
+                        self.movement.push(Direction::Right.value());
+                    },
+                    Keycode::Up => {
+                        self.movement.push(Direction::Up.value());
+                    },
+                    Keycode::Down => {
+                        self.movement.push(Direction::Down.value());
+                    },
+                    _ => ()
+                }
             }
         }
     }
