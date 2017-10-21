@@ -130,6 +130,14 @@ impl Scene {
 
         Ok(scene)
     }
+
+    fn check_player_collision(&self, direction: Direction) -> bool {
+        let position = &direction.value() + &self.player.position;
+        match self.walls.get(&(position.x, position.y)) {
+            Some(_) => true,
+            None => false
+        }
+    }
 }
 
 impl event::EventHandler for Scene {
@@ -139,7 +147,9 @@ impl event::EventHandler for Scene {
         if self.movement_timer > Duration::from_millis(120) {
             self.movement_timer = Duration::from_millis(0);
             if let Some(&current_movement) = self.player.movement.last() {
-                self.player.position = &self.player.position + &current_movement.value();
+                if !self.check_player_collision(current_movement) {
+                    self.player.position = &self.player.position + &current_movement.value();
+                }
             };
         }
 
