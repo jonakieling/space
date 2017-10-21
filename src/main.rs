@@ -3,6 +3,7 @@ extern crate ggez;
 use std::io::Write;
 use std::time::Duration;
 use std::collections::HashMap;
+use std::ops::Add;
 
 use ggez::conf;
 use ggez::event;
@@ -10,34 +11,44 @@ use ggez::{GameResult, Context};
 use ggez::graphics;
 use ggez::event::*;
 
-#[derive(Debug)]
-enum CurrentDirection {
+#[derive(PartialEq, Clone, Copy)]
+struct Vec2 {
+    x: i32,
+    y: i32
+}
+
+impl<'a> Add for &'a Vec2 {
+    type Output = Vec2;
+
+    fn add(self, other: &Vec2) -> Vec2 {
+        Vec2 {
+            x: self.x + other.x,
+            y: self.y + other.y
+        }
+    }
+}
+
+enum Direction {
     Up,
     Down,
     Left,
     Right
 }
 
-struct Direction {
-    x: f32,
-    y: f32
-}
-
-impl CurrentDirection {
-    fn current(&self) -> Direction {
+impl Direction {
+    fn value(&self) -> Vec2 {
         match *self {
-            CurrentDirection::Up => Direction { x: 0.0, y: -1.0 },
-            CurrentDirection::Down => Direction { x: 0.0, y: 1.0 },
-            CurrentDirection::Left => Direction { x: -1.0, y: 0.0 },
-            CurrentDirection::Right => Direction { x: 1.0, y: 0.0 },
+            Direction::Up => Vec2 { x: 0, y: -1 },
+            Direction::Down => Vec2 { x: 0, y: 1 },
+            Direction::Left => Vec2 { x: -1, y: 0 },
+            Direction::Right => Vec2 { x: 1, y: 0 },
         }
     }
 }
 
 struct Player {
-    x: i32,
-    y: i32,
-    direction: CurrentDirection
+    position: Vec2,
+    direction: Direction
 }
 
 struct Wall {
@@ -45,16 +56,17 @@ struct Wall {
 }
 
 struct Scene {
+    movement: Vec<Vec2>,
     player: Player,
     walls: HashMap<(i32, i32), Wall>
 }
 
 impl Scene {
     fn new(_ctx: &mut Context) -> GameResult<Scene> {
+
         let player = Player {
-            x: 200,
-            y: 200,
-            direction: CurrentDirection::Down
+            position: Vec2 { x: 200, y: 200 },
+            direction: Direction::Down
         };
 
         let mut walls: HashMap<(i32, i32), Wall> = HashMap::new();
@@ -64,6 +76,7 @@ impl Scene {
         walls.insert((140,140), Wall {});
 
         let scene = Scene {
+            movement: vec![],
             player,
             walls
         };
@@ -75,6 +88,10 @@ impl Scene {
 impl event::EventHandler for Scene {
     fn update(&mut self, _ctx: &mut Context, _dt: Duration) -> GameResult<()> {
 
+        if let Some(current_movement) = self.movement.last() {
+            self.player.position = &self.player.position + current_movement;
+        };
+
         Ok(())
     }
 
@@ -82,12 +99,16 @@ impl event::EventHandler for Scene {
         if !_repeat {
             match keycode {
                 Keycode::Left => {
+                    self.movement.push(Direction::Left.value());
                 },
                 Keycode::Right => {
+                    self.movement.push(Direction::Right.value());
                 },
                 Keycode::Up => {
+                    self.movement.push(Direction::Up.value());
                 },
                 Keycode::Down => {
+                    self.movement.push(Direction::Down.value());
                 },
                 _ => ()
             }
@@ -95,16 +116,31 @@ impl event::EventHandler for Scene {
     }
 
     fn key_up_event(&mut self, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+        let mut key_direction = Vec2 { x: 0, y: 0 };
         match keycode {
             Keycode::Left => {
+                key_direction = Direction::Left.value()
             },
             Keycode::Right => {
+                key_direction = Direction::Right.value()
             },
             Keycode::Up => {
+                key_direction = Direction::Up.value()
             },
             Keycode::Down => {
+                key_direction = Direction::Down.value()
             },
             _ => ()
+        }
+
+        let mut remove_indicies: Vec<usize> = vec![];
+        for (index, movement) in self.movement.iter().enumerate() {
+            if movement == &key_direction {
+                remove_indicies.push(index);
+            }
+        }
+        for remove_index in remove_indicies.iter() {
+            self.movement.remove(*remove_index);
         }
     }
 
@@ -117,11 +153,11 @@ impl event::EventHandler for Scene {
             graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new(pos.0 as f32, pos.1 as f32, 20.0, 20.0))?;
         }
 
-        let player = graphics::Rect::new(self.player.x as f32, self.player.y as f32, 20.0, 20.0);
+        let player = graphics::Rect::new(self.player.position.x as f32, self.player.position.y as f32, 20.0, 20.0);
         graphics::rectangle(ctx, graphics::DrawMode::Fill, player)?;
 
         graphics::set_color(ctx, graphics::WHITE)?;
-        let face = graphics::Rect::new(self.player.x as f32 + (self.player.direction.current().x * 7.0), self.player.y as f32 + (self.player.direction.current().y * 7.0), 10.0, 10.0);
+        let face = graphics::Rect::new(self.player.position.x as f32 + (self.player.direction.value().x as f32 * 7.0), self.player.position.y as f32 + (self.player.direction.value().y as f32 * 7.0), 10.0, 10.0);
         graphics::rectangle(ctx, graphics::DrawMode::Fill, face)?;
 
         graphics::present(ctx);
