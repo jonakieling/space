@@ -4,7 +4,6 @@ use std::io::Write;
 use std::time::Duration;
 use std::collections::HashMap;
 use std::ops::Add;
-use std::{thread, time};
 
 use ggez::conf;
 use ggez::event;
