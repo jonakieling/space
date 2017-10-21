@@ -4,6 +4,7 @@ use std::io::Write;
 use std::time::Duration;
 use std::collections::HashMap;
 use std::ops::Add;
+use std::{thread, time};
 
 use ggez::conf;
 use ggez::event;
@@ -69,6 +70,7 @@ struct Wall {
 
 struct Scene {
     movement: Vec<Position>,
+    movement_timer: Duration,
     player: Player,
     walls: HashMap<(i32, i32), Wall>
 }
@@ -89,6 +91,7 @@ impl Scene {
 
         let scene = Scene {
             movement: vec![],
+            movement_timer: Duration::from_millis(0),
             player,
             walls
         };
@@ -99,16 +102,21 @@ impl Scene {
 
 impl event::EventHandler for Scene {
     fn update(&mut self, _ctx: &mut Context, _dt: Duration) -> GameResult<()> {
+        self.movement_timer += _dt;
 
-        if let Some(current_movement) = self.movement.last() {
-            self.player.position = &self.player.position + current_movement;
-        };
+        if self.movement_timer > Duration::from_millis(120) {
+            self.movement_timer = Duration::from_millis(0);
+            if let Some(current_movement) = self.movement.last() {
+                self.player.position = &self.player.position + current_movement;
+            };
+        }
 
         Ok(())
     }
 
     fn key_down_event(&mut self, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         if !_repeat {
+            self.movement_timer = Duration::from_millis(120);
             match keycode {
                 Keycode::Left => {
                     self.movement.push(Direction::Left.value());
