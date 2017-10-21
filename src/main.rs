@@ -11,10 +11,22 @@ use ggez::{GameResult, Context};
 use ggez::graphics;
 use ggez::event::*;
 
+const GRID_SIZE: i32 = 20;
+
 #[derive(PartialEq, Clone, Copy)]
 struct Vec2 {
     x: i32,
     y: i32
+}
+
+impl Vec2 {
+    fn x(self) -> f32 {
+        (self.x * GRID_SIZE) as f32
+    }
+
+    fn y(self) -> f32 {
+        (self.y * GRID_SIZE) as f32
+    }
 }
 
 impl<'a> Add for &'a Vec2 {
@@ -65,15 +77,15 @@ impl Scene {
     fn new(_ctx: &mut Context) -> GameResult<Scene> {
 
         let player = Player {
-            position: Vec2 { x: 200, y: 200 },
+            position: Vec2 { x: 10, y: 10 },
             direction: Direction::Down
         };
 
         let mut walls: HashMap<(i32, i32), Wall> = HashMap::new();
-        walls.insert((20,20), Wall {});
-        walls.insert((60,60), Wall {});
-        walls.insert((100,100), Wall {});
-        walls.insert((140,140), Wall {});
+        walls.insert((1,1), Wall {});
+        walls.insert((3,3), Wall {});
+        walls.insert((5,5), Wall {});
+        walls.insert((6,6), Wall {});
 
         let scene = Scene {
             movement: vec![],
@@ -150,14 +162,14 @@ impl event::EventHandler for Scene {
         graphics::set_color(ctx, graphics::BLACK)?;
 
         for pos in self.walls.keys() {
-            graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new(pos.0 as f32, pos.1 as f32, 20.0, 20.0))?;
+            graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((pos.0 * GRID_SIZE) as f32, (pos.1 * GRID_SIZE) as f32, 20.0, 20.0))?;
         }
 
-        let player = graphics::Rect::new(self.player.position.x as f32, self.player.position.y as f32, 20.0, 20.0);
+        let player = graphics::Rect::new(self.player.position.x(), self.player.position.y(), 20.0, 20.0);
         graphics::rectangle(ctx, graphics::DrawMode::Fill, player)?;
 
         graphics::set_color(ctx, graphics::WHITE)?;
-        let face = graphics::Rect::new(self.player.position.x as f32 + (self.player.direction.value().x as f32 * 7.0), self.player.position.y as f32 + (self.player.direction.value().y as f32 * 7.0), 10.0, 10.0);
+        let face = graphics::Rect::new(self.player.position.x() + (self.player.direction.value().x() * 0.1), self.player.position.y() + (self.player.direction.value().y() * 0.1), 10.0, 10.0);
         graphics::rectangle(ctx, graphics::DrawMode::Fill, face)?;
 
         graphics::present(ctx);
