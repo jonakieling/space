@@ -4,6 +4,38 @@
 		"selected_items":
 		[
 			[
+				"mo",
+				"current_movement"
+			],
+			[
+				"remo",
+				"remove_movement"
+			],
+			[
+				"mov",
+				"movement_timer"
+			],
+			[
+				"enum",
+				"enumerate"
+			],
+			[
+				"L",
+				"LevelStorage"
+			],
+			[
+				"us",
+				"usize"
+			],
+			[
+				"pos",
+				"position"
+			],
+			[
+				"key",
+				"key_direction"
+			],
+			[
 				"speed",
 				"speed_x"
 			],
@@ -59,7 +91,7 @@
 			"file": "src/main.rs",
 			"settings":
 			{
-				"buffer_size": 4812,
+				"buffer_size": 7186,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -120,13 +152,14 @@
 	],
 	"find":
 	{
-		"height": 23.0
+		"height": 38.0
 	},
 	"find_in_files":
 	{
 		"height": 98.0,
 		"where_history":
 		[
+			"<current file>",
 			""
 		]
 	},
@@ -135,6 +168,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"Vec2",
 			"hello"
 		],
 		"highlight": true,
@@ -143,6 +177,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"Position",
 			"space"
 		],
 		"reverse": false,
@@ -163,15 +198,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4812,
+						"buffer_size": 7186,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3738,
-								3738
+								3413,
+								3413
 							]
 						],
 						"settings":
@@ -181,7 +216,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1821.0,
+						"translation.y": 1846.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
