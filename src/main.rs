@@ -2,8 +2,8 @@ extern crate ggez;
 
 use std::io::Write;
 use std::time::Duration;
-use std::collections::HashMap;
 use std::ops::Add;
+use std::slice;
 
 use ggez::conf;
 use ggez::event;
@@ -13,7 +13,7 @@ use ggez::event::*;
 
 const GRID_SIZE: i32 = 20;
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, Debug)]
 struct Position {
     x: i32,
     y: i32
@@ -40,7 +40,7 @@ impl<'a> Add for &'a Position {
     }
 }
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, Debug)]
 enum Direction {
     Up,
     Down,
@@ -97,6 +97,46 @@ impl Player {
     }
 }
 
+#[derive(Clone)]
+struct PositionLevelStorage<T: Clone> {
+    storage: Vec<Option<Box<T>>>,
+    width: i32,
+    height: i32
+}
+
+impl<T: Clone> PositionLevelStorage<T> {
+    fn new(width: i32, height: i32) -> PositionLevelStorage<T> {
+        PositionLevelStorage {
+            storage: vec![None; (width * height) as usize],
+            width,
+            height
+        }
+    }
+    fn get(&self, x: i32, y: i32) -> Option<&Option<Box<T>>> {
+        if x <= self.width && y <= self.height  {
+        let position = x + y * self.width;
+            match self.storage.get(position as usize) {
+                Some(item) => Some(item),
+                None => None
+            }
+        } else {
+            None
+        }
+    }
+
+    fn insert(&mut self, x: i32, y: i32, item: T) {
+        if x <= self.width && y <= self.height  {
+            let position = x + y * self.width;
+            self.storage.insert(position as usize, Some(Box::new(item)));
+        }
+    }
+
+    fn iter(&self) -> slice::Iter<Option<Box<T>>> {
+        self.storage.iter()
+    }
+}
+
+#[derive(Clone, Debug)]
 struct Wall {
     
 }
@@ -104,7 +144,7 @@ struct Wall {
 struct Scene {
     movement_timer: Duration,
     player: Player,
-    walls: HashMap<(i32, i32), Wall>
+    walls: PositionLevelStorage<Wall>
 }
 
 impl Scene {
@@ -116,11 +156,12 @@ impl Scene {
             direction: Direction::Down
         };
 
-        let mut walls: HashMap<(i32, i32), Wall> = HashMap::new();
-        walls.insert((1,1), Wall {});
-        walls.insert((3,3), Wall {});
-        walls.insert((5,5), Wall {});
-        walls.insert((6,6), Wall {});
+        let mut walls = <PositionLevelStorage<Wall>>::new(20, 20);
+        walls.insert(1, 2, Wall {});
+        walls.insert(3, 5, Wall {});
+        walls.insert(5, 8, Wall {});
+        walls.insert(6, 10, Wall {});
+        walls.insert(7, 11, Wall {});
 
         let scene = Scene {
             movement_timer: Duration::from_millis(0),
@@ -133,8 +174,16 @@ impl Scene {
 
     fn check_player_collision(&self, direction: Direction) -> bool {
         let position = &direction.value() + &self.player.position;
-        match self.walls.get(&(position.x, position.y)) {
-            Some(_) => true,
+        match self.walls.get(position.x, position.y) {
+            // Match for Vec access
+            Some(item) => {
+                // Match for entity presence
+                match *item {
+                    None => false,
+                    _ => true
+                }
+                
+            },
             None => false
         }
     }
@@ -223,8 +272,16 @@ impl event::EventHandler for Scene {
 
         graphics::set_color(ctx, graphics::BLACK)?;
 
-        for pos in self.walls.keys() {
-            graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((pos.0 * GRID_SIZE) as f32, (pos.1 * GRID_SIZE) as f32, 20.0, 20.0))?;
+        for (pos, wall) in self.walls.iter().enumerate() {
+            // Match for entity presence
+            match *wall {
+                Some(_) => {
+                    let x = pos as i32 % self.walls.width;
+                    let y = pos as i32 / self.walls.width;
+                    graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
+                },
+                None => (),
+            }
         }
 
         let player = graphics::Rect::new(self.player.position.x(), self.player.position.y(), 20.0, 20.0);
