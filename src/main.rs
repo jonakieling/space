@@ -144,7 +144,7 @@ impl event::EventHandler for Scene {
     fn update(&mut self, _ctx: &mut Context, _dt: Duration) -> GameResult<()> {
         self.movement_timer += _dt;
 
-        if self.movement_timer > Duration::from_millis(120) {
+        if self.movement_timer > Duration::from_millis(100) {
             self.movement_timer = Duration::from_millis(0);
             if let Some(&current_movement) = self.player.movement.last() {
                 if !self.check_player_collision(current_movement) {
@@ -158,7 +158,7 @@ impl event::EventHandler for Scene {
 
     fn key_down_event(&mut self, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         if !_repeat {
-            self.movement_timer = Duration::from_millis(120);
+            self.movement_timer = Duration::from_millis(100);
 
             match keycode {
                 Keycode::Left => {
@@ -179,16 +179,16 @@ impl event::EventHandler for Scene {
             if let None = self.player.movement.last() {
                 match keycode {
                     Keycode::Left => {
-                        self.player.movement.push(Direction::Left);
+                        self.player.movement(Direction::Left, Direction::Right);
                     },
                     Keycode::Right => {
-                        self.player.movement.push(Direction::Right);
+                        self.player.movement(Direction::Right, Direction::Left);
                     },
                     Keycode::Up => {
-                        self.player.movement.push(Direction::Up);
+                        self.player.movement(Direction::Up, Direction::Down);
                     },
                     Keycode::Down => {
-                        self.player.movement.push(Direction::Down);
+                        self.player.movement(Direction::Down, Direction::Up);
                     },
                     _ => ()
                 }
