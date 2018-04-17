@@ -247,24 +247,22 @@ impl event::EventHandler for Scene {
     }
 
     fn key_up_event(&mut self, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
-        let mut key_direction = Direction::Up;
         match keycode {
             Keycode::Left => {
-                key_direction = Direction::Left
+                self.player.remove_movement(Direction::Left);
             },
             Keycode::Right => {
-                key_direction = Direction::Right
+                self.player.remove_movement(Direction::Right);
             },
             Keycode::Up => {
-                key_direction = Direction::Up
+                self.player.remove_movement(Direction::Up);
             },
             Keycode::Down => {
-                key_direction = Direction::Down
+                self.player.remove_movement(Direction::Down);
             },
             _ => ()
         }
 
-        self.player.remove_movement(key_direction);
 
     }
 
@@ -300,7 +298,7 @@ impl event::EventHandler for Scene {
 
 fn main() {
     let c = conf::Conf::new();
-    let ctx = &mut Context::load_from_conf("space", "ggez", c).unwrap();
+    let ctx = &mut Context::load_from_conf("Space", "Jonathan Kieling", c).unwrap();
     let scene = &mut Scene::new(ctx).unwrap();
 
     match event::run(ctx, scene) {
