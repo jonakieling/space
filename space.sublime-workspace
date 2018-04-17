@@ -104,10 +104,11 @@
 	"buffers":
 	[
 		{
-			"file": "/home/jonathan/Code/rooms.rust/src/main.rs",
+			"file": "src/main.rs",
 			"settings":
 			{
-				"buffer_size": 45,
+				"buffer_size": 8846,
+				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		}
@@ -161,6 +162,7 @@
 	],
 	"file_history":
 	[
+		"/home/jonathan/Code/rooms.rust/src/main.rs",
 		"/home/jonathan/Code/space.rust/src/main.rs",
 		"/home/jonathan/.config/EgoSoft/X3AP/config.yaml",
 		"/home/jonathan/Code/space.rust/Cargo.toml",
@@ -214,27 +216,29 @@
 			[
 				{
 					"buffer": 0,
-					"file": "/home/jonathan/Code/rooms.rust/src/main.rs",
+					"file": "src/main.rs",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 45,
+						"buffer_size": 8846,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								45,
-								45
+								7227,
+								7227
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Rust/Rust.sublime-syntax"
+							"syntax": "Packages/Rust/Rust.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 4080.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
