@@ -9,6 +9,7 @@ use ggez::conf;
 use ggez::event;
 use ggez::{GameResult, Context};
 use ggez::graphics;
+use ggez::timer;
 use ggez::event::*;
 
 const GRID_SIZE: i32 = 20;
@@ -190,8 +191,8 @@ impl Scene {
 }
 
 impl event::EventHandler for Scene {
-    fn update(&mut self, _ctx: &mut Context, _dt: Duration) -> GameResult<()> {
-        self.movement_timer += _dt;
+    fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
+        self.movement_timer += timer::get_delta(_ctx);
 
         if self.movement_timer > Duration::from_millis(100) {
             self.movement_timer = Duration::from_millis(0);
@@ -205,7 +206,7 @@ impl event::EventHandler for Scene {
         Ok(())
     }
 
-    fn key_down_event(&mut self, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_down_event(&mut self, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         if !_repeat {
             self.movement_timer = Duration::from_millis(100);
 
@@ -245,7 +246,7 @@ impl event::EventHandler for Scene {
         }
     }
 
-    fn key_up_event(&mut self, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         let mut key_direction = Direction::Up;
         match keycode {
             Keycode::Left => {
