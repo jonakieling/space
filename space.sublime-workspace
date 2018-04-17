@@ -4,6 +4,26 @@
 		"selected_items":
 		[
 			[
+				"wa",
+				"wall"
+			],
+			[
+				"s",
+				"self"
+			],
+			[
+				"wall",
+				"wallsStorage"
+			],
+			[
+				"L",
+				"PositionLevelStorage"
+			],
+			[
+				"Posi",
+				"PositionLevelStorage"
+			],
+			[
 				"mo",
 				"current_movement"
 			],
@@ -18,10 +38,6 @@
 			[
 				"enum",
 				"enumerate"
-			],
-			[
-				"L",
-				"LevelStorage"
 			],
 			[
 				"us",
@@ -88,11 +104,10 @@
 	"buffers":
 	[
 		{
-			"file": "src/main.rs",
+			"file": "/home/jonathan/Code/rooms.rust/src/main.rs",
 			"settings":
 			{
-				"buffer_size": 7186,
-				"encoding": "UTF-8",
+				"buffer_size": 45,
 				"line_ending": "Unix"
 			}
 		}
@@ -104,10 +119,14 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 244.0,
-		"last_filter": "insta",
+		"height": 128.0,
+		"last_filter": "menu",
 		"selected_items":
 		[
+			[
+				"menu",
+				"View: Toggle Menu"
+			],
 			[
 				"insta",
 				"Package Control: Install Package"
@@ -117,11 +136,11 @@
 				"Install Package Control"
 			]
 		],
-		"width": 461.0
+		"width": 380.0
 	},
 	"console":
 	{
-		"height": 0.0,
+		"height": 143.0,
 		"history":
 		[
 		]
@@ -142,9 +161,10 @@
 	],
 	"file_history":
 	[
+		"/home/jonathan/Code/space.rust/src/main.rs",
+		"/home/jonathan/.config/EgoSoft/X3AP/config.yaml",
 		"/home/jonathan/Code/space.rust/Cargo.toml",
 		"/home/jonathan/Code/space.rust/src/drop.rs",
-		"/home/jonathan/Code/space.rust/src/main.rs",
 		"/home/jonathan/Code/space.rust/space.sublime-project",
 		"/home/jonathan/Code/space.rust/space.sublime-workspace",
 		"/home/jonathan/Code/hello.rust/src/main.rs",
@@ -152,7 +172,7 @@
 	],
 	"find":
 	{
-		"height": 38.0
+		"height": 25.0
 	},
 	"find_in_files":
 	{
@@ -194,29 +214,27 @@
 			[
 				{
 					"buffer": 0,
-					"file": "src/main.rs",
+					"file": "/home/jonathan/Code/rooms.rust/src/main.rs",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 7186,
+						"buffer_size": 45,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3413,
-								3413
+								45,
+								45
 							]
 						],
 						"settings":
 						{
-							"syntax": "Packages/Rust/Rust.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/Rust/Rust.sublime-syntax"
 						},
 						"translation.x": 0.0,
-						"translation.y": 1846.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -227,7 +245,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 23.0
+		"height": 25.0
 	},
 	"input":
 	{
@@ -255,7 +273,7 @@
 			1.0
 		]
 	},
-	"menu_visible": false,
+	"menu_visible": true,
 	"output.find_results":
 	{
 		"height": 0.0
@@ -264,7 +282,7 @@
 	"project": "space.sublime-project",
 	"replace":
 	{
-		"height": 42.0
+		"height": 46.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -302,7 +320,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 50.0,
+	"side_bar_width": 198.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
