@@ -31,11 +31,11 @@ struct Position {
 }
 
 impl Position {
-    fn x(self) -> f32 {
+    fn viewport_x(self) -> f32 {
         (self.x * GRID_SIZE) as f32
     }
 
-    fn y(self) -> f32 {
+    fn viewport_y(self) -> f32 {
         (self.y * GRID_SIZE) as f32
     }
 }
@@ -448,11 +448,11 @@ impl event::EventHandler for Scene {
 
         graphics::set_color(ctx, graphics::BLACK)?;
 
-        let player = graphics::Rect::new(self.player.position.x(), self.player.position.y(), 20.0, 20.0);
+        let player = graphics::Rect::new(self.player.position.viewport_x(), self.player.position.viewport_y(), 20.0, 20.0);
         graphics::rectangle(ctx, graphics::DrawMode::Fill, player)?;
 
         graphics::set_color(ctx, graphics::WHITE)?;
-        let face = graphics::Rect::new(self.player.position.x() + (self.player.direction.value().x() * 0.2), self.player.position.y() + (self.player.direction.value().y() * 0.2), 10.0, 10.0);
+        let face = graphics::Rect::new(self.player.position.viewport_x() + (self.player.direction.value().viewport_x() * 0.2), self.player.position.viewport_y() + (self.player.direction.value().viewport_y() * 0.2), 10.0, 10.0);
         graphics::rectangle(ctx, graphics::DrawMode::Fill, face)?;
 
         graphics::present(ctx);
