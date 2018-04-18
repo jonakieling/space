@@ -1,5 +1,14 @@
 extern crate ggez;
+extern crate bincode;
+extern crate serde;
+#[macro_use]
+extern crate serde_derive;
+extern crate tar;
 
+use tar::Builder;
+
+use std::fs;
+use std::fs::File;
 use std::io::Write;
 use std::time::Duration;
 use std::ops::Add;
@@ -13,8 +22,9 @@ use ggez::event::*;
 
 const GRID_SIZE: i32 = 20;
 const MOVEMENT_SPEED: u64 = 290;
+const LEVEL_SIZE: i32 = 40;
 
-#[derive(PartialEq, Clone, Copy, Debug)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 struct Position {
     x: i32,
     y: i32
@@ -41,7 +51,7 @@ impl<'a> Add for &'a Position {
     }
 }
 
-#[derive(PartialEq, Clone, Copy, Debug)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 enum Direction {
     Up,
     Down,
@@ -60,6 +70,7 @@ impl Direction {
     }
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 struct Player {
     position: Position,
     movement: Vec<Direction>,
@@ -104,22 +115,18 @@ impl Player {
 
 #[derive(Clone)]
 struct PositionLevelStorage<T: Clone> {
-    storage: Vec<Option<Box<T>>>,
-    width: i32,
-    height: i32
+    storage: Vec<Option<Box<T>>>
 }
 
 impl<T: Clone> PositionLevelStorage<T> {
-    fn new(width: i32, height: i32) -> PositionLevelStorage<T> {
+    fn new() -> PositionLevelStorage<T> {
         PositionLevelStorage {
-            storage: vec![None; (width * height) as usize],
-            width,
-            height
+            storage: vec![None; (LEVEL_SIZE * LEVEL_SIZE) as usize]
         }
     }
     fn get(&self, x: i32, y: i32) -> Option<&Option<Box<T>>> {
-        if x <= self.width && y <= self.height  {
-        let position = x + y * self.width;
+        if x <= LEVEL_SIZE && y <= LEVEL_SIZE  {
+        let position = x + y * LEVEL_SIZE;
             match self.storage.get(position as usize) {
                 Some(item) => Some(item),
                 None => None
@@ -130,8 +137,8 @@ impl<T: Clone> PositionLevelStorage<T> {
     }
 
     fn get_mut(&mut self, x: i32, y: i32) -> Option<&mut Option<Box<T>>> {
-        if x <= self.width && y <= self.height  {
-        let position = x + y * self.width;
+        if x <= LEVEL_SIZE && y <= LEVEL_SIZE  {
+        let position = x + y * LEVEL_SIZE;
             match self.storage.get_mut(position as usize) {
                 Some(item) => Some(item),
                 None => None
@@ -142,8 +149,8 @@ impl<T: Clone> PositionLevelStorage<T> {
     }
 
     fn insert(&mut self, x: i32, y: i32, item: T) {
-        if x <= self.width && y <= self.height  {
-            let position = x + y * self.width;
+        if x <= LEVEL_SIZE && y <= LEVEL_SIZE  {
+            let position = x + y * LEVEL_SIZE;
             self.storage.remove(position as usize);
             self.storage.insert(position as usize, Some(Box::new(item)));
         }
@@ -154,18 +161,18 @@ impl<T: Clone> PositionLevelStorage<T> {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 struct Wall {
     
 }
 
-#[derive(PartialEq, Clone, Copy, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
 enum DoorStatus {
     Open,
     Closed
 }
 
-#[derive(Clone, Debug)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 struct Door {
     status: DoorStatus
 }
@@ -186,31 +193,70 @@ impl Scene {
             direction: Direction::Down
         };
 
-        let mut walls = <PositionLevelStorage<Wall>>::new(20, 20);
+        let mut walls = <PositionLevelStorage<Wall>>::new();
         walls.insert(1, 2, Wall {});
         walls.insert(2, 2, Wall {});
         walls.insert(3, 2, Wall {});
         walls.insert(4, 2, Wall {});
         walls.insert(5, 2, Wall {});
         walls.insert(6, 2, Wall {});
+        walls.insert(7, 2, Wall {});
+        walls.insert(8, 2, Wall {});
 
         walls.insert(1, 3, Wall {});
         walls.insert(1, 4, Wall {});
         walls.insert(1, 5, Wall {});
+        walls.insert(1, 6, Wall {});
 
         walls.insert(1, 6, Wall {});
         walls.insert(2, 6, Wall {});
         walls.insert(3, 6, Wall {});
-        walls.insert(5, 6, Wall {});
+        walls.insert(4, 6, Wall {});
         walls.insert(6, 6, Wall {});
+        walls.insert(7, 6, Wall {});
+        walls.insert(8, 6, Wall {});
 
-        walls.insert(6, 3, Wall {});
-        walls.insert(6, 4, Wall {});
-        walls.insert(6, 5, Wall {});
+        walls.insert(8, 3, Wall {});
+        walls.insert(8, 4, Wall {});
+        walls.insert(8, 5, Wall {});
+        walls.insert(8, 6, Wall {});
 
 
-        let mut doors = <PositionLevelStorage<Door>>::new(20, 20);
-        doors.insert(4, 6, Door {status: DoorStatus::Closed});
+        walls.insert(1, 7, Wall {});
+
+
+        walls.insert(1, 8, Wall {});
+        walls.insert(2, 8, Wall {});
+        walls.insert(3, 8, Wall {});
+        walls.insert(4, 8, Wall {});
+        walls.insert(6, 8, Wall {});
+        walls.insert(7, 8, Wall {});
+        walls.insert(8, 8, Wall {});
+
+        walls.insert(1, 8, Wall {});
+        walls.insert(1, 9, Wall {});
+        walls.insert(1, 10, Wall {});
+        walls.insert(1, 11, Wall {});
+
+        walls.insert(1, 12, Wall {});
+        walls.insert(2, 12, Wall {});
+        walls.insert(3, 12, Wall {});
+        walls.insert(4, 12, Wall {});
+        walls.insert(5, 12, Wall {});
+        walls.insert(6, 12, Wall {});
+        walls.insert(7, 12, Wall {});
+        walls.insert(8, 12, Wall {});
+
+        walls.insert(8, 8, Wall {});
+        walls.insert(8, 9, Wall {});
+        walls.insert(8, 10, Wall {});
+        walls.insert(8, 11, Wall {});
+
+
+        let mut doors = <PositionLevelStorage<Door>>::new();
+        doors.insert(5, 6, Door {status: DoorStatus::Closed});
+        doors.insert(5, 8, Door {status: DoorStatus::Closed});
+        doors.insert(8, 7, Door {status: DoorStatus::Closed});
 
         let scene = Scene {
             movement_timer: Duration::from_millis(0),
@@ -371,8 +417,8 @@ impl event::EventHandler for Scene {
             // Match for entity presence
             match *wall {
                 Some(_) => {
-                    let x = pos as i32 % self.walls.width;
-                    let y = pos as i32 / self.walls.width;
+                    let x = pos as i32 % LEVEL_SIZE;
+                    let y = pos as i32 / LEVEL_SIZE;
                     graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
                 },
                 None => (),
@@ -383,8 +429,8 @@ impl event::EventHandler for Scene {
             // Match for entity presence
             match *door_pos {
                 Some(ref door) => {
-                    let x = pos as i32 % self.doors.width;
-                    let y = pos as i32 / self.doors.width;
+                    let x = pos as i32 % LEVEL_SIZE;
+                    let y = pos as i32 / LEVEL_SIZE;
                     match door.status {
                         DoorStatus::Open => {
                             graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
@@ -420,6 +466,8 @@ fn main() {
     let ctx = &mut Context::load_from_conf("Space", "Jonathan Kieling", c).unwrap();
     let scene = &mut Scene::new(ctx).unwrap();
 
+    save_scene(scene);
+
     match event::run(ctx, scene) {
         Ok(()) => (),
         Err(e) => {
@@ -427,4 +475,36 @@ fn main() {
             std::process::exit(1);
         }
     }
+}
+
+fn save_scene(scene: &Scene) {
+    fs::create_dir("level0").unwrap();
+
+    let mut level_walls: Vec<(i32, i32, Wall)> = vec![];
+    for (pos, item) in scene.walls.iter().enumerate() {
+        if let Some(ref wall) = *item {
+            let x = pos as i32 % LEVEL_SIZE;
+            let y = pos as i32 / LEVEL_SIZE;
+            level_walls.push((x, y, *wall.clone()));
+        }
+    }
+    let bytes: Vec<u8> = bincode::serialize(&level_walls).unwrap();
+    File::create("level0/walls.bin").unwrap().write_all(&bytes).unwrap();
+
+    let mut level_doos: Vec<(i32, i32, Door)> = vec![];
+    for (pos, item) in scene.doors.iter().enumerate() {
+        if let Some(ref door) = *item {
+            let x = pos as i32 % LEVEL_SIZE;
+            let y = pos as i32 / LEVEL_SIZE;
+            level_doos.push((x, y, *door.clone()));
+        }
+    }
+    let bytes: Vec<u8> = bincode::serialize(&level_doos).unwrap();
+    File::create("level0/doors.bin").unwrap().write_all(&bytes).unwrap();
+
+    let file = File::create("level0.tar").unwrap();
+    let mut a = Builder::new(file);
+    a.append_dir_all("level0", "level0").unwrap();
+    a.finish().unwrap();
+    fs::remove_dir_all("level0").unwrap();
 }

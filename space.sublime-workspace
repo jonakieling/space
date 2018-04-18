@@ -4,6 +4,34 @@
 		"selected_items":
 		[
 			[
+				"if",
+				"if-let\tif let … = … { … }"
+			],
+			[
+				"DOR",
+				"DoorStatus"
+			],
+			[
+				"Do",
+				"Door"
+			],
+			[
+				"Dor",
+				"DoorStatus"
+			],
+			[
+				"Cl",
+				"Closed"
+			],
+			[
+				"stat",
+				"status"
+			],
+			[
+				"Door",
+				"DoorStatus"
+			],
+			[
 				"wa",
 				"wall"
 			],
@@ -107,7 +135,7 @@
 			"file": "src/main.rs",
 			"settings":
 			{
-				"buffer_size": 8846,
+				"buffer_size": 12847,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -162,10 +190,10 @@
 	],
 	"file_history":
 	[
+		"/home/jonathan/Code/space.rust/Cargo.toml",
 		"/home/jonathan/Code/rooms.rust/src/main.rs",
 		"/home/jonathan/Code/space.rust/src/main.rs",
 		"/home/jonathan/.config/EgoSoft/X3AP/config.yaml",
-		"/home/jonathan/Code/space.rust/Cargo.toml",
 		"/home/jonathan/Code/space.rust/src/drop.rs",
 		"/home/jonathan/Code/space.rust/space.sublime-project",
 		"/home/jonathan/Code/space.rust/space.sublime-workspace",
@@ -220,15 +248,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8846,
+						"buffer_size": 12847,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6173,
-								6173
+								18,
+								18
 							]
 						],
 						"settings":
@@ -238,7 +266,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3876.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
