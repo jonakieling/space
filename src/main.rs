@@ -12,6 +12,7 @@ use ggez::graphics;
 use ggez::event::*;
 
 const GRID_SIZE: i32 = 20;
+const MOVEMENT_SPEED: u64 = 290;
 
 #[derive(PartialEq, Clone, Copy, Debug)]
 struct Position {
@@ -202,7 +203,7 @@ impl Scene {
         walls.insert(3, 6, Wall {});
         walls.insert(5, 6, Wall {});
         walls.insert(6, 6, Wall {});
-        
+
         walls.insert(6, 3, Wall {});
         walls.insert(6, 4, Wall {});
         walls.insert(6, 5, Wall {});
@@ -286,7 +287,7 @@ impl event::EventHandler for Scene {
     fn update(&mut self, _ctx: &mut Context, _dt: Duration) -> GameResult<()> {
         self.movement_timer += _dt;
 
-        if self.movement_timer > Duration::from_millis(100) {
+        if self.movement_timer > Duration::from_millis(MOVEMENT_SPEED) {
             self.movement_timer = Duration::from_millis(0);
             if let Some(&current_movement) = self.player.movement.last() {
                 if !self.check_player_collision(current_movement) {
@@ -300,7 +301,7 @@ impl event::EventHandler for Scene {
 
     fn key_down_event(&mut self, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         if !_repeat {
-            self.movement_timer = Duration::from_millis(100);
+            self.movement_timer = Duration::from_millis(MOVEMENT_SPEED);
 
             match keycode {
                 Keycode::Left => {
