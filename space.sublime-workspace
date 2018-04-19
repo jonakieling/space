@@ -135,7 +135,7 @@
 			"file": "src/main.rs",
 			"settings":
 			{
-				"buffer_size": 12847,
+				"buffer_size": 15756,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
@@ -185,11 +185,11 @@
 	},
 	"expanded_folders":
 	[
-		"/home/jonathan/Code/space.rust",
-		"/home/jonathan/Code/space.rust/src"
+		"/home/jonathan/Code/space.rust"
 	],
 	"file_history":
 	[
+		"/home/jonathan/Documents/list-games",
 		"/home/jonathan/Code/space.rust/Cargo.toml",
 		"/home/jonathan/Code/rooms.rust/src/main.rs",
 		"/home/jonathan/Code/space.rust/src/main.rs",
@@ -248,15 +248,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 12847,
+						"buffer_size": 15756,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								18,
-								18
+								14567,
+								14567
 							]
 						],
 						"settings":
@@ -266,7 +266,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 8110.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -352,7 +352,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 198.0,
+	"side_bar_width": 139.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

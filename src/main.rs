@@ -20,8 +20,11 @@ use ggez::{GameResult, Context};
 use ggez::graphics;
 use ggez::event::*;
 
+// pixel scaling
 const GRID_SIZE: i32 = 20;
+// delay of movement in miliseconds
 const MOVEMENT_SPEED: u64 = 290;
+// width and height of a level in number of tiles
 const LEVEL_SIZE: i32 = 40;
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
