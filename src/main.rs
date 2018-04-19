@@ -180,11 +180,17 @@ struct Door {
     status: DoorStatus
 }
 
+#[derive(Clone)]
+struct Terminal {
+    text: graphics::Text
+}
+
 struct Scene {
     movement_timer: Duration,
     player: Player,
     walls: PositionLevelStorage<Wall>,
     doors: PositionLevelStorage<Door>,
+    terminals: PositionLevelStorage<Terminal>,
     text: graphics::Text,
 }
 
@@ -193,6 +199,8 @@ impl Scene {
 
         let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
         let text = graphics::Text::new(_ctx, "[static placeholder]", &font).unwrap();
+
+        let terminal_text = graphics::Text::new(_ctx, "[a terminal]", &font).unwrap();
 
         // initialize player and level object storages
         // state and object can be loaded seperatly
@@ -205,11 +213,14 @@ impl Scene {
 
         let walls = <PositionLevelStorage<Wall>>::new();
         let doors = <PositionLevelStorage<Door>>::new();
+        let mut terminals = <PositionLevelStorage<Terminal>>::new();
+        terminals.insert(20, 20, Terminal { text: terminal_text });
         let scene = Scene {
             movement_timer: Duration::from_millis(0),
             player,
             walls,
             doors,
+            terminals,
             text,
         };
 
@@ -220,21 +231,17 @@ impl Scene {
         let mut found_collision = false;
         let position = &direction.value() + &self.player.position;
         
-        // Match for Vec access
-        if let Some(item) = self.walls.get(position.x, position.y) {
-            // Match for entity presence
-            if let &Some(_) = item {
-                found_collision = true;
-            }
+        if let Some(&Some(_)) = self.walls.get(position.x, position.y) {
+            found_collision = true;
         }
 
-        // Match for Vec access
-        if let Some(item) = self.doors.get(position.x, position.y) {
-            // Match for entity presence
-            if let &Some(ref door) = item {
-                if let DoorStatus::Closed = door.status {
-                    found_collision = true;
-                }
+        if let Some(&Some(_)) = self.terminals.get(position.x, position.y) {
+            found_collision = true;
+        }
+
+        if let Some(&Some(ref door)) = self.doors.get(position.x, position.y) {
+            if let DoorStatus::Closed = door.status {
+                found_collision = true;
             }
         }
 
@@ -244,20 +251,16 @@ impl Scene {
     fn interact_with_door(&mut self) {
         let position = &self.player.direction.value() + &self.player.position;
 
-        // Match for Vec access
-        if let Some(item) = self.doors.get_mut(position.x, position.y) {
-            // Match for entity presence
-            if let &mut Some(ref mut door) = item {
-                    match door.status {
-                        DoorStatus::Closed => {
-                            door.status = DoorStatus::Open;
-                            println!("door opened");
-                        },
-                        DoorStatus::Open => {
-                            door.status = DoorStatus::Closed;
-                            println!("door closed");
-                        },
-                    }
+        if let Some(&mut Some(ref mut door)) = self.doors.get_mut(position.x, position.y) {
+            match door.status {
+                DoorStatus::Closed => {
+                    door.status = DoorStatus::Open;
+                    println!("door opened");
+                },
+                DoorStatus::Open => {
+                    door.status = DoorStatus::Closed;
+                    println!("door closed");
+                },
             }
         }
     }
@@ -353,6 +356,17 @@ impl event::EventHandler for Scene {
                 let x = pos as i32 % LEVEL_SIZE;
                 let y = pos as i32 / LEVEL_SIZE;
                 graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
+            }
+        }
+
+        for (pos, terminal) in self.terminals.iter().enumerate() {
+            // Match for entity presence
+            if let &Some(_) = terminal {
+                let x = pos as i32 % LEVEL_SIZE;
+                let y = pos as i32 / LEVEL_SIZE;
+                graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
+                graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
+                graphics::rectangle(ctx, graphics::DrawMode::Line, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
             }
         }
 
