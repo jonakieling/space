@@ -9,6 +9,7 @@ use tar::{Builder, Archive};
 
 use std::fs;
 use std::fs::File;
+use std::io;
 use std::io::{Write};
 use std::time::Duration;
 use std::ops::Add;
@@ -264,6 +265,14 @@ impl Scene {
             }
         }
     }
+
+    fn interact_with_terminal(&mut self) {
+        let position = &self.player.direction.value() + &self.player.position;
+
+        if let Some(&mut Some(ref mut terminal)) = self.terminals.get_mut(position.x, position.y) {
+            println!("{}", terminal.text.contents());;
+        }
+    }
 }
 
 impl event::EventHandler for Scene {
@@ -338,6 +347,15 @@ impl event::EventHandler for Scene {
             },
             Keycode::E => {
                 self.interact_with_door();
+                self.interact_with_terminal();
+
+                let mut input = String::new();
+                match io::stdin().read_line(&mut input) {
+                    Ok(_) => {
+                        println!("{}", input);
+                    }
+                    Err(error) => println!("error: {}", error),
+                }
             },
             _ => ()
         }
