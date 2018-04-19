@@ -427,15 +427,15 @@ fn save_scene(scene: &Scene) {
     let bytes: Vec<u8> = bincode::serialize(&level_walls).unwrap();
     File::create("level0/walls.bin").unwrap().write_all(&bytes).unwrap();
 
-    let mut level_doos: Vec<(i32, i32, Door)> = vec![];
+    let mut level_doors: Vec<(i32, i32, Door)> = vec![];
     for (pos, item) in scene.doors.iter().enumerate() {
         if let Some(ref door) = *item {
             let x = pos as i32 % LEVEL_SIZE;
             let y = pos as i32 / LEVEL_SIZE;
-            level_doos.push((x, y, *door.clone()));
+            level_doors.push((x, y, *door.clone()));
         }
     }
-    let bytes: Vec<u8> = bincode::serialize(&level_doos).unwrap();
+    let bytes: Vec<u8> = bincode::serialize(&level_doors).unwrap();
     File::create("level0/doors.bin").unwrap().write_all(&bytes).unwrap();
 
     let file = File::create("level0.tar").unwrap();
