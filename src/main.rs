@@ -5,11 +5,11 @@ extern crate serde;
 extern crate serde_derive;
 extern crate tar;
 
-use tar::Builder;
+use tar::{Builder, Archive};
 
 use std::fs;
 use std::fs::File;
-use std::io::Write;
+use std::io::{Write};
 use std::time::Duration;
 use std::ops::Add;
 use std::slice;
@@ -196,71 +196,8 @@ impl Scene {
             direction: Direction::Down
         };
 
-        let mut walls = <PositionLevelStorage<Wall>>::new();
-        walls.insert(1, 2, Wall {});
-        walls.insert(2, 2, Wall {});
-        walls.insert(3, 2, Wall {});
-        walls.insert(4, 2, Wall {});
-        walls.insert(5, 2, Wall {});
-        walls.insert(6, 2, Wall {});
-        walls.insert(7, 2, Wall {});
-        walls.insert(8, 2, Wall {});
-
-        walls.insert(1, 3, Wall {});
-        walls.insert(1, 4, Wall {});
-        walls.insert(1, 5, Wall {});
-        walls.insert(1, 6, Wall {});
-
-        walls.insert(1, 6, Wall {});
-        walls.insert(2, 6, Wall {});
-        walls.insert(3, 6, Wall {});
-        walls.insert(4, 6, Wall {});
-        walls.insert(6, 6, Wall {});
-        walls.insert(7, 6, Wall {});
-        walls.insert(8, 6, Wall {});
-
-        walls.insert(8, 3, Wall {});
-        walls.insert(8, 4, Wall {});
-        walls.insert(8, 5, Wall {});
-        walls.insert(8, 6, Wall {});
-
-
-        walls.insert(1, 7, Wall {});
-
-
-        walls.insert(1, 8, Wall {});
-        walls.insert(2, 8, Wall {});
-        walls.insert(3, 8, Wall {});
-        walls.insert(4, 8, Wall {});
-        walls.insert(6, 8, Wall {});
-        walls.insert(7, 8, Wall {});
-        walls.insert(8, 8, Wall {});
-
-        walls.insert(1, 8, Wall {});
-        walls.insert(1, 9, Wall {});
-        walls.insert(1, 10, Wall {});
-        walls.insert(1, 11, Wall {});
-
-        walls.insert(1, 12, Wall {});
-        walls.insert(2, 12, Wall {});
-        walls.insert(3, 12, Wall {});
-        walls.insert(4, 12, Wall {});
-        walls.insert(5, 12, Wall {});
-        walls.insert(6, 12, Wall {});
-        walls.insert(7, 12, Wall {});
-        walls.insert(8, 12, Wall {});
-
-        walls.insert(8, 8, Wall {});
-        walls.insert(8, 9, Wall {});
-        walls.insert(8, 10, Wall {});
-        walls.insert(8, 11, Wall {});
-
-
-        let mut doors = <PositionLevelStorage<Door>>::new();
-        doors.insert(5, 6, Door {status: DoorStatus::Closed});
-        doors.insert(5, 8, Door {status: DoorStatus::Closed});
-        doors.insert(8, 7, Door {status: DoorStatus::Closed});
-
+        let walls = <PositionLevelStorage<Wall>>::new();
+        let doors = <PositionLevelStorage<Door>>::new();
         let scene = Scene {
             movement_timer: Duration::from_millis(0),
             player,
@@ -469,7 +406,7 @@ fn main() {
     let ctx = &mut Context::load_from_conf("Space", "Jonathan Kieling", c).unwrap();
     let scene = &mut Scene::new(ctx).unwrap();
 
-    save_scene(scene);
+    load_scene(scene);
 
     match event::run(ctx, scene) {
         Ok(()) => (),
@@ -478,8 +415,11 @@ fn main() {
             std::process::exit(1);
         }
     }
+
+    save_scene(scene);
 }
 
+// https://github.com/alexcrichton/tar-rs
 fn save_scene(scene: &Scene) {
     fs::create_dir("level0").unwrap();
 
@@ -510,4 +450,31 @@ fn save_scene(scene: &Scene) {
     a.append_dir_all("level0", "level0").unwrap();
     a.finish().unwrap();
     fs::remove_dir_all("level0").unwrap();
+}
+
+// https://github.com/alexcrichton/tar-rs
+fn load_scene(scene: &mut Scene) {
+    let file = File::open("level0.tar").unwrap();
+    let mut a = Archive::new(file);
+
+    for file in a.entries().unwrap() {
+        // Make sure there wasn't an I/O error
+        let mut file = file.unwrap();
+
+        match file.path().unwrap().file_stem().unwrap().to_str().unwrap() as &str {
+            "walls" => {
+                let mut level_walls: Vec<(i32, i32, Wall)> = bincode::deserialize_from(file).unwrap();
+                for wall in level_walls {
+                    scene.walls.insert(wall.0, wall.1, wall.2);
+                }
+            },
+            "doors" => {
+                let mut level_doors: Vec<(i32, i32, Door)> = bincode::deserialize_from(file).unwrap();
+                for door in level_doors {
+                    scene.doors.insert(door.0, door.1, door.2);
+                }
+            },
+            _ => (),
+        }
+    }
 }
