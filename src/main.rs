@@ -214,39 +214,23 @@ impl Scene {
     fn check_player_collision(&self, direction: Direction) -> bool {
         let mut found_collision = false;
         let position = &direction.value() + &self.player.position;
-        match self.walls.get(position.x, position.y) {
-            // Match for Vec access
-            Some(item) => {
-                // Match for entity presence
-                match *item {
-                    None => (),
-                    _ => {
-                        found_collision = true;
-                    }
-                }
-                
-            },
-            None => ()
+        
+        // Match for Vec access
+        if let Some(item) = self.walls.get(position.x, position.y) {
+            // Match for entity presence
+            if let &Some(_) = item {
+                found_collision = true;
+            }
         }
 
-        match self.doors.get(position.x, position.y) {
-            // Match for Vec access
-            Some(item) => {
-                // Match for entity presence
-                match *item {
-                    None => (),
-                    Some(ref door) => {
-                        match door.status {
-                            DoorStatus::Closed => {
-                                found_collision = true;
-                            },
-                            DoorStatus::Open => (),
-                        }
-                    }
+        // Match for Vec access
+        if let Some(item) = self.doors.get(position.x, position.y) {
+            // Match for entity presence
+            if let &Some(ref door) = item {
+                if let DoorStatus::Closed = door.status {
+                    found_collision = true;
                 }
-                
-            },
-            None => ()
+            }
         }
 
         found_collision
@@ -358,34 +342,28 @@ impl event::EventHandler for Scene {
 
         for (pos, wall) in self.walls.iter().enumerate() {
             // Match for entity presence
-            match *wall {
-                Some(_) => {
-                    let x = pos as i32 % LEVEL_SIZE;
-                    let y = pos as i32 / LEVEL_SIZE;
-                    graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
-                },
-                None => (),
+            if let &Some(_) = wall {
+                let x = pos as i32 % LEVEL_SIZE;
+                let y = pos as i32 / LEVEL_SIZE;
+                graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
             }
         }
 
         for (pos, door_pos) in self.doors.iter().enumerate() {
             // Match for entity presence
-            match *door_pos {
-                Some(ref door) => {
-                    let x = pos as i32 % LEVEL_SIZE;
-                    let y = pos as i32 / LEVEL_SIZE;
-                    match door.status {
-                        DoorStatus::Open => {
-                            graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
-                            graphics::rectangle(ctx, graphics::DrawMode::Line, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
-                        },
-                        DoorStatus::Closed => {
-                            graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
-                            graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
-                        },
-                    }
-                },
-                None => (),
+            if let &Some(ref door) = door_pos {
+                let x = pos as i32 % LEVEL_SIZE;
+                let y = pos as i32 / LEVEL_SIZE;
+                match door.status {
+                    DoorStatus::Open => {
+                        graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
+                        graphics::rectangle(ctx, graphics::DrawMode::Line, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
+                    },
+                    DoorStatus::Closed => {
+                        graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
+                        graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
+                    },
+                }
             }
         }
 
