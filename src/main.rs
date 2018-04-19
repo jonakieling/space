@@ -190,6 +190,9 @@ struct Scene {
 impl Scene {
     fn new(_ctx: &mut Context) -> GameResult<Scene> {
 
+        // initialize player and level object storages
+        // state and object can be loaded seperatly
+
         let player = Player {
             position: Position { x: 10, y: 10 },
             movement: vec![],
@@ -423,6 +426,9 @@ fn main() {
 fn save_scene(scene: &Scene) {
     fs::create_dir("level0").unwrap();
 
+    let bytes: Vec<u8> = bincode::serialize(&scene.player).unwrap();
+    File::create("level0/player.bin").unwrap().write_all(&bytes).unwrap();
+
     let mut level_walls: Vec<(i32, i32, Wall)> = vec![];
     for (pos, item) in scene.walls.iter().enumerate() {
         if let Some(ref wall) = *item {
@@ -474,6 +480,10 @@ fn load_scene(scene: &mut Scene) {
                     scene.doors.insert(door.0, door.1, door.2);
                 }
             },
+            "player" => {
+                let mut level_player: Player = bincode::deserialize_from(file).unwrap();
+                scene.player = level_player;
+            }
             _ => (),
         }
     }
