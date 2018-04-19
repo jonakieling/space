@@ -185,15 +185,14 @@ struct Scene {
     player: Player,
     walls: PositionLevelStorage<Wall>,
     doors: PositionLevelStorage<Door>,
-    text: Vec<graphics::Text>,
+    text: graphics::Text,
 }
 
 impl Scene {
     fn new(_ctx: &mut Context) -> GameResult<Scene> {
 
         let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
-        let mut text = vec![];
-        text.push(graphics::Text::new(_ctx, "[static placeholder]", &font).unwrap());
+        let text = graphics::Text::new(_ctx, "[static placeholder]", &font).unwrap();
 
         // initialize player and level object storages
         // state and object can be loaded seperatly
@@ -252,9 +251,11 @@ impl Scene {
                     match door.status {
                         DoorStatus::Closed => {
                             door.status = DoorStatus::Open;
+                            println!("door opened");
                         },
                         DoorStatus::Open => {
                             door.status = DoorStatus::Closed;
+                            println!("door closed");
                         },
                     }
             }
@@ -382,7 +383,7 @@ impl event::EventHandler for Scene {
         let face = graphics::Rect::new(self.player.position.viewport_x() + (self.player.direction.value().viewport_x() * 0.2), self.player.position.viewport_y() + (self.player.direction.value().viewport_y() * 0.2), 10.0, 10.0);
         graphics::rectangle(ctx, graphics::DrawMode::Fill, face)?;
 
-        graphics::draw(ctx, self.text.last().unwrap(), graphics::Point::new(90.0, 15.0), 0.0)?;
+        graphics::draw(ctx, &self.text, graphics::Point::new(90.0, 15.0), 0.0)?;
 
         graphics::present(ctx);
 
@@ -442,6 +443,7 @@ fn save_scene(scene: &Scene) {
     a.append_dir_all("level0", "level0").unwrap();
     a.finish().unwrap();
     fs::remove_dir_all("level0").unwrap();
+    println!("saved game: level0");
 }
 
 // https://github.com/alexcrichton/tar-rs
@@ -473,4 +475,5 @@ fn load_scene(scene: &mut Scene) {
             _ => (),
         }
     }
+    println!("game loaded: level0");
 }
