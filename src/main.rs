@@ -28,6 +28,7 @@ const GRID_SIZE: i32 = 20;
 const MOVEMENT_SPEED: u64 = 290;
 // width and height of a level in number of tiles
 const LEVEL_SIZE: i32 = 40;
+const TERMINAL_LIMIT: usize = 20;
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 struct Position {
@@ -382,12 +383,18 @@ impl event::EventHandler for Scene {
 
     fn text_input_event(&mut self, _ctx: &mut Context, _text: String) {
         if self.input == InputState::Terminal {
+            let mut text_limit_reached = false;
             let mut new_terminal_text: String = String::new();
             if let Some(ref terminal_text) = self.terminal_text {
-                new_terminal_text = format!("{}{}", terminal_text, _text);
+                if terminal_text.len() <= TERMINAL_LIMIT {
+                    new_terminal_text = format!("{}{}", terminal_text, _text);
+                } else {
+                    text_limit_reached = true;
+                }
             }
-            self.terminal_text = Some(new_terminal_text);
-            println!("{:?}", self.terminal_text);
+            if !text_limit_reached {
+                self.terminal_text = Some(new_terminal_text);
+            }
         }
     }
 
@@ -443,6 +450,12 @@ impl event::EventHandler for Scene {
         let face = graphics::Rect::new(self.player.position.viewport_x() + 5.0 + (self.player.direction.value().viewport_x() * 0.2), self.player.position.viewport_y() + 5.0 + (self.player.direction.value().viewport_y() * 0.2), 10.0, 10.0);
         graphics::rectangle(ctx, graphics::DrawMode::Fill, face)?;
 
+        let font = graphics::Font::new(ctx, "/aller-bold.ttf", 12).unwrap();
+        if let Some(ref terminal_text) = self.terminal_text {
+            let text = graphics::Text::new(ctx, &terminal_text, &font).unwrap();
+            graphics::draw(ctx, &text, graphics::Point2::new(320.0, 500.0), 0.0)?;
+        }
+
         graphics::present(ctx);
 
         Ok(())
@@ -456,12 +469,9 @@ fn main() {
 
     load_scene(scene);
 
-    match event::run(ctx, scene) {
-        Ok(()) => (),
-        Err(e) => {
-            writeln!(&mut std::io::stderr(), "error: {}", e).expect("couldn't write error to stderr");
-            std::process::exit(1);
-        }
+    if let Err(e) = event::run(ctx, scene) {
+        writeln!(&mut std::io::stderr(), "error: {}", e).expect("couldn't write error to stderr");
+        std::process::exit(1);
     }
 
     save_scene(scene);
