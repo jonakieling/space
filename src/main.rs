@@ -9,15 +9,15 @@ use tar::{Builder, Archive};
 
 use std::fs;
 use std::fs::File;
-use std::io;
-use std::io::{Write};
+use std::io::Write;
 use std::time::Duration;
 use std::ops::Add;
 use std::slice;
 
 use ggez::conf;
 use ggez::event;
-use ggez::{GameResult, Context};
+use ggez::GameResult;
+use ggez::Context;
 use ggez::graphics;
 use ggez::event::*;
 
@@ -183,7 +183,13 @@ struct Door {
 
 #[derive(Clone)]
 struct Terminal {
-    text: graphics::Text
+    text: Box<String>
+}
+
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
+enum InputState {
+    Terminal,
+    World
 }
 
 struct Scene {
@@ -192,16 +198,17 @@ struct Scene {
     walls: PositionLevelStorage<Wall>,
     doors: PositionLevelStorage<Door>,
     terminals: PositionLevelStorage<Terminal>,
-    text: graphics::Text,
+    terminal_text: Option<String>,
+    input: InputState,
 }
 
 impl Scene {
     fn new(_ctx: &mut Context) -> GameResult<Scene> {
 
-        let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
-        let text = graphics::Text::new(_ctx, "[static placeholder]", &font).unwrap();
+        // let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
+        // let text = graphics::Text::new(_ctx, "[static placeholder]", &font).unwrap();
 
-        let terminal_text = graphics::Text::new(_ctx, "[a terminal]", &font).unwrap();
+        let terminal_text = Box::new(String::new());
 
         // initialize player and level object storages
         // state and object can be loaded seperatly
@@ -222,7 +229,8 @@ impl Scene {
             walls,
             doors,
             terminals,
-            text,
+            terminal_text: None,
+            input: InputState::World,
         };
 
         Ok(scene)
@@ -270,7 +278,8 @@ impl Scene {
         let position = &self.player.direction.value() + &self.player.position;
 
         if let Some(&mut Some(ref mut terminal)) = self.terminals.get_mut(position.x, position.y) {
-            println!("{}", terminal.text.contents());;
+            self.terminal_text = Some(*terminal.text.clone());
+            self.input = InputState::Terminal;
         }
     }
 }
@@ -292,26 +301,10 @@ impl event::EventHandler for Scene {
     }
 
     fn key_down_event(&mut self, keycode: Keycode, _keymod: Mod, _repeat: bool) {
-        if !_repeat {
-            self.movement_timer = Duration::from_millis(MOVEMENT_SPEED);
+        if self.input == InputState::World {
+            if !_repeat {
+                self.movement_timer = Duration::from_millis(MOVEMENT_SPEED);
 
-            match keycode {
-                Keycode::Left => {
-                    self.player.movement(Direction::Left, Direction::Right);
-                },
-                Keycode::Right => {
-                    self.player.movement(Direction::Right, Direction::Left);
-                },
-                Keycode::Up => {
-                    self.player.movement(Direction::Up, Direction::Down);
-                },
-                Keycode::Down => {
-                    self.player.movement(Direction::Down, Direction::Up);
-                },
-                _ => ()
-            }
-        } else {
-            if let None = self.player.movement.last() {
                 match keycode {
                     Keycode::Left => {
                         self.player.movement(Direction::Left, Direction::Right);
@@ -327,37 +320,66 @@ impl event::EventHandler for Scene {
                     },
                     _ => ()
                 }
+            } else {
+                if let None = self.player.movement.last() {
+                    match keycode {
+                        Keycode::Left => {
+                            self.player.movement(Direction::Left, Direction::Right);
+                        },
+                        Keycode::Right => {
+                            self.player.movement(Direction::Right, Direction::Left);
+                        },
+                        Keycode::Up => {
+                            self.player.movement(Direction::Up, Direction::Down);
+                        },
+                        Keycode::Down => {
+                            self.player.movement(Direction::Down, Direction::Up);
+                        },
+                        _ => ()
+                    }
+                }
             }
         }
     }
 
     fn key_up_event(&mut self, keycode: Keycode, _keymod: Mod, _repeat: bool) {
-        match keycode {
-            Keycode::Left => {
-                self.player.remove_movement(Direction::Left);
-            },
-            Keycode::Right => {
-                self.player.remove_movement(Direction::Right);
-            },
-            Keycode::Up => {
-                self.player.remove_movement(Direction::Up);
-            },
-            Keycode::Down => {
-                self.player.remove_movement(Direction::Down);
-            },
-            Keycode::E => {
-                self.interact_with_door();
-                self.interact_with_terminal();
-
-                let mut input = String::new();
-                match io::stdin().read_line(&mut input) {
-                    Ok(_) => {
-                        println!("{}", input);
-                    }
-                    Err(error) => println!("error: {}", error),
+        match self.input {
+            InputState::World => {
+                match keycode {
+                    Keycode::Left => {
+                        self.player.remove_movement(Direction::Left);
+                    },
+                    Keycode::Right => {
+                        self.player.remove_movement(Direction::Right);
+                    },
+                    Keycode::Up => {
+                        self.player.remove_movement(Direction::Up);
+                    },
+                    Keycode::Down => {
+                        self.player.remove_movement(Direction::Down);
+                    },
+                    Keycode::E => {
+                        self.interact_with_door();
+                        self.interact_with_terminal();
+                    },
+                    _ => ()
                 }
             },
-            _ => ()
+            InputState::Terminal => {
+                match keycode {
+                    Keycode::Q => {
+                        self.terminal_text = None;
+                        self.input = InputState::World;
+                    },
+                    _ => {
+                        let mut new_terminal_text: String = String::new();
+                        if let Some(ref terminal_text) = self.terminal_text {
+                            new_terminal_text = format!("{}{}", terminal_text, keycode.name());
+                        }
+                        self.terminal_text = Some(new_terminal_text);
+                    }
+                }
+            },
         }
 
 
@@ -414,8 +436,6 @@ impl event::EventHandler for Scene {
         graphics::set_color(ctx, graphics::WHITE)?;
         let face = graphics::Rect::new(self.player.position.viewport_x() + (self.player.direction.value().viewport_x() * 0.2), self.player.position.viewport_y() + (self.player.direction.value().viewport_y() * 0.2), 10.0, 10.0);
         graphics::rectangle(ctx, graphics::DrawMode::Fill, face)?;
-
-        graphics::draw(ctx, &self.text, graphics::Point::new(90.0, 15.0), 0.0)?;
 
         graphics::present(ctx);
 
