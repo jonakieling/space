@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["jonathan"]
 
 [dependencies]
-ggez = "^0.3"
+ggez = "^0.4"
 rand = "*"
 rayon = "*"
 serde = "*"

@@ -16,6 +16,7 @@ use std::slice;
 
 use ggez::conf;
 use ggez::event;
+use ggez::timer;
 use ggez::GameResult;
 use ggez::Context;
 use ggez::graphics;
@@ -285,8 +286,8 @@ impl Scene {
 }
 
 impl event::EventHandler for Scene {
-    fn update(&mut self, _ctx: &mut Context, _dt: Duration) -> GameResult<()> {
-        self.movement_timer += _dt;
+    fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
+        self.movement_timer += timer::get_delta(_ctx);
 
         if self.movement_timer > Duration::from_millis(MOVEMENT_SPEED) {
             self.movement_timer = Duration::from_millis(0);
@@ -300,7 +301,7 @@ impl event::EventHandler for Scene {
         Ok(())
     }
 
-    fn key_down_event(&mut self, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_down_event(&mut self, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         if self.input == InputState::World {
             if !_repeat {
                 self.movement_timer = Duration::from_millis(MOVEMENT_SPEED);
@@ -342,7 +343,7 @@ impl event::EventHandler for Scene {
         }
     }
 
-    fn key_up_event(&mut self, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match self.input {
             InputState::World => {
                 match keycode {
@@ -358,7 +359,7 @@ impl event::EventHandler for Scene {
                     Keycode::Down => {
                         self.player.remove_movement(Direction::Down);
                     },
-                    Keycode::E => {
+                    Keycode::Return => {
                         self.interact_with_door();
                         self.interact_with_terminal();
                     },
@@ -367,22 +368,27 @@ impl event::EventHandler for Scene {
             },
             InputState::Terminal => {
                 match keycode {
-                    Keycode::Q => {
+                    Keycode::Escape => {
                         self.terminal_text = None;
                         self.input = InputState::World;
                     },
-                    _ => {
-                        let mut new_terminal_text: String = String::new();
-                        if let Some(ref terminal_text) = self.terminal_text {
-                            new_terminal_text = format!("{}{}", terminal_text, keycode.name());
-                        }
-                        self.terminal_text = Some(new_terminal_text);
-                    }
+                    _ => ()
                 }
             },
         }
 
 
+    }
+
+    fn text_input_event(&mut self, _ctx: &mut Context, _text: String) {
+        if self.input == InputState::Terminal {
+            let mut new_terminal_text: String = String::new();
+            if let Some(ref terminal_text) = self.terminal_text {
+                new_terminal_text = format!("{}{}", terminal_text, _text);
+            }
+            self.terminal_text = Some(new_terminal_text);
+            println!("{:?}", self.terminal_text);
+        }
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
@@ -406,7 +412,7 @@ impl event::EventHandler for Scene {
                 let y = pos as i32 / LEVEL_SIZE;
                 graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
                 graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
-                graphics::rectangle(ctx, graphics::DrawMode::Line, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
+                graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
             }
         }
 
@@ -418,7 +424,7 @@ impl event::EventHandler for Scene {
                 match door.status {
                     DoorStatus::Open => {
                         graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
-                        graphics::rectangle(ctx, graphics::DrawMode::Line, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
+                        graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
                     },
                     DoorStatus::Closed => {
                         graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
@@ -434,7 +440,7 @@ impl event::EventHandler for Scene {
         graphics::rectangle(ctx, graphics::DrawMode::Fill, player)?;
 
         graphics::set_color(ctx, graphics::WHITE)?;
-        let face = graphics::Rect::new(self.player.position.viewport_x() + (self.player.direction.value().viewport_x() * 0.2), self.player.position.viewport_y() + (self.player.direction.value().viewport_y() * 0.2), 10.0, 10.0);
+        let face = graphics::Rect::new(self.player.position.viewport_x() + 5.0 + (self.player.direction.value().viewport_x() * 0.2), self.player.position.viewport_y() + 5.0 + (self.player.direction.value().viewport_y() * 0.2), 10.0, 10.0);
         graphics::rectangle(ctx, graphics::DrawMode::Fill, face)?;
 
         graphics::present(ctx);
