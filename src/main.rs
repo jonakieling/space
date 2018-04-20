@@ -201,16 +201,15 @@ struct Scene {
     walls: PositionLevelStorage<Wall>,
     doors: PositionLevelStorage<Door>,
     terminals: PositionLevelStorage<Terminal>,
-    terminal_text: Option<String>,
+    terminal_text: graphics::Text,
     input: InputState,
 }
 
 impl Scene {
     fn new(_ctx: &mut Context) -> GameResult<Scene> {
 
-        // let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
-        // let text = graphics::Text::new(_ctx, "[static placeholder]", &font).unwrap();
-
+        let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
+        
         // initialize player and level object storages
         // state and object can be loaded seperatly
 
@@ -234,7 +233,7 @@ impl Scene {
             walls,
             doors,
             terminals,
-            terminal_text: None,
+            terminal_text: graphics::Text::new(_ctx, "", &font)?,
             input: InputState::World,
         };
 
@@ -273,13 +272,6 @@ impl Scene {
                     println!("door closed");
                 },
             }
-        }
-    }
-
-    fn interact_with_terminal(&mut self) {
-        if let Some(&mut Some(ref mut terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
-            self.terminal_text = Some(*terminal.text.clone());
-            self.input = InputState::Terminal;
         }
     }
 }
@@ -362,7 +354,14 @@ impl event::EventHandler for Scene {
                     },
                     Keycode::Return => {
                         self.interact_with_door();
-                        self.interact_with_terminal();
+
+                        // interact_with_terminal
+                        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
+                            self.input = InputState::Terminal;
+                            
+                            let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
+                            self.terminal_text = graphics::Text::new(_ctx, &current_terminal.text, &font).unwrap();
+                        }
                     },
                     _ => ()
                 }
@@ -370,36 +369,27 @@ impl event::EventHandler for Scene {
             InputState::Terminal => {
                 match keycode {
                     Keycode::Escape => {
-                        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
-                            if let Some(ref current_terminal_text) = self.terminal_text {
-                                current_terminal.text = Box::new(current_terminal_text.clone());
-                            }
-                        }
-                        
-                        self.terminal_text = None;
+                        let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
+                        self.terminal_text = graphics::Text::new(_ctx, "", &font).unwrap();
                         self.input = InputState::World;
                     },
                     _ => ()
                 }
             },
         }
-
-
     }
 
     fn text_input_event(&mut self, _ctx: &mut Context, _text: String) {
         if self.input == InputState::Terminal {
-            let mut text_limit_reached = false;
-            let mut new_terminal_text: String = String::new();
-            if let Some(ref terminal_text) = self.terminal_text {
-                if terminal_text.len() <= TERMINAL_LIMIT {
-                    new_terminal_text = format!("{}{}", terminal_text, _text);
-                } else {
-                    text_limit_reached = true;
+
+            if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
+                if current_terminal.text.len() <= TERMINAL_LIMIT {
+                    let new_terminal_text = format!("{}{}", current_terminal.text, _text);
+                    current_terminal.text = Box::new(new_terminal_text);
+
+                    let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
+                    self.terminal_text = graphics::Text::new(_ctx, &current_terminal.text, &font).unwrap();
                 }
-            }
-            if !text_limit_reached {
-                self.terminal_text = Some(new_terminal_text);
             }
         }
     }
@@ -457,11 +447,7 @@ impl event::EventHandler for Scene {
         let face = graphics::Rect::new(self.player.position.viewport_x() + 5.0 + (self.player.direction.value().viewport_x() * 0.2), self.player.position.viewport_y() + 5.0 + (self.player.direction.value().viewport_y() * 0.2), 10.0, 10.0);
         graphics::rectangle(ctx, graphics::DrawMode::Fill, face)?;
 
-        let font = graphics::Font::new(ctx, "/aller-bold.ttf", 12).unwrap();
-        if let Some(ref terminal_text) = self.terminal_text {
-            let text = graphics::Text::new(ctx, &terminal_text, &font).unwrap();
-            graphics::draw(ctx, &text, graphics::Point2::new(320.0, 500.0), 0.0)?;
-        }
+        graphics::draw(ctx, &self.terminal_text, graphics::Point2::new(320.0, 500.0), 0.0)?;
 
         graphics::present(ctx);
 
