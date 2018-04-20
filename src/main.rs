@@ -197,6 +197,7 @@ enum InputState {
 struct Scene {
     movement_timer: Duration,
     player: Player,
+    player_front_tile: Position,
     walls: PositionLevelStorage<Wall>,
     doors: PositionLevelStorage<Door>,
     terminals: PositionLevelStorage<Terminal>,
@@ -210,8 +211,6 @@ impl Scene {
         // let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
         // let text = graphics::Text::new(_ctx, "[static placeholder]", &font).unwrap();
 
-        let terminal_text = Box::new(String::new());
-
         // initialize player and level object storages
         // state and object can be loaded seperatly
 
@@ -220,14 +219,18 @@ impl Scene {
             movement: vec![],
             direction: Direction::Down
         };
+        let player_front_tile = &player.direction.value() + &player.position;
 
         let walls = <PositionLevelStorage<Wall>>::new();
         let doors = <PositionLevelStorage<Door>>::new();
         let mut terminals = <PositionLevelStorage<Terminal>>::new();
-        terminals.insert(20, 20, Terminal { text: terminal_text });
+        terminals.insert(20, 20, Terminal { text: Box::new(String::new()) });
+        terminals.insert(22, 20, Terminal { text: Box::new(String::new()) });
+        
         let scene = Scene {
             movement_timer: Duration::from_millis(0),
             player,
+            player_front_tile,
             walls,
             doors,
             terminals,
@@ -238,19 +241,18 @@ impl Scene {
         Ok(scene)
     }
 
-    fn check_player_collision(&self, direction: Direction) -> bool {
+    fn check_player_collision(&self) -> bool {
         let mut found_collision = false;
-        let position = &direction.value() + &self.player.position;
-        
-        if let Some(&Some(_)) = self.walls.get(position.x, position.y) {
+
+        if let Some(&Some(_)) = self.walls.get(self.player_front_tile.x, self.player_front_tile.y) {
             found_collision = true;
         }
 
-        if let Some(&Some(_)) = self.terminals.get(position.x, position.y) {
+        if let Some(&Some(_)) = self.terminals.get(self.player_front_tile.x, self.player_front_tile.y) {
             found_collision = true;
         }
 
-        if let Some(&Some(ref door)) = self.doors.get(position.x, position.y) {
+        if let Some(&Some(ref door)) = self.doors.get(self.player_front_tile.x, self.player_front_tile.y) {
             if let DoorStatus::Closed = door.status {
                 found_collision = true;
             }
@@ -260,9 +262,7 @@ impl Scene {
     }
 
     fn interact_with_door(&mut self) {
-        let position = &self.player.direction.value() + &self.player.position;
-
-        if let Some(&mut Some(ref mut door)) = self.doors.get_mut(position.x, position.y) {
+        if let Some(&mut Some(ref mut door)) = self.doors.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
             match door.status {
                 DoorStatus::Closed => {
                     door.status = DoorStatus::Open;
@@ -277,9 +277,7 @@ impl Scene {
     }
 
     fn interact_with_terminal(&mut self) {
-        let position = &self.player.direction.value() + &self.player.position;
-
-        if let Some(&mut Some(ref mut terminal)) = self.terminals.get_mut(position.x, position.y) {
+        if let Some(&mut Some(ref mut terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
             self.terminal_text = Some(*terminal.text.clone());
             self.input = InputState::Terminal;
         }
@@ -293,11 +291,13 @@ impl event::EventHandler for Scene {
         if self.movement_timer > Duration::from_millis(MOVEMENT_SPEED) {
             self.movement_timer = Duration::from_millis(0);
             if let Some(&current_movement) = self.player.movement.last() {
-                if !self.check_player_collision(current_movement) {
+                if !self.check_player_collision() {
                     self.player.position = &self.player.position + &current_movement.value();
                 }
             };
         }
+
+        self.player_front_tile = &self.player.direction.value() + &self.player.position;
 
         Ok(())
     }
@@ -370,6 +370,12 @@ impl event::EventHandler for Scene {
             InputState::Terminal => {
                 match keycode {
                     Keycode::Escape => {
+                        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
+                            if let Some(ref current_terminal_text) = self.terminal_text {
+                                current_terminal.text = Box::new(current_terminal_text.clone());
+                            }
+                        }
+                        
                         self.terminal_text = None;
                         self.input = InputState::World;
                     },
@@ -417,6 +423,7 @@ impl event::EventHandler for Scene {
             if let &Some(_) = terminal {
                 let x = pos as i32 % LEVEL_SIZE;
                 let y = pos as i32 / LEVEL_SIZE;
+                graphics::set_color(ctx, graphics::BLACK)?;
                 graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
                 graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
                 graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
