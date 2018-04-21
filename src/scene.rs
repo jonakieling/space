@@ -125,7 +125,7 @@ impl Terminal {
         graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
         match *direction {
             Direction::Up => {
-                let front = graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 4.0);
+                let front = graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 3.0);
                 graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
             },
             Direction::Down => {
@@ -134,12 +134,12 @@ impl Terminal {
                 
             },
             Direction::Right => {
-                let front = graphics::Rect::new((x * GRID_SIZE) as f32 + (direction.value().x as f32), (y * GRID_SIZE) as f32 + (direction.value().y as f32), 21.0, 4.0);
+                let front = graphics::Rect::new((x * GRID_SIZE) as f32 + (direction.value().x as f32 * 17.0), (y * GRID_SIZE) as f32 + (direction.value().y as f32), 4.0, 21.0);
                 graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
                 
             },
             Direction::Left => {
-                let front = graphics::Rect::new((x * GRID_SIZE) as f32 + (direction.value().x as f32), (y * GRID_SIZE) as f32 + (direction.value().y as f32), 21.0, 4.0);
+                let front = graphics::Rect::new((x * GRID_SIZE) as f32 + (direction.value().x as f32), (y * GRID_SIZE) as f32 + (direction.value().y as f32), 4.0, 21.0);
                 graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
                 
             },
