@@ -410,6 +410,34 @@ impl event::EventHandler for Scene {
                     Keycode::T => {
                         self.terminals.insert(self.edit_cursor.x, self.edit_cursor.y, Terminal { text: Box::new(String::new()), front: Direction::Down});
                     },
+                    Keycode::Tab => {
+                        if let Some(&mut Some(ref mut door)) = self.doors.get_mut(self.edit_cursor.x, self.edit_cursor.y) {
+                            match door.status {
+                                DoorStatus::Open => {
+                                    door.status = DoorStatus::Closed;
+                                },
+                                DoorStatus::Closed => {
+                                    door.status = DoorStatus::Open;
+                                }
+                            }
+                        }
+                        if let Some(&mut Some(ref mut terminal)) = self.terminals.get_mut(self.edit_cursor.x, self.edit_cursor.y) {
+                            match terminal.front {
+                                Direction::Up => {
+                                    terminal.front = Direction::Right;
+                                },
+                                Direction::Right => {
+                                    terminal.front = Direction::Down;
+                                },
+                                Direction::Down => {
+                                    terminal.front = Direction::Left;
+                                },
+                                Direction::Left => {
+                                    terminal.front = Direction::Up;
+                                },
+                            }
+                        }
+                    },
                     _ => ()
                 }
             }
