@@ -150,11 +150,50 @@ impl Scene {
             }
         }
     }
+
+    fn interact_with_terminal(&mut self, ctx: &mut Context) {
+        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
+            self.input = InputState::Terminal;
+            
+            let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
+            self.terminal_text = graphics::Text::new(ctx, &current_terminal.text, &font).unwrap();
+        }
+    }
+
+    fn clear_terminal(&mut self, ctx: &mut Context) {
+        let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
+        self.terminal_text = graphics::Text::new(ctx, "", &font).unwrap();
+        self.input = InputState::World;
+    }
+
+    fn terminal_remove_character(&mut self, ctx: &mut Context) {
+        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
+            if current_terminal.text.len() > 0 {
+                let text_len = current_terminal.text.len();
+                current_terminal.text.split_off(text_len - 1);
+
+                let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
+                self.terminal_text = graphics::Text::new(ctx, &current_terminal.text, &font).unwrap();
+            }
+        }
+    }
+
+    fn terminal_add_character(&mut self, ctx: &mut Context, text: String) {
+        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
+            if current_terminal.text.len() <= TERMINAL_LIMIT {
+                let new_terminal_text = format!("{}{}", current_terminal.text, text);
+                current_terminal.text = Box::new(new_terminal_text);
+
+                let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
+                self.terminal_text = graphics::Text::new(ctx, &current_terminal.text, &font).unwrap();
+            }
+        }
+    }
 }
 
 impl event::EventHandler for Scene {
-    fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
-        self.movement_timer += timer::get_delta(_ctx);
+    fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
+        self.movement_timer += timer::get_delta(ctx);
 
         if self.movement_timer > Duration::from_millis(MOVEMENT_SPEED) {
             self.movement_timer = Duration::from_millis(0);
@@ -170,9 +209,9 @@ impl event::EventHandler for Scene {
         Ok(())
     }
 
-    fn key_down_event(&mut self, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_down_event(&mut self, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, repeat: bool) {
         if self.input == InputState::World {
-            if !_repeat {
+            if !repeat {
                 self.movement_timer = Duration::from_millis(MOVEMENT_SPEED);
 
                 match keycode {
@@ -212,7 +251,7 @@ impl event::EventHandler for Scene {
         }
     }
 
-    fn key_up_event(&mut self, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match self.input {
             InputState::World => {
                 match keycode {
@@ -230,14 +269,7 @@ impl event::EventHandler for Scene {
                     },
                     Keycode::Return => {
                         self.interact_with_door();
-
-                        // interact_with_terminal
-                        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
-                            self.input = InputState::Terminal;
-                            
-                            let font = graphics::Font::new(_ctx, "/04B_03.TTF", 12).unwrap();
-                            self.terminal_text = graphics::Text::new(_ctx, &current_terminal.text, &font).unwrap();
-                        }
+                        self.interact_with_terminal(ctx);
                     },
                     _ => ()
                 }
@@ -245,20 +277,10 @@ impl event::EventHandler for Scene {
             InputState::Terminal => {
                 match keycode {
                     Keycode::Backspace => {
-                        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
-                            if current_terminal.text.len() > 0 {
-                                let text_len = current_terminal.text.len();
-                                current_terminal.text.split_off(text_len - 1);
-
-                                let font = graphics::Font::new(_ctx, "/04B_03.TTF", 12).unwrap();
-                                self.terminal_text = graphics::Text::new(_ctx, &current_terminal.text, &font).unwrap();
-                            }
-                        }
+                        self.terminal_remove_character(ctx);
                     },
                     Keycode::Escape => {
-                        let font = graphics::Font::new(_ctx, "/04B_03.TTF", 12).unwrap();
-                        self.terminal_text = graphics::Text::new(_ctx, "", &font).unwrap();
-                        self.input = InputState::World;
+                        self.clear_terminal(ctx);
                     },
                     _ => ()
                 }
@@ -266,18 +288,9 @@ impl event::EventHandler for Scene {
         }
     }
 
-    fn text_input_event(&mut self, _ctx: &mut Context, _text: String) {
+    fn text_input_event(&mut self, ctx: &mut Context, text: String) {
         if self.input == InputState::Terminal {
-
-            if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
-                if current_terminal.text.len() <= TERMINAL_LIMIT {
-                    let new_terminal_text = format!("{}{}", current_terminal.text, _text);
-                    current_terminal.text = Box::new(new_terminal_text);
-
-                    let font = graphics::Font::new(_ctx, "/04B_03.TTF", 12).unwrap();
-                    self.terminal_text = graphics::Text::new(_ctx, &current_terminal.text, &font).unwrap();
-                }
-            }
+            self.terminal_add_character(ctx, text);
         }
     }
 
