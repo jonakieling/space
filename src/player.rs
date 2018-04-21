@@ -23,7 +23,8 @@ impl Direction {
 pub struct Player {
     pub position: Position,
     pub movement: Vec<Direction>,
-    pub direction: Direction
+    pub direction: Direction,
+    pub front_tile: Position,
 }
 
 impl Player {

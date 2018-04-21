@@ -117,7 +117,6 @@ pub enum InputState {
 pub struct Scene {
     movement_timer: Duration,
     pub player: Player,
-    player_front_tile: Position,
     pub walls: PositionLevelStorage<Wall>,
     pub doors: PositionLevelStorage<Door>,
     pub terminals: PositionLevelStorage<Terminal>,
@@ -133,12 +132,15 @@ impl Scene {
         // initialize player and level object storages
         // state and object can be loaded seperatly
 
+        let player_position = Position { x: 10, y: 10 };
+        let player_direction = Direction::Down;
+        let player_front_tile = &player_direction.value() + &player_position;
         let player = Player {
-            position: Position { x: 10, y: 10 },
+            position: player_position,
             movement: vec![],
-            direction: Direction::Down
+            direction: player_direction,
+            front_tile: player_front_tile
         };
-        let player_front_tile = &player.direction.value() + &player.position;
 
         let walls = <PositionLevelStorage<Wall>>::new();
         let doors = <PositionLevelStorage<Door>>::new();
@@ -147,7 +149,6 @@ impl Scene {
         let scene = Scene {
             movement_timer: Duration::from_millis(0),
             player,
-            player_front_tile,
             walls,
             doors,
             terminals,
@@ -161,15 +162,15 @@ impl Scene {
     fn check_player_collision(&self) -> bool {
         let mut found_collision = false;
 
-        if let Some(&Some(_)) = self.walls.get(self.player_front_tile.x, self.player_front_tile.y) {
+        if let Some(&Some(_)) = self.walls.get(self.player.front_tile.x, self.player.front_tile.y) {
             found_collision = true;
         }
 
-        if let Some(&Some(_)) = self.terminals.get(self.player_front_tile.x, self.player_front_tile.y) {
+        if let Some(&Some(_)) = self.terminals.get(self.player.front_tile.x, self.player.front_tile.y) {
             found_collision = true;
         }
 
-        if let Some(&Some(ref door)) = self.doors.get(self.player_front_tile.x, self.player_front_tile.y) {
+        if let Some(&Some(ref door)) = self.doors.get(self.player.front_tile.x, self.player.front_tile.y) {
             if let DoorStatus::Closed = door.status {
                 found_collision = true;
             }
@@ -179,7 +180,7 @@ impl Scene {
     }
 
     fn interact_with_door(&mut self) {
-        if let Some(&mut Some(ref mut door)) = self.doors.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
+        if let Some(&mut Some(ref mut door)) = self.doors.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             match door.status {
                 DoorStatus::Closed => {
                     door.status = DoorStatus::Open;
@@ -194,7 +195,7 @@ impl Scene {
     }
 
     fn interact_with_terminal(&mut self, ctx: &mut Context) {
-        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
+        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             self.input = InputState::Terminal;
             
             let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
@@ -209,7 +210,7 @@ impl Scene {
     }
 
     fn terminal_remove_character(&mut self, ctx: &mut Context) {
-        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
+        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             if current_terminal.text.len() > 0 {
                 let text_len = current_terminal.text.len();
                 current_terminal.text.split_off(text_len - 1);
@@ -221,7 +222,7 @@ impl Scene {
     }
 
     fn terminal_add_character(&mut self, ctx: &mut Context, text: String) {
-        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
+        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             if current_terminal.text.len() <= TERMINAL_LIMIT {
                 let new_terminal_text = format!("{}{}", current_terminal.text, text);
                 current_terminal.text = Box::new(new_terminal_text);
@@ -246,7 +247,7 @@ impl event::EventHandler for Scene {
             };
         }
 
-        self.player_front_tile = &self.player.direction.value() + &self.player.position;
+        self.player.front_tile = &self.player.direction.value() + &self.player.position;
 
         Ok(())
     }
