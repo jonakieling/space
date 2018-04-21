@@ -89,7 +89,7 @@ pub fn load_scene(scene: &mut Scene) {
         }
         println!("game loaded: from file level0");
     } else {
-        static_level0(scene);
+        static_ship_tech_2_1(scene);
     }
     
 }
@@ -181,4 +181,44 @@ pub fn static_level0(scene: &mut Scene) {
     scene.player = player;
 
     println!("game loaded: static level0");
+}
+
+
+pub fn static_ship_tech_2_1(scene: &mut Scene) {
+    scene.walls.insert(2, 2, Wall {});
+    scene.walls.insert(3, 2, Wall {});
+    scene.walls.insert(4, 2, Wall {});
+    scene.walls.insert(5, 2, Wall {});
+    scene.walls.insert(6, 2, Wall {});
+
+    scene.walls.insert(2, 3, Wall {});
+    scene.walls.insert(2, 4, Wall {});
+
+    scene.walls.insert(3, 5, Wall {});
+    scene.walls.insert(5, 5, Wall {});
+
+    scene.walls.insert(6, 3, Wall {});
+    scene.walls.insert(6, 4, Wall {});
+
+    scene.doors.insert(4, 5, Door {status: DoorStatus::Closed});
+
+
+    scene.terminals.insert(4, 3, Terminal {
+        text: Box::new(String::new()),
+        front: Direction::Down
+    });
+
+
+    let player_position = Position { x: 4, y: 4 };
+    let player_direction = Direction::Up;
+    let player_front_tile = &player_direction.value() + &player_position;
+    let player = Player {
+        position: player_position,
+        movement: vec![],
+        direction: player_direction,
+        front_tile: player_front_tile
+    };
+    scene.player = player;
+
+    println!("game loaded: static ship tech 2.1");
 }
