@@ -168,5 +168,17 @@ pub fn static_level0(scene: &mut Scene) {
         front: Direction::Up
     });
 
+
+    let player_position = Position { x: 10, y: 10 };
+    let player_direction = Direction::Down;
+    let player_front_tile = &player_direction.value() + &player_position;
+    let player = Player {
+        position: player_position,
+        movement: vec![],
+        direction: player_direction,
+        front_tile: player_front_tile
+    };
+    scene.player = player;
+
     println!("game loaded: static level0");
 }
