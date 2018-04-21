@@ -68,7 +68,7 @@ pub enum DoorStatus {
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 pub struct Door {
-    status: DoorStatus
+    pub status: DoorStatus
 }
 
 impl Door {
@@ -92,7 +92,7 @@ impl Door {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Terminal {
-    text: Box<String>
+    pub text: Box<String>
 }
 
 impl Terminal {
