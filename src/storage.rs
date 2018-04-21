@@ -45,6 +45,14 @@ impl<T: Clone> PositionLevelStorage<T> {
         }
     }
 
+    pub fn remove(&mut self, x: i32, y: i32) {
+        if x <= LEVEL_SIZE && y <= LEVEL_SIZE  {
+            let position = x + y * LEVEL_SIZE;
+            self.storage.remove(position as usize);
+            self.storage.insert(position as usize, None);
+        }
+    }
+
     pub fn iter(&self) -> slice::Iter<Option<Box<T>>> {
         self.storage.iter()
     }

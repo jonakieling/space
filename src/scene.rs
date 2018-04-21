@@ -396,6 +396,11 @@ impl event::EventHandler for Scene {
                     Keycode::Down => {
                         self.edit_cursor = &self.edit_cursor + &Direction::Down.value();
                     },
+                    Keycode::Delete => {
+                        self.walls.remove(self.edit_cursor.x, self.edit_cursor.y);
+                        self.doors.remove(self.edit_cursor.x, self.edit_cursor.y);
+                        self.terminals.remove(self.edit_cursor.x, self.edit_cursor.y);
+                    },
                     _ => ()
                 }
             }
