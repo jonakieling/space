@@ -1,0 +1,91 @@
+use tar::{Builder, Archive};
+use std::fs;
+use std::fs::File;
+use std::io::Write;
+use bincode;
+use scene::*;
+use player::Player;
+
+pub fn save_scene(scene: &Scene) {
+    fs::create_dir("level0").unwrap();
+
+    let bytes: Vec<u8> = bincode::serialize(&scene.player).unwrap();
+    File::create("level0/player.bin").unwrap().write_all(&bytes).unwrap();
+
+    let mut level_walls: Vec<(i32, i32, Wall)> = vec![];
+    for (pos, item) in scene.walls.iter().enumerate() {
+        if let Some(ref wall) = *item {
+            let x = pos as i32 % LEVEL_SIZE;
+            let y = pos as i32 / LEVEL_SIZE;
+            level_walls.push((x, y, *wall.clone()));
+        }
+    }
+    let bytes: Vec<u8> = bincode::serialize(&level_walls).unwrap();
+    File::create("level0/walls.bin").unwrap().write_all(&bytes).unwrap();
+
+    let mut level_doors: Vec<(i32, i32, Door)> = vec![];
+    for (pos, item) in scene.doors.iter().enumerate() {
+        if let Some(ref door) = *item {
+            let x = pos as i32 % LEVEL_SIZE;
+            let y = pos as i32 / LEVEL_SIZE;
+            level_doors.push((x, y, *door.clone()));
+        }
+    }
+    let bytes: Vec<u8> = bincode::serialize(&level_doors).unwrap();
+    File::create("level0/doors.bin").unwrap().write_all(&bytes).unwrap();
+
+    let mut level_terminals: Vec<(i32, i32, Terminal)> = vec![];
+    for (pos, item) in scene.terminals.iter().enumerate() {
+        if let Some(ref terminal) = *item {
+            let x = pos as i32 % LEVEL_SIZE;
+            let y = pos as i32 / LEVEL_SIZE;
+            level_terminals.push((x, y, *terminal.clone()));
+        }
+    }
+    let bytes: Vec<u8> = bincode::serialize(&level_terminals).unwrap();
+    File::create("level0/terminals.bin").unwrap().write_all(&bytes).unwrap();
+
+    let file = File::create("level0.tar").unwrap();
+    let mut a = Builder::new(file);
+    a.append_dir_all("level0", "level0").unwrap();
+    a.finish().unwrap();
+    fs::remove_dir_all("level0").unwrap();
+    println!("saved game: level0");
+}
+
+pub fn load_scene(scene: &mut Scene) {
+    let file = File::open("level0.tar").unwrap();
+    let mut a = Archive::new(file);
+
+    for file in a.entries().unwrap() {
+        // Make sure there wasn't an I/O error
+        let mut file = file.unwrap();
+
+        match file.path().unwrap().file_stem().unwrap().to_str().unwrap() as &str {
+            "walls" => {
+                let mut level_walls: Vec<(i32, i32, Wall)> = bincode::deserialize_from(file).unwrap();
+                for wall in level_walls {
+                    scene.walls.insert(wall.0, wall.1, wall.2);
+                }
+            },
+            "doors" => {
+                let mut level_doors: Vec<(i32, i32, Door)> = bincode::deserialize_from(file).unwrap();
+                for door in level_doors {
+                    scene.doors.insert(door.0, door.1, door.2);
+                }
+            },
+            "terminals" => {
+                let mut level_terminals: Vec<(i32, i32, Terminal)> = bincode::deserialize_from(file).unwrap();
+                for terminal in level_terminals {
+                    scene.terminals.insert(terminal.0, terminal.1, terminal.2);
+                }
+            },
+            "player" => {
+                let mut level_player: Player = bincode::deserialize_from(file).unwrap();
+                scene.player = level_player;
+            },
+            _ => (),
+        }
+    }
+    println!("game loaded: level0");
+}
