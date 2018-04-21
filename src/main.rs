@@ -183,7 +183,7 @@ struct Door {
     status: DoorStatus
 }
 
-#[derive(Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 struct Terminal {
     text: Box<String>
 }
@@ -368,6 +368,17 @@ impl event::EventHandler for Scene {
             },
             InputState::Terminal => {
                 match keycode {
+                    Keycode::Backspace => {
+                        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
+                            if current_terminal.text.len() > 0 {
+                                let text_len = current_terminal.text.len();
+                                current_terminal.text.split_off(text_len - 1);
+
+                                let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
+                                self.terminal_text = graphics::Text::new(_ctx, &current_terminal.text, &font).unwrap();
+                            }
+                        }
+                    },
                     Keycode::Escape => {
                         let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
                         self.terminal_text = graphics::Text::new(_ctx, "", &font).unwrap();
@@ -499,6 +510,17 @@ fn save_scene(scene: &Scene) {
     let bytes: Vec<u8> = bincode::serialize(&level_doors).unwrap();
     File::create("level0/doors.bin").unwrap().write_all(&bytes).unwrap();
 
+    let mut level_terminals: Vec<(i32, i32, Terminal)> = vec![];
+    for (pos, item) in scene.terminals.iter().enumerate() {
+        if let Some(ref terminal) = *item {
+            let x = pos as i32 % LEVEL_SIZE;
+            let y = pos as i32 / LEVEL_SIZE;
+            level_terminals.push((x, y, *terminal.clone()));
+        }
+    }
+    let bytes: Vec<u8> = bincode::serialize(&level_terminals).unwrap();
+    File::create("level0/terminals.bin").unwrap().write_all(&bytes).unwrap();
+
     let file = File::create("level0.tar").unwrap();
     let mut a = Builder::new(file);
     a.append_dir_all("level0", "level0").unwrap();
@@ -529,10 +551,16 @@ fn load_scene(scene: &mut Scene) {
                     scene.doors.insert(door.0, door.1, door.2);
                 }
             },
+            "terminals" => {
+                let mut level_terminals: Vec<(i32, i32, Terminal)> = bincode::deserialize_from(file).unwrap();
+                for terminal in level_terminals {
+                    scene.terminals.insert(terminal.0, terminal.1, terminal.2);
+                }
+            },
             "player" => {
                 let mut level_player: Player = bincode::deserialize_from(file).unwrap();
                 scene.player = level_player;
-            }
+            },
             _ => (),
         }
     }
