@@ -152,7 +152,8 @@ impl Terminal {
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 pub enum InputState {
     Terminal,
-    World
+    World,
+    Edit
 }
 
 pub struct Scene {
@@ -163,6 +164,7 @@ pub struct Scene {
     pub terminals: PositionLevelStorage<Terminal>,
     terminal_text: graphics::Text,
     input: InputState,
+    edit_cursor: Position,
 }
 
 impl Scene {
@@ -195,6 +197,7 @@ impl Scene {
             terminals,
             terminal_text: graphics::Text::new(_ctx, "", &font)?,
             input: InputState::World,
+            edit_cursor: Position {x: 0, y: 0}
         };
 
         Ok(scene)
@@ -359,6 +362,9 @@ impl event::EventHandler for Scene {
                         self.interact_with_door();
                         self.interact_with_terminal(ctx);
                     },
+                    Keycode::Insert => {
+                        self.input = InputState::Edit;
+                    },
                     _ => ()
                 }
             },
@@ -373,6 +379,26 @@ impl event::EventHandler for Scene {
                     _ => ()
                 }
             },
+            InputState::Edit => {
+                match keycode {
+                    Keycode::Escape => {
+                        self.input = InputState::World;
+                    },
+                    Keycode::Left => {
+                        self.edit_cursor = &self.edit_cursor + &Direction::Left.value();
+                    },
+                    Keycode::Right => {
+                        self.edit_cursor = &self.edit_cursor + &Direction::Right.value();
+                    },
+                    Keycode::Up => {
+                        self.edit_cursor = &self.edit_cursor + &Direction::Up.value();
+                    },
+                    Keycode::Down => {
+                        self.edit_cursor = &self.edit_cursor + &Direction::Down.value();
+                    },
+                    _ => ()
+                }
+            }
         }
     }
 
@@ -422,6 +448,12 @@ impl event::EventHandler for Scene {
             graphics::set_color(ctx, graphics::WHITE)?;
             graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), console)?;
             graphics::draw(ctx, &self.terminal_text, graphics::Point2::new(270.0, 500.0), 0.0)?;
+        }
+
+        if self.input == InputState::Edit {
+            graphics::set_color(ctx, graphics::Color{r: 0.2, g: 0.8, b: 0.2, a: 1.0,})?;
+            let player = graphics::Rect::new(self.edit_cursor.viewport_x(), self.edit_cursor.viewport_y(), 20.0, 20.0);
+            graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), player)?;
         }
 
         graphics::present(ctx);
