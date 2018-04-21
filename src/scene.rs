@@ -50,6 +50,16 @@ pub struct Wall {
     
 }
 
+impl Wall {
+    pub fn draw(pos: i32, ctx: &mut Context) -> GameResult<()> {
+        let x = pos % LEVEL_SIZE;
+        let y = pos / LEVEL_SIZE;
+        graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
+
+        Ok(())
+    }
+}
+
 #[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
 pub enum DoorStatus {
     Open,
@@ -61,9 +71,41 @@ pub struct Door {
     status: DoorStatus
 }
 
+impl Door {
+    pub fn draw(door: &Door, pos: i32, ctx: &mut Context) -> GameResult<()> {
+        let x = pos % LEVEL_SIZE;
+        let y = pos / LEVEL_SIZE;
+        match door.status {
+            DoorStatus::Open => {
+                graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
+                graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
+            },
+            DoorStatus::Closed => {
+                graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
+                graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
+            },
+        }
+
+        Ok(())
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Terminal {
     text: Box<String>
+}
+
+impl Terminal {
+    pub fn draw(pos: i32, ctx: &mut Context) -> GameResult<()> {
+        let x = pos % LEVEL_SIZE;
+        let y = pos / LEVEL_SIZE;
+        graphics::set_color(ctx, graphics::BLACK)?;
+        graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
+        graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
+        graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
+
+        Ok(())
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
@@ -302,44 +344,24 @@ impl event::EventHandler for Scene {
         for (pos, wall) in self.walls.iter().enumerate() {
             // Match for entity presence
             if let &Some(_) = wall {
-                let x = pos as i32 % LEVEL_SIZE;
-                let y = pos as i32 / LEVEL_SIZE;
-                graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
+                Wall::draw(pos as i32, ctx)?;
             }
         }
 
         for (pos, terminal) in self.terminals.iter().enumerate() {
             // Match for entity presence
             if let &Some(_) = terminal {
-                let x = pos as i32 % LEVEL_SIZE;
-                let y = pos as i32 / LEVEL_SIZE;
-                graphics::set_color(ctx, graphics::BLACK)?;
-                graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
-                graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
-                graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
+                Terminal::draw(pos as i32, ctx)?;
             }
         }
 
-        for (pos, door_pos) in self.doors.iter().enumerate() {
-            // Match for entity presence
-            if let &Some(ref door) = door_pos {
-                let x = pos as i32 % LEVEL_SIZE;
-                let y = pos as i32 / LEVEL_SIZE;
-                match door.status {
-                    DoorStatus::Open => {
-                        graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
-                        graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
-                    },
-                    DoorStatus::Closed => {
-                        graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
-                        graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
-                    },
-                }
+        for (pos, item) in self.doors.iter().enumerate() {
+            if let &Some(ref door) = item {
+                Door::draw(door, pos as i32, ctx)?;
             }
         }
 
         graphics::set_color(ctx, graphics::BLACK)?;
-
         let player = graphics::Rect::new(self.player.position.viewport_x(), self.player.position.viewport_y(), 20.0, 20.0);
         graphics::rectangle(ctx, graphics::DrawMode::Fill, player)?;
 
