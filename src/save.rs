@@ -160,10 +160,12 @@ pub fn static_level0(scene: &mut Scene) {
 
 
     scene.terminals.insert(12, 10, Terminal {
-        text: Box::new(String::new())
+        text: Box::new(String::new()),
+        front: Direction::Down
     });
     scene.terminals.insert(12, 12, Terminal {
-        text: Box::new(String::new())
+        text: Box::new(String::new()),
+        front: Direction::Up
     });
 
     println!("game loaded: static level0");

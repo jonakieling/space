@@ -46,6 +46,25 @@ impl<'a> Add for &'a Position {
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
+pub enum Direction {
+    Up,
+    Down,
+    Left,
+    Right
+}
+
+impl Direction {
+    pub fn value(&self) -> Position {
+        match *self {
+            Direction::Up => Position { x: 0, y: -1 },
+            Direction::Down => Position { x: 0, y: 1 },
+            Direction::Left => Position { x: -1, y: 0 },
+            Direction::Right => Position { x: 1, y: 0 },
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 pub struct Wall {
     
 }
@@ -92,17 +111,39 @@ impl Door {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Terminal {
-    pub text: Box<String>
+    pub text: Box<String>,
+    pub front: Direction,
 }
 
 impl Terminal {
-    pub fn draw(pos: i32, ctx: &mut Context) -> GameResult<()> {
+    pub fn draw(pos: i32, direction: &Direction, ctx: &mut Context) -> GameResult<()> {
         let x = pos % LEVEL_SIZE;
         let y = pos / LEVEL_SIZE;
         graphics::set_color(ctx, graphics::BLACK)?;
         graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
-        graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
-        graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
+        graphics::set_color(ctx, graphics::Color{r: 0.5, g: 0.8, b: 0.5, a: 1.0,})?;
+        graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
+        match *direction {
+            Direction::Up => {
+                let front = graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 4.0);
+                graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
+            },
+            Direction::Down => {
+                let front = graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32 + (direction.value().y as f32 * 17.0), 21.0, 4.0);
+                graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
+                
+            },
+            Direction::Right => {
+                let front = graphics::Rect::new((x * GRID_SIZE) as f32 + (direction.value().x as f32), (y * GRID_SIZE) as f32 + (direction.value().y as f32), 21.0, 4.0);
+                graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
+                
+            },
+            Direction::Left => {
+                let front = graphics::Rect::new((x * GRID_SIZE) as f32 + (direction.value().x as f32), (y * GRID_SIZE) as f32 + (direction.value().y as f32), 21.0, 4.0);
+                graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
+                
+            },
+        }
 
         Ok(())
     }
@@ -196,10 +237,14 @@ impl Scene {
 
     fn interact_with_terminal(&mut self, ctx: &mut Context) {
         if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
-            self.input = InputState::Terminal;
-            
-            let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
-            self.terminal_text = graphics::Text::new(ctx, &current_terminal.text, &font).unwrap();
+            let terminal_front_tile = &self.player.front_tile + &current_terminal.front.value();
+            if terminal_front_tile == self.player.position {
+                self.input = InputState::Terminal;
+                let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
+                self.terminal_text = graphics::Text::new(ctx, &current_terminal.text, &font).unwrap();
+            } else {
+                println!("this is not the front of the terminal");
+            }
         }
     }
 
@@ -351,8 +396,8 @@ impl event::EventHandler for Scene {
 
         for (pos, terminal) in self.terminals.iter().enumerate() {
             // Match for entity presence
-            if let &Some(_) = terminal {
-                Terminal::draw(pos as i32, ctx)?;
+            if let &Some(ref current_terminal) = terminal {
+                Terminal::draw(pos as i32, &current_terminal.front, ctx)?;
             }
         }
 
