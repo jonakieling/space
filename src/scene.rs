@@ -401,6 +401,15 @@ impl event::EventHandler for Scene {
                         self.doors.remove(self.edit_cursor.x, self.edit_cursor.y);
                         self.terminals.remove(self.edit_cursor.x, self.edit_cursor.y);
                     },
+                    Keycode::W => {
+                        self.walls.insert(self.edit_cursor.x, self.edit_cursor.y, Wall {});
+                    },
+                    Keycode::D => {
+                        self.doors.insert(self.edit_cursor.x, self.edit_cursor.y, Door { status: DoorStatus::Closed});
+                    },
+                    Keycode::T => {
+                        self.terminals.insert(self.edit_cursor.x, self.edit_cursor.y, Terminal { text: Box::new(String::new()), front: Direction::Down});
+                    },
                     _ => ()
                 }
             }
