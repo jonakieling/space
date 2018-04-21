@@ -494,7 +494,7 @@ impl event::EventHandler for Scene {
 
         if self.input == InputState::Edit {
             graphics::set_color(ctx, graphics::Color{r: 0.2, g: 0.8, b: 0.2, a: 1.0,})?;
-            let player = graphics::Rect::new(self.edit_cursor.viewport_x(), self.edit_cursor.viewport_y(), 20.0, 20.0);
+            let player = graphics::Rect::new(self.edit_cursor.viewport_x(), self.edit_cursor.viewport_y(), 21.0, 21.0);
             graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), player)?;
         }
 
