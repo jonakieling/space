@@ -415,7 +415,14 @@ impl event::EventHandler for Scene {
         let face = graphics::Rect::new(self.player.position.viewport_x() + 5.0 + (self.player.direction.value().viewport_x() * 0.2), self.player.position.viewport_y() + 5.0 + (self.player.direction.value().viewport_y() * 0.2), 10.0, 10.0);
         graphics::rectangle(ctx, graphics::DrawMode::Fill, face)?;
 
-        graphics::draw(ctx, &self.terminal_text, graphics::Point2::new(320.0, 500.0), 0.0)?;
+        if self.input == InputState::Terminal {
+            graphics::set_color(ctx, graphics::BLACK)?;
+            let console = graphics::Rect::new(260.0, 500.0, self.terminal_text.width() as f32 + 20.0, 20.0);
+            graphics::rectangle(ctx, graphics::DrawMode::Fill, console)?;
+            graphics::set_color(ctx, graphics::WHITE)?;
+            graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), console)?;
+            graphics::draw(ctx, &self.terminal_text, graphics::Point2::new(270.0, 500.0), 0.0)?;
+        }
 
         graphics::present(ctx);
 
