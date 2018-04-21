@@ -7,10 +7,10 @@ use scene::*;
 use player::Player;
 
 pub fn save_scene(scene: &Scene) {
-    fs::create_dir("level0").unwrap();
+    fs::create_dir("dev-level").unwrap();
 
     let bytes: Vec<u8> = bincode::serialize(&scene.player).unwrap();
-    File::create("level0/player.bin").unwrap().write_all(&bytes).unwrap();
+    File::create("dev-level/player.bin").unwrap().write_all(&bytes).unwrap();
 
     let mut level_walls: Vec<(i32, i32, Wall)> = vec![];
     for (pos, item) in scene.walls.iter().enumerate() {
@@ -21,7 +21,7 @@ pub fn save_scene(scene: &Scene) {
         }
     }
     let bytes: Vec<u8> = bincode::serialize(&level_walls).unwrap();
-    File::create("level0/walls.bin").unwrap().write_all(&bytes).unwrap();
+    File::create("dev-level/walls.bin").unwrap().write_all(&bytes).unwrap();
 
     let mut level_doors: Vec<(i32, i32, Door)> = vec![];
     for (pos, item) in scene.doors.iter().enumerate() {
@@ -32,7 +32,7 @@ pub fn save_scene(scene: &Scene) {
         }
     }
     let bytes: Vec<u8> = bincode::serialize(&level_doors).unwrap();
-    File::create("level0/doors.bin").unwrap().write_all(&bytes).unwrap();
+    File::create("dev-level/doors.bin").unwrap().write_all(&bytes).unwrap();
 
     let mut level_terminals: Vec<(i32, i32, Terminal)> = vec![];
     for (pos, item) in scene.terminals.iter().enumerate() {
@@ -43,18 +43,18 @@ pub fn save_scene(scene: &Scene) {
         }
     }
     let bytes: Vec<u8> = bincode::serialize(&level_terminals).unwrap();
-    File::create("level0/terminals.bin").unwrap().write_all(&bytes).unwrap();
+    File::create("dev-level/terminals.bin").unwrap().write_all(&bytes).unwrap();
 
-    let file = File::create("level0.tar").unwrap();
+    let file = File::create("dev-level.tar").unwrap();
     let mut a = Builder::new(file);
-    a.append_dir_all("level0", "level0").unwrap();
+    a.append_dir_all("dev-level", "dev-level").unwrap();
     a.finish().unwrap();
-    fs::remove_dir_all("level0").unwrap();
-    println!("saved game: level0");
+    fs::remove_dir_all("dev-level").unwrap();
+    println!("saved game: dev-level");
 }
 
 pub fn load_scene(scene: &mut Scene) {
-    if let Ok(file) = File::open("level0.tar") {
+    if let Ok(file) = File::open("dev-level.tar") {
         let mut a = Archive::new(file);
 
         for file in a.entries().unwrap() {
@@ -87,7 +87,7 @@ pub fn load_scene(scene: &mut Scene) {
                 _ => (),
             }
         }
-        println!("game loaded: from file level0");
+        println!("game loaded: from file dev-level.tar");
     } else {
         static_ship_tech_2_1(scene);
     }
