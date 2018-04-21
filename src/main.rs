@@ -208,7 +208,7 @@ struct Scene {
 impl Scene {
     fn new(_ctx: &mut Context) -> GameResult<Scene> {
 
-        let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
+        let font = graphics::Font::new(_ctx, "/04B_03.TTF", 12).unwrap();
         
         // initialize player and level object storages
         // state and object can be loaded seperatly
@@ -359,7 +359,7 @@ impl event::EventHandler for Scene {
                         if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player_front_tile.x, self.player_front_tile.y) {
                             self.input = InputState::Terminal;
                             
-                            let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
+                            let font = graphics::Font::new(_ctx, "/04B_03.TTF", 12).unwrap();
                             self.terminal_text = graphics::Text::new(_ctx, &current_terminal.text, &font).unwrap();
                         }
                     },
@@ -374,13 +374,13 @@ impl event::EventHandler for Scene {
                                 let text_len = current_terminal.text.len();
                                 current_terminal.text.split_off(text_len - 1);
 
-                                let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
+                                let font = graphics::Font::new(_ctx, "/04B_03.TTF", 12).unwrap();
                                 self.terminal_text = graphics::Text::new(_ctx, &current_terminal.text, &font).unwrap();
                             }
                         }
                     },
                     Keycode::Escape => {
-                        let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
+                        let font = graphics::Font::new(_ctx, "/04B_03.TTF", 12).unwrap();
                         self.terminal_text = graphics::Text::new(_ctx, "", &font).unwrap();
                         self.input = InputState::World;
                     },
@@ -398,7 +398,7 @@ impl event::EventHandler for Scene {
                     let new_terminal_text = format!("{}{}", current_terminal.text, _text);
                     current_terminal.text = Box::new(new_terminal_text);
 
-                    let font = graphics::Font::new(_ctx, "/aller-bold.ttf", 12).unwrap();
+                    let font = graphics::Font::new(_ctx, "/04B_03.TTF", 12).unwrap();
                     self.terminal_text = graphics::Text::new(_ctx, &current_terminal.text, &font).unwrap();
                 }
             }
