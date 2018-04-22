@@ -3,7 +3,7 @@ use scene::LEVEL_SIZE;
 
 #[derive(Clone)]
 pub struct PositionLevelStorage<T: Clone> {
-    storage: Box<Vec<Option<Box<T>>>>
+    storage: Box<Vec<Option<T>>>
 }
 
 impl<T: Clone> PositionLevelStorage<T> {
@@ -13,7 +13,7 @@ impl<T: Clone> PositionLevelStorage<T> {
         }
     }
     
-    pub fn get(&self, x: i32, y: i32) -> Option<&Option<Box<T>>> {
+    pub fn get(&self, x: i32, y: i32) -> Option<&Option<T>> {
         if x <= LEVEL_SIZE && y <= LEVEL_SIZE  {
             let position = x + y * LEVEL_SIZE;
             self.storage.get(position as usize)
@@ -22,7 +22,7 @@ impl<T: Clone> PositionLevelStorage<T> {
         }
     }
 
-    pub fn get_mut(&mut self, x: i32, y: i32) -> Option<&mut Option<Box<T>>> {
+    pub fn get_mut(&mut self, x: i32, y: i32) -> Option<&mut Option<T>> {
         if x <= LEVEL_SIZE && y <= LEVEL_SIZE  {
             let position = x + y * LEVEL_SIZE;
             self.storage.get_mut(position as usize)
@@ -35,7 +35,7 @@ impl<T: Clone> PositionLevelStorage<T> {
         if x <= LEVEL_SIZE && y <= LEVEL_SIZE  {
             let position = x + y * LEVEL_SIZE;
             self.storage.remove(position as usize);
-            self.storage.insert(position as usize, Some(Box::new(item)));
+            self.storage.insert(position as usize, Some(item));
         }
     }
 
@@ -47,7 +47,7 @@ impl<T: Clone> PositionLevelStorage<T> {
         }
     }
 
-    pub fn iter(&self) -> slice::Iter<Option<Box<T>>> {
+    pub fn iter(&self) -> slice::Iter<Option<T>> {
         self.storage.iter()
     }
 }

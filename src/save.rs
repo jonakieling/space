@@ -17,7 +17,7 @@ pub fn save_scene(scene: &Scene) {
         if let Some(ref wall) = *item {
             let x = pos as i32 % LEVEL_SIZE;
             let y = pos as i32 / LEVEL_SIZE;
-            level_walls.push((x, y, *wall.clone()));
+            level_walls.push((x, y, wall.clone()));
         }
     }
     let bytes: Vec<u8> = bincode::serialize(&level_walls).unwrap();
@@ -28,7 +28,7 @@ pub fn save_scene(scene: &Scene) {
         if let Some(ref door) = *item {
             let x = pos as i32 % LEVEL_SIZE;
             let y = pos as i32 / LEVEL_SIZE;
-            level_doors.push((x, y, *door.clone()));
+            level_doors.push((x, y, door.clone()));
         }
     }
     let bytes: Vec<u8> = bincode::serialize(&level_doors).unwrap();
@@ -39,7 +39,7 @@ pub fn save_scene(scene: &Scene) {
         if let Some(ref terminal) = *item {
             let x = pos as i32 % LEVEL_SIZE;
             let y = pos as i32 / LEVEL_SIZE;
-            level_terminals.push((x, y, *terminal.clone()));
+            level_terminals.push((x, y, terminal.clone()));
         }
     }
     let bytes: Vec<u8> = bincode::serialize(&level_terminals).unwrap();
