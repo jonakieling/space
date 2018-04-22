@@ -22,10 +22,19 @@ pub struct Terminal {
     pub front: Direction,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct Circuitry {
+	pub parts: Box<Vec<Item>>
+}
+
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 pub enum Item {
     Log,
     PilotLicense,
     Terminal,
     Communicator,
+    Chip,
+    Cable,
+    Isolation,
+    Adapter,
 }

@@ -18,6 +18,7 @@ pub struct Scene {
     pub walls: PositionLevelStorage<Wall>,
     pub doors: PositionLevelStorage<Door>,
     pub terminals: PositionLevelStorage<Terminal>,
+    pub circuitry: PositionLevelStorage<Circuitry>,
     terminal_text: graphics::Text,
     input: InputState,
     edit_cursor: Position,
@@ -50,6 +51,7 @@ impl Scene {
         let walls = <PositionLevelStorage<Wall>>::new();
         let doors = <PositionLevelStorage<Door>>::new();
         let terminals = <PositionLevelStorage<Terminal>>::new();
+        let circuitry = <PositionLevelStorage<Circuitry>>::new();
         
         let scene = Scene {
             movement_timer: Duration::from_millis(0),
@@ -57,6 +59,7 @@ impl Scene {
             walls,
             doors,
             terminals,
+            circuitry,
             terminal_text: graphics::Text::new(_ctx, "", &font)?,
             input: InputState::World,
             edit_cursor: Position {x: 0, y: 0}
@@ -96,6 +99,14 @@ impl Scene {
                     door.status = DoorStatus::Closed;
                     println!("door closed");
                 },
+            }
+        }
+    }
+
+    fn interact_with_circuitry(&mut self) {
+        if let Some(&mut Some(ref mut current_circuitry)) = self.circuitry.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+            for part in current_circuitry.parts.iter() {
+                println!("{:?}", part);
             }
         }
     }
@@ -223,6 +234,7 @@ impl event::EventHandler for Scene {
                     Keycode::Return => {
                         self.interact_with_door();
                         self.interact_with_terminal(ctx);
+                        self.interact_with_circuitry();
                     },
                     Keycode::Insert => {
                         self.input = InputState::Edit;
@@ -324,6 +336,13 @@ impl event::EventHandler for Scene {
             }
         }
 
+        for (pos, circuitry) in self.circuitry.iter().enumerate() {
+            // Match for entity presence
+            if let &Some(_) = circuitry {
+                draw_circuitry(pos as i32, ctx)?;
+            }
+        }
+
         for (pos, terminal) in self.terminals.iter().enumerate() {
             // Match for entity presence
             if let &Some(ref current_terminal) = terminal {
@@ -370,6 +389,16 @@ fn draw_wall(pos: i32, ctx: &mut Context) -> GameResult<()> {
     let x = pos % LEVEL_SIZE;
     let y = pos / LEVEL_SIZE;
     graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
+
+    Ok(())
+}
+
+fn draw_circuitry(pos: i32, ctx: &mut Context) -> GameResult<()> {
+    let x = pos % LEVEL_SIZE;
+    let y = pos / LEVEL_SIZE;
+    graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 0.1,})?;
+    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 3.0, (y * GRID_SIZE) as f32 + 3.0, 15.0, 15.0))?;
+    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 5.0, (y * GRID_SIZE) as f32 + 5.0, 11.0, 11.0))?;
 
     Ok(())
 }

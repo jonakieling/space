@@ -49,6 +49,17 @@ pub fn save_scene(scene: &Scene) {
     let bytes: Vec<u8> = bincode::serialize(&level_terminals).unwrap();
     File::create("dev-level/terminals.bin").unwrap().write_all(&bytes).unwrap();
 
+    let mut level_circuitry: Vec<(i32, i32, Circuitry)> = vec![];
+    for (pos, item) in scene.circuitry.iter().enumerate() {
+        if let Some(ref circuitry) = *item {
+            let x = pos as i32 % LEVEL_SIZE;
+            let y = pos as i32 / LEVEL_SIZE;
+            level_circuitry.push((x, y, circuitry.clone()));
+        }
+    }
+    let bytes: Vec<u8> = bincode::serialize(&level_circuitry).unwrap();
+    File::create("dev-level/circuitry.bin").unwrap().write_all(&bytes).unwrap();
+
     let file = File::create("dev-level.tar").unwrap();
     let mut a = Builder::new(file);
     a.append_dir_all("dev-level", "dev-level").unwrap();
@@ -82,6 +93,12 @@ pub fn load_scene(scene: &mut Scene) {
                     let mut level_terminals: Vec<(i32, i32, Terminal)> = bincode::deserialize_from(file).unwrap();
                     for terminal in level_terminals {
                         scene.terminals.insert(terminal.0, terminal.1, terminal.2);
+                    }
+                },
+                "circuitry" => {
+                    let mut level_circuitry: Vec<(i32, i32, Circuitry)> = bincode::deserialize_from(file).unwrap();
+                    for circuitry in level_circuitry {
+                        scene.circuitry.insert(circuitry.0, circuitry.1, circuitry.2);
                     }
                 },
                 "player" => {
@@ -221,6 +238,16 @@ pub fn static_ship_tech_2_1(scene: &mut Scene) {
     scene.walls.insert(6, 4, Wall {});
 
     scene.doors.insert(4, 5, Door {status: DoorStatus::Closed});
+
+    let mut parts = Box::new(Vec::new());
+    parts.push(Item::Chip);
+    parts.push(Item::Chip);
+    parts.push(Item::Cable);
+    parts.push(Item::Isolation);
+    parts.push(Item::Isolation);
+    parts.push(Item::Isolation);
+    parts.push(Item::Adapter);
+    scene.circuitry.insert(4, 7, Circuitry {parts});
 
 
     scene.terminals.insert(4, 3, Terminal {
