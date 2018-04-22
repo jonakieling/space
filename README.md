@@ -19,3 +19,9 @@ thoughts before implmentation.
 * energy, circuits
 * scanners, navigation
 * logs
+
+thoughts after implmentation start.
+
+## engine tech
+* gui for selections and lists
+* scene/storage management (how to deal with space, ship, level, objects)
