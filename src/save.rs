@@ -82,6 +82,10 @@ pub fn load_scene(scene: &mut Scene) {
                 },
                 "player" => {
                     let mut level_player: Player = bincode::deserialize_from(file).unwrap();
+                    println!("player inventory:");
+                    for item in level_player.inventory.iter() {
+                        println!("{:?}", item);
+                    }
                     scene.player = level_player;
                 },
                 _ => (),
