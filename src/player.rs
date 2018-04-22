@@ -1,4 +1,4 @@
-use scene::{Position, Direction};
+use scene::{Position, Direction, Item};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Player {
@@ -6,6 +6,7 @@ pub struct Player {
     pub movement: Vec<Direction>,
     pub direction: Direction,
     pub front_tile: Position,
+    pub inventory: Box<Vec<Item>>,
 }
 
 impl Player {

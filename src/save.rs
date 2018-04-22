@@ -172,12 +172,20 @@ pub fn static_level0(scene: &mut Scene) {
     let player_position = Position { x: 10, y: 10 };
     let player_direction = Direction::Down;
     let player_front_tile = &player_direction.value() + &player_position;
+    let mut inventory = Box::new(Vec::new());
+    inventory.push(Item::Log);
+    inventory.push(Item::Communicator);
     let player = Player {
         position: player_position,
         movement: vec![],
         direction: player_direction,
-        front_tile: player_front_tile
+        front_tile: player_front_tile,
+        inventory
     };
+    println!("player inventory:");
+    for item in player.inventory.iter() {
+        println!("{:?}", item);
+    }
     scene.player = player;
 
     println!("game loaded: static level0");
@@ -212,12 +220,22 @@ pub fn static_ship_tech_2_1(scene: &mut Scene) {
     let player_position = Position { x: 4, y: 4 };
     let player_direction = Direction::Up;
     let player_front_tile = &player_direction.value() + &player_position;
+    let mut inventory = Box::new(Vec::new());
+    inventory.push(Item::Log);
+    inventory.push(Item::PilotLicense);
+    inventory.push(Item::Communicator);
+    inventory.push(Item::Terminal);
     let player = Player {
         position: player_position,
         movement: vec![],
         direction: player_direction,
-        front_tile: player_front_tile
+        front_tile: player_front_tile,
+        inventory
     };
+    println!("player inventory:");
+    for item in player.inventory.iter() {
+        println!("{:?}", item);
+    }
     scene.player = player;
 
     println!("game loaded: static ship tech 2.1");

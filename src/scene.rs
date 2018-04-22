@@ -150,6 +150,14 @@ impl Terminal {
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
+pub enum Item {
+    Log,
+    PilotLicense,
+    Terminal,
+    Communicator,
+}
+
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 pub enum InputState {
     Terminal,
     World,
@@ -178,11 +186,13 @@ impl Scene {
         let player_position = Position { x: 10, y: 10 };
         let player_direction = Direction::Down;
         let player_front_tile = &player_direction.value() + &player_position;
+        let inventory = Box::new(Vec::new());
         let player = Player {
             position: player_position,
             movement: vec![],
             direction: player_direction,
-            front_tile: player_front_tile
+            front_tile: player_front_tile,
+            inventory
         };
 
         let walls = <PositionLevelStorage<Wall>>::new();
