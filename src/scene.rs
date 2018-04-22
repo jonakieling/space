@@ -274,9 +274,13 @@ impl event::EventHandler for Scene {
                         self.walls.remove(self.edit_cursor.x, self.edit_cursor.y);
                         self.doors.remove(self.edit_cursor.x, self.edit_cursor.y);
                         self.terminals.remove(self.edit_cursor.x, self.edit_cursor.y);
+                        self.circuitry.remove(self.edit_cursor.x, self.edit_cursor.y);
                     },
                     Keycode::W => {
                         self.walls.insert(self.edit_cursor.x, self.edit_cursor.y, Wall {});
+                    },
+                    Keycode::C => {
+                        self.circuitry.insert(self.edit_cursor.x, self.edit_cursor.y, Circuitry {parts: Box::new(Vec::new())});
                     },
                     Keycode::D => {
                         self.doors.insert(self.edit_cursor.x, self.edit_cursor.y, Door { status: DoorStatus::Closed});
@@ -336,13 +340,6 @@ impl event::EventHandler for Scene {
             }
         }
 
-        for (pos, circuitry) in self.circuitry.iter().enumerate() {
-            // Match for entity presence
-            if let &Some(_) = circuitry {
-                draw_circuitry(pos as i32, ctx)?;
-            }
-        }
-
         for (pos, terminal) in self.terminals.iter().enumerate() {
             // Match for entity presence
             if let &Some(ref current_terminal) = terminal {
@@ -353,6 +350,13 @@ impl event::EventHandler for Scene {
         for (pos, item) in self.doors.iter().enumerate() {
             if let &Some(ref door) = item {
                 draw_door(door, pos as i32, ctx)?;
+            }
+        }
+
+        for (pos, circuitry) in self.circuitry.iter().enumerate() {
+            // Match for entity presence
+            if let &Some(_) = circuitry {
+                draw_circuitry(pos as i32, ctx)?;
             }
         }
 
