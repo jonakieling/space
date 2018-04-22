@@ -5,6 +5,10 @@ use std::io::Write;
 use bincode;
 use scene::*;
 use player::Player;
+use objects::*;
+use misc::*;
+
+pub const LEVEL_SIZE: i32 = 40;
 
 pub fn save_scene(scene: &Scene) {
     fs::create_dir("dev-level").unwrap();
@@ -184,7 +188,11 @@ pub fn static_level0(scene: &mut Scene) {
         movement: vec![],
         direction: player_direction,
         front_tile: player_front_tile,
-        inventory
+        inventory,
+        terminal: Box::new(Terminal {
+            text: Box::new(String::new()),
+            front: Direction::Down
+        })
     };
     println!("player inventory:");
     for item in player.inventory.iter() {
@@ -234,7 +242,11 @@ pub fn static_ship_tech_2_1(scene: &mut Scene) {
         movement: vec![],
         direction: player_direction,
         front_tile: player_front_tile,
-        inventory
+        inventory,
+        terminal: Box::new(Terminal {
+            text: Box::new(String::new()),
+            front: Direction::Down
+        })
     };
     println!("player inventory:");
     for item in player.inventory.iter() {

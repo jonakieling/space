@@ -1,5 +1,5 @@
 use std::slice;
-use scene::LEVEL_SIZE;
+use constants::LEVEL_SIZE;
 
 #[derive(Clone)]
 pub struct PositionLevelStorage<T: Clone> {

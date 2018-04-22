@@ -9,6 +9,9 @@ mod save;
 mod scene;
 mod storage;
 mod player;
+mod objects;
+mod misc;
+mod constants;
 
 use std::io::Write;
 use ggez::{Context, conf, event};

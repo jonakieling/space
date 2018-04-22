@@ -5,164 +5,12 @@ use ggez::Context;
 use ggez::graphics;
 use ggez::event;
 use ggez::event::*;
-use std::ops::Add;
 
 use player::*;
 use storage::*;
-
-// pixel scaling
-pub const GRID_SIZE: i32 = 20;
-// delay of movement in miliseconds
-const MOVEMENT_SPEED: u64 = 290;
-// width and height of a level in number of tiles
-pub const LEVEL_SIZE: i32 = 40;
-const TERMINAL_LIMIT: usize = 20;
-
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
-pub struct Position {
-    pub x: i32,
-    pub y: i32
-}
-
-impl Position {
-    pub fn viewport_x(self) -> f32 {
-        (self.x * GRID_SIZE) as f32
-    }
-
-    pub fn viewport_y(self) -> f32 {
-        (self.y * GRID_SIZE) as f32
-    }
-}
-
-impl<'a> Add for &'a Position {
-    type Output = Position;
-
-    fn add(self, other: &Position) -> Position {
-        Position {
-            x: self.x + other.x,
-            y: self.y + other.y
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
-pub enum Direction {
-    Up,
-    Down,
-    Left,
-    Right
-}
-
-impl Direction {
-    pub fn value(&self) -> Position {
-        match *self {
-            Direction::Up => Position { x: 0, y: -1 },
-            Direction::Down => Position { x: 0, y: 1 },
-            Direction::Left => Position { x: -1, y: 0 },
-            Direction::Right => Position { x: 1, y: 0 },
-        }
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
-pub struct Wall {
-    
-}
-
-impl Wall {
-    pub fn draw(pos: i32, ctx: &mut Context) -> GameResult<()> {
-        let x = pos % LEVEL_SIZE;
-        let y = pos / LEVEL_SIZE;
-        graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
-
-        Ok(())
-    }
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
-pub enum DoorStatus {
-    Open,
-    Closed
-}
-
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
-pub struct Door {
-    pub status: DoorStatus
-}
-
-impl Door {
-    pub fn draw(door: &Door, pos: i32, ctx: &mut Context) -> GameResult<()> {
-        let x = pos % LEVEL_SIZE;
-        let y = pos / LEVEL_SIZE;
-        match door.status {
-            DoorStatus::Open => {
-                graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
-                graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
-            },
-            DoorStatus::Closed => {
-                graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
-                graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
-            },
-        }
-
-        Ok(())
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct Terminal {
-    pub text: Box<String>,
-    pub front: Direction,
-}
-
-impl Terminal {
-    pub fn draw(pos: i32, direction: &Direction, ctx: &mut Context) -> GameResult<()> {
-        let x = pos % LEVEL_SIZE;
-        let y = pos / LEVEL_SIZE;
-        graphics::set_color(ctx, graphics::BLACK)?;
-        graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
-        graphics::set_color(ctx, graphics::Color{r: 0.5, g: 0.8, b: 0.5, a: 1.0,})?;
-        graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
-        match *direction {
-            Direction::Up => {
-                let front = graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 3.0);
-                graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
-            },
-            Direction::Down => {
-                let front = graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32 + (direction.value().y as f32 * 17.0), 21.0, 4.0);
-                graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
-                
-            },
-            Direction::Right => {
-                let front = graphics::Rect::new((x * GRID_SIZE) as f32 + (direction.value().x as f32 * 17.0), (y * GRID_SIZE) as f32 + (direction.value().y as f32), 4.0, 21.0);
-                graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
-                
-            },
-            Direction::Left => {
-                let front = graphics::Rect::new((x * GRID_SIZE) as f32 + (direction.value().x as f32), (y * GRID_SIZE) as f32 + (direction.value().y as f32), 4.0, 21.0);
-                graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
-                
-            },
-        }
-
-        Ok(())
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
-pub enum Item {
-    Log,
-    PilotLicense,
-    Terminal,
-    Communicator,
-}
-
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
-pub enum InputState {
-    Terminal,
-    World,
-    Edit
-}
+use objects::*;
+use misc::*;
+use constants::*;
 
 pub struct Scene {
     movement_timer: Duration,
@@ -192,7 +40,11 @@ impl Scene {
             movement: vec![],
             direction: player_direction,
             front_tile: player_front_tile,
-            inventory
+            inventory,
+            terminal: Box::new(Terminal {
+                text: Box::new(String::new()),
+                front: Direction::Down
+            })
         };
 
         let walls = <PositionLevelStorage<Wall>>::new();
@@ -468,20 +320,20 @@ impl event::EventHandler for Scene {
         for (pos, wall) in self.walls.iter().enumerate() {
             // Match for entity presence
             if let &Some(_) = wall {
-                Wall::draw(pos as i32, ctx)?;
+                draw_wall(pos as i32, ctx)?;
             }
         }
 
         for (pos, terminal) in self.terminals.iter().enumerate() {
             // Match for entity presence
             if let &Some(ref current_terminal) = terminal {
-                Terminal::draw(pos as i32, &current_terminal.front, ctx)?;
+                draw_terminal(pos as i32, &current_terminal.front, ctx)?;
             }
         }
 
         for (pos, item) in self.doors.iter().enumerate() {
             if let &Some(ref door) = item {
-                Door::draw(door, pos as i32, ctx)?;
+                draw_door(door, pos as i32, ctx)?;
             }
         }
 
@@ -512,4 +364,61 @@ impl event::EventHandler for Scene {
 
         Ok(())
     }
+}
+
+fn draw_wall(pos: i32, ctx: &mut Context) -> GameResult<()> {
+    let x = pos % LEVEL_SIZE;
+    let y = pos / LEVEL_SIZE;
+    graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
+
+    Ok(())
+}
+
+fn draw_door(door: &Door, pos: i32, ctx: &mut Context) -> GameResult<()> {
+    let x = pos % LEVEL_SIZE;
+    let y = pos / LEVEL_SIZE;
+    match door.status {
+        DoorStatus::Open => {
+            graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
+            graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
+        },
+        DoorStatus::Closed => {
+            graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
+            graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
+        },
+    }
+
+    Ok(())
+}
+
+fn draw_terminal(pos: i32, direction: &Direction, ctx: &mut Context) -> GameResult<()> {
+    let x = pos % LEVEL_SIZE;
+    let y = pos / LEVEL_SIZE;
+    graphics::set_color(ctx, graphics::BLACK)?;
+    graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
+    graphics::set_color(ctx, graphics::Color{r: 0.5, g: 0.8, b: 0.5, a: 1.0,})?;
+    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
+    match *direction {
+        Direction::Up => {
+            let front = graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 3.0);
+            graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
+        },
+        Direction::Down => {
+            let front = graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32 + (direction.value().y as f32 * 17.0), 21.0, 4.0);
+            graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
+            
+        },
+        Direction::Right => {
+            let front = graphics::Rect::new((x * GRID_SIZE) as f32 + (direction.value().x as f32 * 17.0), (y * GRID_SIZE) as f32 + (direction.value().y as f32), 4.0, 21.0);
+            graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
+            
+        },
+        Direction::Left => {
+            let front = graphics::Rect::new((x * GRID_SIZE) as f32 + (direction.value().x as f32), (y * GRID_SIZE) as f32 + (direction.value().y as f32), 4.0, 21.0);
+            graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
+            
+        },
+    }
+
+    Ok(())
 }

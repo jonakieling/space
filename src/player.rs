@@ -1,4 +1,5 @@
-use scene::{Position, Direction, Item};
+use misc::{Position, Direction};
+use objects::{Item, Terminal};
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Player {
@@ -7,6 +8,7 @@ pub struct Player {
     pub direction: Direction,
     pub front_tile: Position,
     pub inventory: Box<Vec<Item>>,
+    pub terminal: Box<Terminal>,
 }
 
 impl Player {
