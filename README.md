@@ -4,15 +4,15 @@ thoughts before implmentation.
 
 ## parts
 * stations
-* objects
+* objects (✓)
 * ships
 * npc
 
 ## interaction
 * conversations
-* terminals, consoles
+* terminals, consoles (✓)
 * space flight
-* inventory
+* inventory (✓)
 
 ## systems
 * object crafting
