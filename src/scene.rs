@@ -30,7 +30,7 @@ impl Scene {
         let font = graphics::Font::new(_ctx, "/04B_03.TTF", 12).unwrap();
         
         // initialize player and level object storages
-        // state and object can be loaded seperatly
+        // state and object are loaded seperatly
 
         let player_position = Position { x: 10, y: 10 };
         let player_direction = Direction::Down;
@@ -105,6 +105,7 @@ impl Scene {
 
     fn interact_with_circuitry(&mut self) {
         if let Some(&mut Some(ref mut current_circuitry)) = self.circuitry.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+            println!("accessing circuitry");
             for part in current_circuitry.parts.iter() {
                 println!("{:?}", part);
             }
@@ -334,14 +335,12 @@ impl event::EventHandler for Scene {
         graphics::set_color(ctx, graphics::BLACK)?;
 
         for (pos, wall) in self.walls.iter().enumerate() {
-            // Match for entity presence
             if let &Some(_) = wall {
                 draw_wall(pos as i32, ctx)?;
             }
         }
 
         for (pos, terminal) in self.terminals.iter().enumerate() {
-            // Match for entity presence
             if let &Some(ref current_terminal) = terminal {
                 draw_terminal(pos as i32, &current_terminal.front, ctx)?;
             }
@@ -354,7 +353,6 @@ impl event::EventHandler for Scene {
         }
 
         for (pos, circuitry) in self.circuitry.iter().enumerate() {
-            // Match for entity presence
             if let &Some(_) = circuitry {
                 draw_circuitry(pos as i32, ctx)?;
             }
