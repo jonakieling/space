@@ -74,35 +74,35 @@ pub fn load_scene(scene: &mut Scene) {
 
         for file in a.entries().unwrap() {
             // Make sure there wasn't an I/O error
-            let mut file = file.unwrap();
+            let file = file.unwrap();
 
             match file.path().unwrap().file_stem().unwrap().to_str().unwrap() as &str {
                 "walls" => {
-                    let mut level_walls: Vec<(i32, i32, Wall)> = bincode::deserialize_from(file).unwrap();
+                    let level_walls: Vec<(i32, i32, Wall)> = bincode::deserialize_from(file).unwrap();
                     for wall in level_walls {
                         scene.walls.insert(wall.0, wall.1, wall.2);
                     }
                 },
                 "doors" => {
-                    let mut level_doors: Vec<(i32, i32, Door)> = bincode::deserialize_from(file).unwrap();
+                    let level_doors: Vec<(i32, i32, Door)> = bincode::deserialize_from(file).unwrap();
                     for door in level_doors {
                         scene.doors.insert(door.0, door.1, door.2);
                     }
                 },
                 "terminals" => {
-                    let mut level_terminals: Vec<(i32, i32, Terminal)> = bincode::deserialize_from(file).unwrap();
+                    let level_terminals: Vec<(i32, i32, Terminal)> = bincode::deserialize_from(file).unwrap();
                     for terminal in level_terminals {
                         scene.terminals.insert(terminal.0, terminal.1, terminal.2);
                     }
                 },
                 "circuitry" => {
-                    let mut level_circuitry: Vec<(i32, i32, Circuitry)> = bincode::deserialize_from(file).unwrap();
+                    let level_circuitry: Vec<(i32, i32, Circuitry)> = bincode::deserialize_from(file).unwrap();
                     for circuitry in level_circuitry {
                         scene.circuitry.insert(circuitry.0, circuitry.1, circuitry.2);
                     }
                 },
                 "player" => {
-                    let mut level_player: Player = bincode::deserialize_from(file).unwrap();
+                    let level_player: Player = bincode::deserialize_from(file).unwrap();
                     println!("player inventory:");
                     for item in level_player.inventory.iter() {
                         println!("{:?}", item);
@@ -211,10 +211,6 @@ pub fn static_level0(scene: &mut Scene) {
             front: Direction::Down
         })
     };
-    println!("player inventory:");
-    for item in player.inventory.iter() {
-        println!("{:?}", item);
-    }
     scene.player = player;
 
     println!("game loaded: static level0");
@@ -275,10 +271,6 @@ pub fn static_ship_tech_2_1(scene: &mut Scene) {
             front: Direction::Down
         })
     };
-    println!("player inventory:");
-    for item in player.inventory.iter() {
-        println!("{:?}", item);
-    }
     scene.player = player;
 
     println!("game loaded: static ship tech 2.1");

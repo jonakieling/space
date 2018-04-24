@@ -22,6 +22,7 @@ pub struct Scene {
     terminal_text: graphics::Text,
     input: InputState,
     edit_cursor: Position,
+    insight_view: bool,
 }
 
 impl Scene {
@@ -62,7 +63,8 @@ impl Scene {
             circuitry,
             terminal_text: graphics::Text::new(_ctx, "", &font)?,
             input: InputState::World,
-            edit_cursor: Position {x: 0, y: 0}
+            edit_cursor: Position {x: 0, y: 0},
+            insight_view: false
         };
 
         Ok(scene)
@@ -192,6 +194,9 @@ impl event::EventHandler for Scene {
                     Keycode::Down => {
                         self.player.movement(Direction::Down, Direction::Up);
                     },
+                    Keycode::LCtrl => {
+                        self.insight_view = true;
+                    }
                     _ => ()
                 }
             } else {
@@ -233,12 +238,24 @@ impl event::EventHandler for Scene {
                         self.player.remove_movement(Direction::Down);
                     },
                     Keycode::Return => {
-                        self.interact_with_door();
-                        self.interact_with_terminal(ctx);
-                        self.interact_with_circuitry();
+                        if self.insight_view {
+                            self.interact_with_circuitry();
+                        } else {
+                            self.interact_with_door();
+                            self.interact_with_terminal(ctx);
+                        }
+                    },
+                    Keycode::I => {
+                        println!("player inventory:");
+                        for item in self.player.inventory.iter() {
+                            println!("{:?}", item);
+                        }
                     },
                     Keycode::Insert => {
                         self.input = InputState::Edit;
+                    },
+                    Keycode::LCtrl => {
+                        self.insight_view = false;
                     },
                     _ => ()
                 }
@@ -352,9 +369,11 @@ impl event::EventHandler for Scene {
             }
         }
 
-        for (pos, circuitry) in self.circuitry.iter().enumerate() {
-            if let &Some(_) = circuitry {
-                draw_circuitry(pos as i32, ctx)?;
+        if self.insight_view {
+            for (pos, circuitry) in self.circuitry.iter().enumerate() {
+                if let &Some(_) = circuitry {
+                    draw_circuitry(pos as i32, ctx)?;
+                }
             }
         }
 
