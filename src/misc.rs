@@ -51,5 +51,6 @@ impl Direction {
 pub enum InputState {
     Terminal,
     World,
-    Edit
+    Edit,
+    Inventory
 }

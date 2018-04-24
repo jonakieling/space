@@ -23,6 +23,8 @@ pub struct Scene {
     input: InputState,
     edit_cursor: Position,
     insight_view: bool,
+    selection: Vec<String>,
+    current_selection: usize,
 }
 
 impl Scene {
@@ -64,7 +66,9 @@ impl Scene {
             terminal_text: graphics::Text::new(_ctx, "", &font)?,
             input: InputState::World,
             edit_cursor: Position {x: 0, y: 0},
-            insight_view: false
+            insight_view: false,
+            selection: Vec::new(),
+            current_selection: 0,
         };
 
         Ok(scene)
@@ -246,10 +250,12 @@ impl event::EventHandler for Scene {
                         }
                     },
                     Keycode::I => {
+                        self.input = InputState::Inventory;
                         println!("player inventory:");
                         for item in self.player.inventory.iter() {
-                            println!("{:?}", item);
+                            self.selection.push(format!("{:?}", item));
                         }
+                        println!("{:?}", self.selection.get(self.current_selection));
                     },
                     Keycode::Insert => {
                         self.input = InputState::Edit;
@@ -333,6 +339,27 @@ impl event::EventHandler for Scene {
                                 },
                             }
                         }
+                    },
+                    _ => ()
+                }
+            },
+            InputState::Inventory => {
+                match keycode {
+                    Keycode::I => {
+                        self.input = InputState::World;
+                        self.selection.clear();
+                    },
+                    Keycode::Up => {
+                        if self.current_selection > 0 {
+                            self.current_selection -= 1;
+                        }
+                        println!("{:?}", self.selection.get(self.current_selection));
+                    },
+                    Keycode::Down => {
+                        if self.current_selection < self.selection.len() - 1 {
+                            self.current_selection += 1;
+                        }
+                        println!("{:?}", self.selection.get(self.current_selection));
                     },
                     _ => ()
                 }
