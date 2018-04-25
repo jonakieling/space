@@ -4,16 +4,136 @@
 		"selected_items":
 		[
 			[
+				"cu",
+				"current"
+			],
+			[
+				"sel",
+				"self"
+			],
+			[
+				"curre",
+				"current_selection"
+			],
+			[
+				"curr",
+				"current_selection"
+			],
+			[
+				"ins",
+				"insight_view"
+			],
+			[
+				"C",
+				"Circuitry"
+			],
+			[
+				"Term",
+				"TerminalNode"
+			],
+			[
+				"Termi",
+				"TerminalProgramm"
+			],
+			[
+				"Ter",
+				"TerminalNode"
+			],
+			[
+				"T",
+				"TerminalNode"
+			],
+			[
+				"Terminal",
+				"TerminalAction"
+			],
+			[
+				"ke",
+				"_keymod"
+			],
+			[
 				"if",
-				"if-let\tif let … = … { … }"
+				"if\tif … { … }"
+			],
+			[
+				"Do",
+				"DoorStatus"
+			],
+			[
+				"cl",
+				"Closed"
+			],
+			[
+				"w",
+				"walls"
+			],
+			[
+				"termi",
+				"terminal_front_tile"
+			],
+			[
+				"term",
+				"terminal_front_tile"
+			],
+			[
+				"bin",
+				"bincode"
+			],
+			[
+				"len",
+				"text_len"
+			],
+			[
+				"play",
+				"player_front_tile"
+			],
+			[
+				"Posi",
+				"Position"
+			],
+			[
+				"tr",
+				"true"
+			],
+			[
+				"tex",
+				"text_limit_reached"
+			],
+			[
+				"te",
+				"text_limit_reached"
+			],
+			[
+				"terminal",
+				"terminal_text"
+			],
+			[
+				"termin",
+				"terminal_text"
+			],
+			[
+				"new",
+				"new_terminal_text"
+			],
+			[
+				"cur",
+				"current_terminal"
+			],
+			[
+				"in",
+				"input"
+			],
+			[
+				"ct",
+				"_ctx"
+			],
+			[
+				"level",
+				"level_player"
 			],
 			[
 				"DOR",
 				"DoorStatus"
-			],
-			[
-				"Do",
-				"Door"
 			],
 			[
 				"Dor",
@@ -45,10 +165,6 @@
 			],
 			[
 				"L",
-				"PositionLevelStorage"
-			],
-			[
-				"Posi",
 				"PositionLevelStorage"
 			],
 			[
@@ -96,10 +212,6 @@
 				"actors"
 			],
 			[
-				"play",
-				"player"
-			],
-			[
 				"pl",
 				"player"
 			],
@@ -131,15 +243,6 @@
 	},
 	"buffers":
 	[
-		{
-			"file": "src/main.rs",
-			"settings":
-			{
-				"buffer_size": 15756,
-				"encoding": "UTF-8",
-				"line_ending": "Unix"
-			}
-		}
 	],
 	"build_system": "",
 	"build_system_choices":
@@ -185,20 +288,29 @@
 	},
 	"expanded_folders":
 	[
-		"/home/jonathan/Code/space.rust"
+		"/home/jonathan/Code/space.rust",
+		"/home/jonathan/Code/space.rust/src"
 	],
 	"file_history":
 	[
-		"/home/jonathan/Documents/list-games",
+		"/home/jonathan/Code/space.rust/src/scene.rs",
+		"/home/jonathan/Code/space.rust/src/save.rs",
+		"/home/jonathan/Code/space.rust/src/player.rs",
+		"/home/jonathan/Code/space.rust/src/storage.rs",
+		"/home/jonathan/Code/space.rust/src/misc.rs",
+		"/home/jonathan/Code/space.rust/README.md",
+		"/home/jonathan/Code/space.rust/src/objects.rs",
+		"/home/jonathan/Code/space.rust/src/main.rs",
+		"/home/jonathan/Code/space.rust/src/constants.rs",
+		"/home/jonathan/Code/space.rust/src/location.rs",
 		"/home/jonathan/Code/space.rust/Cargo.toml",
 		"/home/jonathan/Code/rooms.rust/src/main.rs",
-		"/home/jonathan/Code/space.rust/src/main.rs",
+		"/home/jonathan/Code/space.rust/space.sublime-project",
+		"/home/jonathan/Documents/list-games",
 		"/home/jonathan/.config/EgoSoft/X3AP/config.yaml",
 		"/home/jonathan/Code/space.rust/src/drop.rs",
-		"/home/jonathan/Code/space.rust/space.sublime-project",
 		"/home/jonathan/Code/space.rust/space.sublime-workspace",
-		"/home/jonathan/Code/hello.rust/src/main.rs",
-		"/home/jonathan/Code/space.rust/README.md"
+		"/home/jonathan/Code/hello.rust/src/main.rs"
 	],
 	"find":
 	{
@@ -206,7 +318,7 @@
 	},
 	"find_in_files":
 	{
-		"height": 98.0,
+		"height": 101.0,
 		"where_history":
 		[
 			"<current file>",
@@ -218,6 +330,9 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"player.front_tile",
+			"player_front_tile",
+			"font",
 			"Vec2",
 			"hello"
 		],
@@ -227,6 +342,7 @@
 		"regex": false,
 		"replace_history":
 		[
+			"player.front_tile",
 			"Position",
 			"space"
 		],
@@ -239,39 +355,8 @@
 	"groups":
 	[
 		{
-			"selected": 0,
 			"sheets":
 			[
-				{
-					"buffer": 0,
-					"file": "src/main.rs",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 15756,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								14567,
-								14567
-							]
-						],
-						"settings":
-						{
-							"syntax": "Packages/Rust/Rust.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 8110.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 0,
-					"type": "text"
-				}
 			]
 		}
 	],
@@ -281,7 +366,7 @@
 	},
 	"input":
 	{
-		"height": 0.0
+		"height": 37.0
 	},
 	"layout":
 	{
@@ -352,7 +437,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 139.0,
+	"side_bar_width": 114.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{
