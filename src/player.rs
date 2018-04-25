@@ -1,5 +1,6 @@
 use misc::{Position, Direction};
 use objects::{Item, Terminal};
+use storage::SelectionStorage;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Player {
@@ -7,7 +8,7 @@ pub struct Player {
     pub movement: Vec<Direction>,
     pub direction: Direction,
     pub front_tile: Position,
-    pub inventory: Box<Vec<Item>>,
+    pub inventory: SelectionStorage<Item>,
     pub terminal: Box<Terminal>,
 }
 

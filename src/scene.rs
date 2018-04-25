@@ -23,8 +23,6 @@ pub struct Scene {
     input: InputState,
     edit_cursor: Position,
     insight_view: bool,
-    selection: Vec<String>,
-    current_selection: usize,
 }
 
 impl Scene {
@@ -38,7 +36,7 @@ impl Scene {
         let player_position = Position { x: 10, y: 10 };
         let player_direction = Direction::Down;
         let player_front_tile = &player_direction.value() + &player_position;
-        let inventory = Box::new(Vec::new());
+        let inventory = SelectionStorage::new();
         let player = Player {
             position: player_position,
             movement: vec![],
@@ -67,8 +65,6 @@ impl Scene {
             input: InputState::World,
             edit_cursor: Position {x: 0, y: 0},
             insight_view: false,
-            selection: Vec::new(),
-            current_selection: 0,
         };
 
         Ok(scene)
@@ -252,10 +248,7 @@ impl event::EventHandler for Scene {
                     Keycode::I => {
                         self.input = InputState::Inventory;
                         println!("player inventory:");
-                        for item in self.player.inventory.iter() {
-                            self.selection.push(format!("{:?}", item));
-                        }
-                        println!("{:?}", self.selection.get(self.current_selection));
+                        println!("{:?}", self.player.inventory.current());
                     },
                     Keycode::Insert => {
                         self.input = InputState::Edit;
@@ -347,19 +340,12 @@ impl event::EventHandler for Scene {
                 match keycode {
                     Keycode::I => {
                         self.input = InputState::World;
-                        self.selection.clear();
                     },
                     Keycode::Up => {
-                        if self.current_selection > 0 {
-                            self.current_selection -= 1;
-                        }
-                        println!("{:?}", self.selection.get(self.current_selection));
+                        println!("{:?}", self.player.inventory.prev());
                     },
                     Keycode::Down => {
-                        if self.current_selection < self.selection.len() - 1 {
-                            self.current_selection += 1;
-                        }
-                        println!("{:?}", self.selection.get(self.current_selection));
+                        println!("{:?}", self.player.inventory.next());
                     },
                     _ => ()
                 }

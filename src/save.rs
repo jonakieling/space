@@ -7,6 +7,7 @@ use scene::*;
 use player::Player;
 use objects::*;
 use misc::*;
+use storage::SelectionStorage;
 
 pub const LEVEL_SIZE: i32 = 40;
 
@@ -197,9 +198,9 @@ pub fn static_level0(scene: &mut Scene) {
     let player_position = Position { x: 10, y: 10 };
     let player_direction = Direction::Down;
     let player_front_tile = &player_direction.value() + &player_position;
-    let mut inventory = Box::new(Vec::new());
-    inventory.push(Item::Log);
-    inventory.push(Item::Communicator);
+    let mut inventory = <SelectionStorage<Item>>::new();
+    inventory.insert(Item::Log);
+    inventory.insert(Item::Communicator);
     let player = Player {
         position: player_position,
         movement: vec![],
@@ -255,11 +256,11 @@ pub fn static_ship_tech_2_1(scene: &mut Scene) {
     let player_position = Position { x: 4, y: 4 };
     let player_direction = Direction::Up;
     let player_front_tile = &player_direction.value() + &player_position;
-    let mut inventory = Box::new(Vec::new());
-    inventory.push(Item::Log);
-    inventory.push(Item::PilotLicense);
-    inventory.push(Item::Communicator);
-    inventory.push(Item::Terminal);
+    let mut inventory = <SelectionStorage<Item>>::new();
+    inventory.insert(Item::Log);
+    inventory.insert(Item::PilotLicense);
+    inventory.insert(Item::Communicator);
+    inventory.insert(Item::Terminal);
     let player = Player {
         position: player_position,
         movement: vec![],
