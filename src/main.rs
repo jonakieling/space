@@ -13,12 +13,21 @@ mod objects;
 mod misc;
 mod constants;
 
+use std::env;
+use std::path;
 use std::io::Write;
 use ggez::{Context, conf, event};
 
 fn main() {
     let c = conf::Conf::new();
     let ctx = &mut Context::load_from_conf("Space", "Jonathan Kieling", c).unwrap();
+
+    if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
+        let mut path = path::PathBuf::from(manifest_dir);
+        path.push("res");
+        ctx.filesystem.mount(&path, true);
+	}
+	
     let scene = &mut scene::Scene::new(ctx).unwrap();
 
     save::load_scene(scene);

@@ -362,6 +362,23 @@ impl event::EventHandler for Scene {
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx);
 
+        let mut ship = graphics::Image::new(ctx, "/realm_of_sol__0000s_0001_2.1.png")?;
+        ship.set_filter(graphics::FilterMode::Nearest);
+        let dst = graphics::Point2::new(20.0, 20.0);
+        graphics::draw_ex(
+            ctx,
+            &ship,
+            graphics::DrawParam {
+                // src: src,
+                dest: dst,
+                rotation: 0.0,
+                // offset: Point2::new(-16.0, 0.0),
+                scale: graphics::Point2::new(GRID_SIZE as f32, GRID_SIZE as f32),
+                // shear: shear,
+                ..Default::default()
+            },
+        )?;
+
         graphics::set_color(ctx, graphics::BLACK)?;
 
         for (pos, wall) in self.walls.iter().enumerate() {
@@ -409,8 +426,8 @@ impl event::EventHandler for Scene {
 
         if self.input == InputState::Edit {
             graphics::set_color(ctx, graphics::Color{r: 0.2, g: 0.8, b: 0.2, a: 1.0,})?;
-            let player = graphics::Rect::new(self.edit_cursor.viewport_x(), self.edit_cursor.viewport_y(), 21.0, 21.0);
-            graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), player)?;
+            let edit_cursor = graphics::Rect::new(self.edit_cursor.viewport_x(), self.edit_cursor.viewport_y(), 21.0, 21.0);
+            graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), edit_cursor)?;
         }
 
         graphics::present(ctx);

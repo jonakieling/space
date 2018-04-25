@@ -219,22 +219,22 @@ pub fn static_level0(scene: &mut Scene) {
 
 
 pub fn static_ship_tech_2_1(scene: &mut Scene) {
-    scene.walls.insert(2, 2, Wall {});
-    scene.walls.insert(3, 2, Wall {});
-    scene.walls.insert(4, 2, Wall {});
-    scene.walls.insert(5, 2, Wall {});
-    scene.walls.insert(6, 2, Wall {});
+    scene.walls.insert(6, 8, Wall {});
+    scene.walls.insert(7, 8, Wall {});
+    scene.walls.insert(8, 8, Wall {});
+    scene.walls.insert(9, 8, Wall {});
+    scene.walls.insert(10, 8, Wall {});
 
-    scene.walls.insert(2, 3, Wall {});
-    scene.walls.insert(2, 4, Wall {});
+    scene.walls.insert(6, 9, Wall {});
+    scene.walls.insert(6, 10, Wall {});
 
-    scene.walls.insert(3, 5, Wall {});
-    scene.walls.insert(5, 5, Wall {});
+    scene.walls.insert(7, 11, Wall {});
+    scene.walls.insert(9, 11, Wall {});
 
-    scene.walls.insert(6, 3, Wall {});
-    scene.walls.insert(6, 4, Wall {});
+    scene.walls.insert(10, 9, Wall {});
+    scene.walls.insert(10, 10, Wall {});
 
-    scene.doors.insert(4, 5, Door {status: DoorStatus::Closed});
+    scene.doors.insert(8, 11, Door {status: DoorStatus::Closed});
 
     let mut parts = Box::new(Vec::new());
     parts.push(Item::Chip);
@@ -244,16 +244,16 @@ pub fn static_ship_tech_2_1(scene: &mut Scene) {
     parts.push(Item::Isolation);
     parts.push(Item::Isolation);
     parts.push(Item::Adapter);
-    scene.circuitry.insert(4, 7, Circuitry {parts});
+    scene.circuitry.insert(8, 13, Circuitry {parts});
 
 
-    scene.terminals.insert(4, 3, Terminal {
+    scene.terminals.insert(8, 9, Terminal {
         text: Box::new(String::new()),
         front: Direction::Down
     });
 
 
-    let player_position = Position { x: 4, y: 4 };
+    let player_position = Position { x: 8, y: 10 };
     let player_direction = Direction::Up;
     let player_front_tile = &player_direction.value() + &player_position;
     let mut inventory = <SelectionStorage<Item>>::new();
