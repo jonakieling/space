@@ -466,13 +466,49 @@ impl event::EventHandler for Scene {
             graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), edit_cursor)?;
         }
 
+        match self.input {
+            InputState::World => {
+                if self.insight_view {
+                    draw_input_state("World insight", ctx)?;
+                } else {
+                    draw_input_state("World", ctx)?;
+                }
+            },
+            InputState::Terminal => {
+                draw_input_state("Terminal", ctx)?;
+            },
+            InputState::Edit => {
+                draw_input_state("Edit", ctx)?;
+            },
+            InputState::Inventory => {
+                draw_input_state("Inventory", ctx)?;
+            }
+            InputState::Circuitry => {
+                draw_input_state("Circuitry", ctx)?;
+            },
+        }
+
         graphics::present(ctx);
 
         Ok(())
     }
 }
 
-fn draw_selection<T: Clone + Debug>(selection: &SelectionStorage<T> ,ctx: &mut Context) -> GameResult<()> {
+fn draw_input_state(state: &str, ctx: &mut Context) -> GameResult<()> {
+    let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
+    let input_state_text = String::from(state);
+    let input_state_graphics = graphics::Text::new(ctx, &input_state_text, &font).unwrap();
+    graphics::set_color(ctx, graphics::BLACK)?;
+    let input_state_box = graphics::Rect::new(20.0, 20.0, input_state_graphics.width() as f32 + 20.0, 20.0);
+    graphics::rectangle(ctx, graphics::DrawMode::Fill, input_state_box)?;
+    graphics::set_color(ctx, graphics::WHITE)?;
+    graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), input_state_box)?;
+    graphics::draw(ctx, &input_state_graphics, graphics::Point2::new(30.0, 20.0), 0.0)?;
+
+    Ok(())
+}
+
+fn draw_selection<T: Clone + Debug>(selection: &SelectionStorage<T>, ctx: &mut Context) -> GameResult<()> {
     let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
     let mut inventory_item_position = 0.0;
     let current_item = selection.current_index();
