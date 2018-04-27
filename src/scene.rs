@@ -1,4 +1,5 @@
 use std::time::Duration;
+use std::fmt::Debug;
 use ggez::timer;
 use ggez::GameResult;
 use ggez::Context;
@@ -106,11 +107,16 @@ impl Scene {
     }
 
     fn interact_with_circuitry(&mut self) {
+        if let Some(&mut Some(_)) = self.circuitry.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+            self.input = InputState::Circuitry;
+        }
+    }
+
+    fn current_circuitry(&mut self) -> Option<&mut Circuitry>{
         if let Some(&mut Some(ref mut current_circuitry)) = self.circuitry.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
-            println!("accessing circuitry");
-            for part in current_circuitry.parts.iter() {
-                println!("{:?}", part);
-            }
+            Some(current_circuitry)
+        } else {
+            None
         }
     }
 
@@ -177,6 +183,13 @@ impl event::EventHandler for Scene {
     }
 
     fn key_down_event(&mut self, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, repeat: bool) {
+        match keycode {
+            Keycode::LCtrl => {
+                self.insight_view = true;
+            },
+            _ => ()
+        }
+
         if self.input == InputState::World {
             if !repeat {
                 self.movement_timer = Duration::from_millis(MOVEMENT_SPEED);
@@ -194,9 +207,6 @@ impl event::EventHandler for Scene {
                     Keycode::Down => {
                         self.player.movement(Direction::Down, Direction::Up);
                     },
-                    Keycode::LCtrl => {
-                        self.insight_view = true;
-                    }
                     _ => ()
                 }
             } else {
@@ -222,6 +232,13 @@ impl event::EventHandler for Scene {
     }
 
     fn key_up_event(&mut self, ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+        match keycode {
+            Keycode::LCtrl => {
+                self.insight_view = false;
+            },
+            _ => ()
+        }
+
         match self.input {
             InputState::World => {
                 match keycode {
@@ -247,14 +264,9 @@ impl event::EventHandler for Scene {
                     },
                     Keycode::I => {
                         self.input = InputState::Inventory;
-                        println!("player inventory:");
-                        println!("{:?}", self.player.inventory.current());
                     },
                     Keycode::Insert => {
                         self.input = InputState::Edit;
-                    },
-                    Keycode::LCtrl => {
-                        self.insight_view = false;
                     },
                     _ => ()
                 }
@@ -297,7 +309,7 @@ impl event::EventHandler for Scene {
                         self.walls.insert(self.edit_cursor.x, self.edit_cursor.y, Wall {});
                     },
                     Keycode::C => {
-                        self.circuitry.insert(self.edit_cursor.x, self.edit_cursor.y, Circuitry {parts: Box::new(Vec::new())});
+                        self.circuitry.insert(self.edit_cursor.x, self.edit_cursor.y, Circuitry {parts: SelectionStorage::new()});
                     },
                     Keycode::D => {
                         self.doors.insert(self.edit_cursor.x, self.edit_cursor.y, Door { status: DoorStatus::Closed});
@@ -342,10 +354,24 @@ impl event::EventHandler for Scene {
                         self.input = InputState::World;
                     },
                     Keycode::Up => {
-                        println!("{:?}", self.player.inventory.prev());
+                        self.player.inventory.prev();
                     },
                     Keycode::Down => {
-                        println!("{:?}", self.player.inventory.next());
+                        self.player.inventory.next();
+                    },
+                    _ => ()
+                }
+            },
+            InputState::Circuitry => {
+                match keycode {
+                    Keycode::Escape => {
+                        self.input = InputState::World;
+                    },
+                    Keycode::Up => {
+                        self.current_circuitry().unwrap().parts.prev();
+                    },
+                    Keycode::Down => {
+                        self.current_circuitry().unwrap().parts.next();
                     },
                     _ => ()
                 }
@@ -354,7 +380,7 @@ impl event::EventHandler for Scene {
     }
 
     fn text_input_event(&mut self, ctx: &mut Context, text: String) {
-        if self.input == InputState::Terminal {
+        if let InputState::Terminal = self.input {
             self.terminal_add_character(ctx, text);
         }
     }
@@ -415,13 +441,20 @@ impl event::EventHandler for Scene {
         let face = graphics::Rect::new(self.player.position.viewport_x() + 5.0 + (self.player.direction.value().viewport_x() * 0.2), self.player.position.viewport_y() + 5.0 + (self.player.direction.value().viewport_y() * 0.2), 10.0, 10.0);
         graphics::rectangle(ctx, graphics::DrawMode::Fill, face)?;
 
-        if self.input == InputState::Terminal {
+        if let InputState::Terminal = self.input {
             graphics::set_color(ctx, graphics::BLACK)?;
-            let console = graphics::Rect::new(260.0, 500.0, self.terminal_text.width() as f32 + 20.0, 20.0);
+            let console = graphics::Rect::new(600.0 - self.terminal_text.width() as f32 + 20.0, 20.0, self.terminal_text.width() as f32 + 20.0, 20.0);
             graphics::rectangle(ctx, graphics::DrawMode::Fill, console)?;
             graphics::set_color(ctx, graphics::WHITE)?;
-            graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), console)?;
-            graphics::draw(ctx, &self.terminal_text, graphics::Point2::new(270.0, 500.0), 0.0)?;
+            graphics::draw(ctx, &self.terminal_text, graphics::Point2::new(620.0 - self.terminal_text.width() as f32 + 20.0, 20.0), 0.0)?;
+        }
+
+        if self.input == InputState::Inventory {
+            draw_selection(&self.player.inventory, ctx)?;
+        }
+
+        if self.input == InputState::Circuitry {
+            draw_selection(&self.current_circuitry().unwrap().parts, ctx)?;
         }
 
         if self.input == InputState::Edit {
@@ -434,6 +467,27 @@ impl event::EventHandler for Scene {
 
         Ok(())
     }
+}
+
+fn draw_selection<T: Clone + Debug>(selection: &SelectionStorage<T> ,ctx: &mut Context) -> GameResult<()> {
+    let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
+    let mut inventory_item_position = 0.0;
+    let current_item = selection.current_index();
+    for (pos, item) in selection.iter().enumerate() {
+        let item_text = format!("{:?}", item);
+        let item_graphics = graphics::Text::new(ctx, &item_text, &font).unwrap();
+        let inventory_box = graphics::Rect::new(760.0 - (item_graphics.width() as f32), 20.0 + (inventory_item_position * 25.0), item_graphics.width() as f32 + 20.0, 20.0);
+        graphics::set_color(ctx, graphics::BLACK)?;
+        graphics::rectangle(ctx, graphics::DrawMode::Fill, inventory_box)?;
+        graphics::set_color(ctx, graphics::WHITE)?;
+        if pos == current_item {
+            graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), inventory_box)?;
+        }
+        graphics::draw(ctx, &item_graphics, graphics::Point2::new(771.0 - item_graphics.width() as f32, 20.0 + (inventory_item_position * 25.0)), 0.0)?;
+        inventory_item_position += 1.0;
+    }
+
+    Ok(())
 }
 
 fn draw_wall(pos: i32, ctx: &mut Context) -> GameResult<()> {

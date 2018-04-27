@@ -236,14 +236,14 @@ pub fn static_ship_tech_2_1(scene: &mut Scene) {
 
     scene.doors.insert(8, 11, Door {status: DoorStatus::Closed});
 
-    let mut parts = Box::new(Vec::new());
-    parts.push(Item::Chip);
-    parts.push(Item::Chip);
-    parts.push(Item::Cable);
-    parts.push(Item::Isolation);
-    parts.push(Item::Isolation);
-    parts.push(Item::Isolation);
-    parts.push(Item::Adapter);
+    let mut parts = SelectionStorage::new();
+    parts.insert(Item::Chip);
+    parts.insert(Item::Chip);
+    parts.insert(Item::Cable);
+    parts.insert(Item::Isolation);
+    parts.insert(Item::Isolation);
+    parts.insert(Item::Isolation);
+    parts.insert(Item::Adapter);
     scene.circuitry.insert(8, 13, Circuitry {parts});
 
 

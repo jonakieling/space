@@ -84,6 +84,10 @@ impl<T: Clone> SelectionStorage<T> {
         self.storage.get(self.current_selection)
     }
 
+    pub fn current_index(&self) -> usize {
+        self.current_selection
+    }
+
     pub fn insert(&mut self, item: T) {
         self.storage.push(item);
     }

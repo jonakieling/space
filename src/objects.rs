@@ -1,3 +1,4 @@
+use storage::SelectionStorage;
 use misc::Direction;
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
@@ -24,7 +25,7 @@ pub struct Terminal {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Circuitry {
-	pub parts: Box<Vec<Item>>
+	pub parts: SelectionStorage<Item>
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]

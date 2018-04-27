@@ -47,10 +47,11 @@ impl Direction {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum InputState {
     Terminal,
     World,
     Edit,
-    Inventory
+    Inventory,
+    Circuitry
 }
