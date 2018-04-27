@@ -431,6 +431,8 @@ impl event::EventHandler for Scene {
                     draw_circuitry(pos as i32, ctx)?;
                 }
             }
+        } else if self.input == InputState::Circuitry {
+            draw_circuitry(self.player.front_tile.to_one_d() as i32, ctx)?;
         }
 
         graphics::set_color(ctx, graphics::BLACK)?;
@@ -443,10 +445,11 @@ impl event::EventHandler for Scene {
 
         if let InputState::Terminal = self.input {
             graphics::set_color(ctx, graphics::BLACK)?;
-            let console = graphics::Rect::new(600.0 - self.terminal_text.width() as f32 + 20.0, 20.0, self.terminal_text.width() as f32 + 20.0, 20.0);
+            let console = graphics::Rect::new(740.0 - self.terminal_text.width() as f32 + 20.0, 20.0, self.terminal_text.width() as f32 + 20.0, 20.0);
             graphics::rectangle(ctx, graphics::DrawMode::Fill, console)?;
             graphics::set_color(ctx, graphics::WHITE)?;
-            graphics::draw(ctx, &self.terminal_text, graphics::Point2::new(620.0 - self.terminal_text.width() as f32 + 20.0, 20.0), 0.0)?;
+            graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), console)?;
+            graphics::draw(ctx, &self.terminal_text, graphics::Point2::new(750.0 - self.terminal_text.width() as f32 + 20.0, 20.0), 0.0)?;
         }
 
         if self.input == InputState::Inventory {

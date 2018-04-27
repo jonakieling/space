@@ -1,5 +1,5 @@
 use std::ops::Add;
-use constants::GRID_SIZE;
+use constants::{GRID_SIZE, LEVEL_SIZE};
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 pub struct Position {
@@ -14,6 +14,10 @@ impl Position {
 
     pub fn viewport_y(self) -> f32 {
         (self.y * GRID_SIZE) as f32
+    }
+
+    pub fn to_one_d(self) -> i32 {
+        self.x + self.y * LEVEL_SIZE
     }
 }
 
