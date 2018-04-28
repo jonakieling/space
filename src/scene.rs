@@ -368,10 +368,14 @@ impl event::EventHandler for Scene {
                         self.input = InputState::World;
                     },
                     Keycode::Up => {
-                        self.current_circuitry().unwrap().parts.prev();
+                        if let Some(current_circuitry) = self.current_circuitry() {
+                            current_circuitry.parts.prev();
+                        }
                     },
                     Keycode::Down => {
-                        self.current_circuitry().unwrap().parts.next();
+                        if let Some(current_circuitry) = self.current_circuitry() {
+                            current_circuitry.parts.next();
+                        }
                     },
                     _ => ()
                 }

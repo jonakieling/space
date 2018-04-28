@@ -1,3 +1,4 @@
+use std::cmp::max;
 use std::slice;
 use constants::LEVEL_SIZE;
 
@@ -70,7 +71,7 @@ impl<T: Clone> SelectionStorage<T> {
         if self.current_selection > 0 {
             self.current_selection -= 1;
         } else {
-            self.current_selection = self.storage.len() - 1;
+            self.current_selection = max(0, self.storage.len() - 1);
         }
         self.current()
     }
