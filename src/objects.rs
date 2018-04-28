@@ -25,7 +25,13 @@ pub struct Terminal {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Circuitry {
-	pub parts: SelectionStorage<Item>
+    pub parts: SelectionStorage<Item>,
+    pub powered: bool
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct Generator {
+    
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]

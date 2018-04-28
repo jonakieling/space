@@ -244,7 +244,7 @@ pub fn static_ship_tech_2_1(scene: &mut Scene) {
     parts.insert(Item::Isolation);
     parts.insert(Item::Isolation);
     parts.insert(Item::Adapter);
-    scene.circuitry.insert(8, 13, Circuitry {parts});
+    scene.circuitry.insert(8, 13, Circuitry {parts, powered: false});
 
 
     scene.terminals.insert(8, 9, Terminal {

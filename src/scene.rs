@@ -20,6 +20,7 @@ pub struct Scene {
     pub doors: PositionLevelStorage<Door>,
     pub terminals: PositionLevelStorage<Terminal>,
     pub circuitry: PositionLevelStorage<Circuitry>,
+    pub generators: PositionLevelStorage<Generator>,
     terminal_text: graphics::Text,
     input: InputState,
     edit_cursor: Position,
@@ -54,6 +55,7 @@ impl Scene {
         let doors = <PositionLevelStorage<Door>>::new();
         let terminals = <PositionLevelStorage<Terminal>>::new();
         let circuitry = <PositionLevelStorage<Circuitry>>::new();
+        let generators = <PositionLevelStorage<Generator>>::new();
         
         let scene = Scene {
             movement_timer: Duration::from_millis(0),
@@ -62,6 +64,7 @@ impl Scene {
             doors,
             terminals,
             circuitry,
+            generators,
             terminal_text: graphics::Text::new(_ctx, "", &font)?,
             input: InputState::World,
             edit_cursor: Position {x: 0, y: 0},
@@ -309,7 +312,10 @@ impl event::EventHandler for Scene {
                         self.walls.insert(self.edit_cursor.x, self.edit_cursor.y, Wall {});
                     },
                     Keycode::C => {
-                        self.circuitry.insert(self.edit_cursor.x, self.edit_cursor.y, Circuitry {parts: SelectionStorage::new()});
+                        self.circuitry.insert(self.edit_cursor.x, self.edit_cursor.y, Circuitry {parts: SelectionStorage::new(), powered: false});
+                    },
+                    Keycode::G => {
+                        self.generators.insert(self.edit_cursor.x, self.edit_cursor.y, Generator {});
                     },
                     Keycode::D => {
                         self.doors.insert(self.edit_cursor.x, self.edit_cursor.y, Door { status: DoorStatus::Closed});
@@ -429,14 +435,23 @@ impl event::EventHandler for Scene {
             }
         }
 
+        for (pos, generator) in self.generators.iter().enumerate() {
+            if let &Some(_) = generator {
+                draw_generator(pos as i32, ctx)?;
+            }
+        }
+
         if self.insight_view {
             for (pos, circuitry) in self.circuitry.iter().enumerate() {
-                if let &Some(_) = circuitry {
-                    draw_circuitry(pos as i32, ctx)?;
+                if let &Some(ref circuitry) = circuitry {
+                    draw_circuitry(circuitry, pos as i32, ctx)?;
                 }
             }
         } else if self.input == InputState::Circuitry {
-            draw_circuitry(self.player.front_tile.to_one_d() as i32, ctx)?;
+            let front_index = self.player.front_tile.to_one_d();
+            if let Some(ref circuitry) = self.current_circuitry() {
+                draw_circuitry(circuitry, front_index as i32, ctx)?;
+            }
         }
 
         graphics::set_color(ctx, graphics::BLACK)?;
@@ -541,11 +556,26 @@ fn draw_wall(pos: i32, ctx: &mut Context) -> GameResult<()> {
     Ok(())
 }
 
-fn draw_circuitry(pos: i32, ctx: &mut Context) -> GameResult<()> {
+fn draw_circuitry(circuitry: &Circuitry, pos: i32, ctx: &mut Context) -> GameResult<()> {
     let x = pos % LEVEL_SIZE;
     let y = pos / LEVEL_SIZE;
     graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 0.1,})?;
     graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 3.0, (y * GRID_SIZE) as f32 + 3.0, 15.0, 15.0))?;
+    if circuitry.powered {
+        graphics::set_color(ctx, graphics::Color{r: 0.5, g: 0.8, b: 0.5, a: 0.15,})?;
+    }
+    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 5.0, (y * GRID_SIZE) as f32 + 5.0, 11.0, 11.0))?;
+
+    Ok(())
+}
+
+fn draw_generator(pos: i32, ctx: &mut Context) -> GameResult<()> {
+    let x = pos % LEVEL_SIZE;
+    let y = pos / LEVEL_SIZE;
+    graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 0.1,})?;
+    graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32 + 3.0, (y * GRID_SIZE) as f32 + 3.0, 15.0, 15.0))?;
+
+    graphics::set_color(ctx, graphics::Color{r: 0.8, g: 1.0, b: 0.8, a: 1.0,})?;
     graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 5.0, (y * GRID_SIZE) as f32 + 5.0, 11.0, 11.0))?;
 
     Ok(())
