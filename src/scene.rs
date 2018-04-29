@@ -24,6 +24,7 @@ pub struct Scene {
     terminal_text: graphics::Text,
     input: InputState,
     edit_cursor: Position,
+    edit_selection: SelectionStorage<String>,
     insight_view: bool,
 }
 
@@ -68,6 +69,7 @@ impl Scene {
             terminal_text: graphics::Text::new(_ctx, "", &font)?,
             input: InputState::World,
             edit_cursor: Position {x: 0, y: 0},
+            edit_selection: SelectionStorage::new(),
             insight_view: false,
         };
 
@@ -98,6 +100,31 @@ impl Scene {
         }
 
         found_collision
+    }
+
+    fn get_edit_selection(&mut self) -> SelectionStorage<String> {
+        let mut selection_storage: SelectionStorage<String> = SelectionStorage::new();
+        if let Some(&Some(_)) = self.walls.get(self.edit_cursor.x, self.edit_cursor.y) {
+            selection_storage.insert(String::from("Wall"));
+        }
+        
+        if let Some(&Some(_)) = self.doors.get(self.edit_cursor.x, self.edit_cursor.y) {
+            selection_storage.insert(String::from("Door"));
+        }
+        
+        if let Some(&Some(_)) = self.terminals.get(self.edit_cursor.x, self.edit_cursor.y) {
+            selection_storage.insert(String::from("Terminal"));
+        }
+        
+        if let Some(&Some(_)) = self.circuitry.get(self.edit_cursor.x, self.edit_cursor.y) {
+            selection_storage.insert(String::from("Circuitry"));
+        }
+        
+        if let Some(&Some(_)) = self.generators.get(self.edit_cursor.x, self.edit_cursor.y) {
+            selection_storage.insert(String::from("Generator"));
+        }
+
+        selection_storage
     }
 
     fn interact_with_door(&mut self) {
@@ -299,6 +326,7 @@ impl event::EventHandler for Scene {
                     },
                     Keycode::Insert => {
                         self.input = InputState::Edit;
+                        self.edit_selection = self.get_edit_selection();
                     },
                     _ => ()
                 }
@@ -321,15 +349,19 @@ impl event::EventHandler for Scene {
                     },
                     Keycode::Left => {
                         self.edit_cursor = &self.edit_cursor + &Direction::Left.value();
+                        self.edit_selection = self.get_edit_selection();
                     },
                     Keycode::Right => {
                         self.edit_cursor = &self.edit_cursor + &Direction::Right.value();
+                        self.edit_selection = self.get_edit_selection();
                     },
                     Keycode::Up => {
                         self.edit_cursor = &self.edit_cursor + &Direction::Up.value();
+                        self.edit_selection = self.get_edit_selection();
                     },
                     Keycode::Down => {
                         self.edit_cursor = &self.edit_cursor + &Direction::Down.value();
+                        self.edit_selection = self.get_edit_selection();
                     },
                     Keycode::Delete => {
                         self.walls.remove(self.edit_cursor.x, self.edit_cursor.y);
@@ -505,11 +537,15 @@ impl event::EventHandler for Scene {
         }
 
         if self.input == InputState::Inventory {
-            draw_selection(&self.player.inventory, ctx)?;
+            draw_selection(&self.player.inventory, ctx, true)?;
         }
 
         if self.input == InputState::Circuitry {
-            draw_selection(&self.current_circuitry().unwrap().parts, ctx)?;
+            draw_selection(&self.current_circuitry().unwrap().parts, ctx, true)?;
+        }
+
+        if self.input == InputState::Edit {
+            draw_selection(&self.edit_selection, ctx, false)?;
         }
 
         if self.input == InputState::Edit {
@@ -560,7 +596,7 @@ fn draw_input_state(state: &str, ctx: &mut Context) -> GameResult<()> {
     Ok(())
 }
 
-fn draw_selection<T: Clone + Debug>(selection: &SelectionStorage<T>, ctx: &mut Context) -> GameResult<()> {
+fn draw_selection<T: Clone + Debug>(selection: &SelectionStorage<T>, ctx: &mut Context, cursor: bool) -> GameResult<()> {
     let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
     let mut inventory_item_position = 0.0;
     let current_item = selection.current_index();
@@ -571,7 +607,7 @@ fn draw_selection<T: Clone + Debug>(selection: &SelectionStorage<T>, ctx: &mut C
         graphics::set_color(ctx, graphics::BLACK)?;
         graphics::rectangle(ctx, graphics::DrawMode::Fill, inventory_box)?;
         graphics::set_color(ctx, graphics::WHITE)?;
-        if pos == current_item {
+        if pos == current_item && cursor {
             graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), inventory_box)?;
         }
         graphics::draw(ctx, &item_graphics, graphics::Point2::new(771.0 - item_graphics.width() as f32, 20.0 + (inventory_item_position * 25.0)), 0.0)?;
