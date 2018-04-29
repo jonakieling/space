@@ -51,6 +51,10 @@ impl<T: Clone> PositionLevelStorage<T> {
     pub fn iter(&self) -> slice::Iter<Option<T>> {
         self.storage.iter()
     }
+
+    pub fn iter_mut(&mut self) -> slice::IterMut<Option<T>> {
+        self.storage.iter_mut()
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

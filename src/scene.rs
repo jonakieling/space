@@ -57,7 +57,7 @@ impl Scene {
         let circuitry = <PositionLevelStorage<Circuitry>>::new();
         let generators = <PositionLevelStorage<Generator>>::new();
         
-        let scene = Scene {
+        let mut scene = Scene {
             movement_timer: Duration::from_millis(0),
             player,
             walls,
@@ -70,6 +70,8 @@ impl Scene {
             edit_cursor: Position {x: 0, y: 0},
             insight_view: false,
         };
+
+        scene.update_power();
 
         Ok(scene)
     }
@@ -105,6 +107,29 @@ impl Scene {
                     door.status = DoorStatus::Closed;
                     println!("door closed");
                 },
+            }
+        }
+    }
+
+    fn reset_powert(&mut self) {
+        for circuitry in self.circuitry.iter_mut() {
+            if let &mut Some(ref mut circuitry) = circuitry {
+                circuitry.powered = false;
+            }
+        }
+    }
+
+    fn update_power(&mut self) {
+        self.reset_powert();
+        for (generator_pos, generator) in self.generators.iter().enumerate() {
+            if let &Some(_) = generator {
+                for (circuitry_pos, circuitry) in self.circuitry.iter_mut().enumerate() {
+                    if let &mut Some(ref mut circuitry) = circuitry {
+                        if Position::to_two_d(circuitry_pos as i32).dist(&Position::to_two_d(generator_pos as i32)) <= 10.0 {
+                            circuitry.powered = true;
+                        }
+                    }
+                }
             }
         }
     }
@@ -307,15 +332,19 @@ impl event::EventHandler for Scene {
                         self.doors.remove(self.edit_cursor.x, self.edit_cursor.y);
                         self.terminals.remove(self.edit_cursor.x, self.edit_cursor.y);
                         self.circuitry.remove(self.edit_cursor.x, self.edit_cursor.y);
+                        self.generators.remove(self.edit_cursor.x, self.edit_cursor.y);
+                        self.update_power();
                     },
                     Keycode::W => {
                         self.walls.insert(self.edit_cursor.x, self.edit_cursor.y, Wall {});
                     },
                     Keycode::C => {
                         self.circuitry.insert(self.edit_cursor.x, self.edit_cursor.y, Circuitry {parts: SelectionStorage::new(), powered: false});
+                        self.update_power();
                     },
                     Keycode::G => {
                         self.generators.insert(self.edit_cursor.x, self.edit_cursor.y, Generator {});
+                        self.update_power();
                     },
                     Keycode::D => {
                         self.doors.insert(self.edit_cursor.x, self.edit_cursor.y, Door { status: DoorStatus::Closed});
@@ -562,7 +591,7 @@ fn draw_circuitry(circuitry: &Circuitry, pos: i32, ctx: &mut Context) -> GameRes
     graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 0.1,})?;
     graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 3.0, (y * GRID_SIZE) as f32 + 3.0, 15.0, 15.0))?;
     if circuitry.powered {
-        graphics::set_color(ctx, graphics::Color{r: 0.5, g: 0.8, b: 0.5, a: 0.15,})?;
+        graphics::set_color(ctx, graphics::Color{r: 0.5, g: 0.8, b: 0.5, a: 0.8,})?;
     }
     graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 5.0, (y * GRID_SIZE) as f32 + 5.0, 11.0, 11.0))?;
 

@@ -16,8 +16,19 @@ impl Position {
         (self.y * GRID_SIZE) as f32
     }
 
+    pub fn dist(self, other: &Position) -> f32 {
+        ((other.x - self.x).pow(2) as f32 + (other.y - self.y).pow(2) as f32).sqrt()
+    }
+
     pub fn to_one_d(self) -> i32 {
         self.x + self.y * LEVEL_SIZE
+    }
+
+    pub fn to_two_d(pos: i32) -> Position {
+        Position {
+            x: pos % LEVEL_SIZE,
+            y: pos / LEVEL_SIZE
+        }
     }
 }
 
