@@ -12,20 +12,21 @@ use storage::*;
 use objects::*;
 use misc::*;
 use constants::*;
+use mode::*;
 
 pub struct Scene {
-    movement_timer: Duration,
+    pub movement_timer: Duration,
     pub player: Player,
     pub walls: PositionLevelStorage<Wall>,
     pub doors: PositionLevelStorage<Door>,
     pub terminals: PositionLevelStorage<Terminal>,
     pub circuitry: PositionLevelStorage<Circuitry>,
     pub generators: PositionLevelStorage<Generator>,
-    terminal_text: graphics::Text,
-    input: InputState,
-    edit_cursor: Position,
-    edit_selection: SelectionStorage<String>,
-    insight_view: bool,
+    pub terminal_text: graphics::Text,
+    pub input: InputState,
+    pub edit_cursor: Position,
+    pub edit_selection: SelectionStorage<String>,
+    pub insight_view: bool,
 }
 
 impl Scene {
@@ -78,7 +79,7 @@ impl Scene {
         Ok(scene)
     }
 
-    fn check_player_collision(&self) -> bool {
+    pub fn check_player_collision(&self) -> bool {
         let mut found_collision = false;
 
         if let Some(&Some(_)) = self.walls.get(self.player.front_tile.x, self.player.front_tile.y) {
@@ -102,7 +103,7 @@ impl Scene {
         found_collision
     }
 
-    fn get_edit_selection(&mut self) -> SelectionStorage<String> {
+    pub fn get_edit_selection(&mut self) -> SelectionStorage<String> {
         let mut selection_storage: SelectionStorage<String> = SelectionStorage::new();
         if let Some(&Some(_)) = self.walls.get(self.edit_cursor.x, self.edit_cursor.y) {
             selection_storage.insert(String::from("Wall"));
@@ -127,7 +128,7 @@ impl Scene {
         selection_storage
     }
 
-    fn interact_with_door(&mut self) {
+    pub fn interact_with_door(&mut self) {
         if let Some(&mut Some(ref mut door)) = self.doors.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             match door.status {
                 DoorStatus::Closed => {
@@ -142,7 +143,7 @@ impl Scene {
         }
     }
 
-    fn reset_powert(&mut self) {
+    pub fn reset_powert(&mut self) {
         for circuitry in self.circuitry.iter_mut() {
             if let &mut Some(ref mut circuitry) = circuitry {
                 circuitry.powered = false;
@@ -150,7 +151,7 @@ impl Scene {
         }
     }
 
-    fn update_power(&mut self) {
+    pub fn update_power(&mut self) {
         self.reset_powert();
         for (generator_pos, generator) in self.generators.iter().enumerate() {
             if let &Some(_) = generator {
@@ -165,13 +166,13 @@ impl Scene {
         }
     }
 
-    fn interact_with_circuitry(&mut self) {
+    pub fn interact_with_circuitry(&mut self) {
         if let Some(&mut Some(_)) = self.circuitry.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             self.input = InputState::Circuitry;
         }
     }
 
-    fn current_circuitry(&mut self) -> Option<&mut Circuitry>{
+    pub fn current_circuitry(&mut self) -> Option<&mut Circuitry>{
         if let Some(&mut Some(ref mut current_circuitry)) = self.circuitry.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             Some(current_circuitry)
         } else {
@@ -179,7 +180,7 @@ impl Scene {
         }
     }
 
-    fn interact_with_terminal(&mut self, ctx: &mut Context) {
+    pub fn interact_with_terminal(&mut self, ctx: &mut Context) {
         if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             let terminal_front_tile = &self.player.front_tile + &current_terminal.front.value();
             if terminal_front_tile == self.player.position {
@@ -192,13 +193,13 @@ impl Scene {
         }
     }
 
-    fn clear_terminal(&mut self, ctx: &mut Context) {
+    pub fn clear_terminal(&mut self, ctx: &mut Context) {
         let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
         self.terminal_text = graphics::Text::new(ctx, "", &font).unwrap();
         self.input = InputState::World;
     }
 
-    fn terminal_remove_character(&mut self, ctx: &mut Context) {
+    pub fn terminal_remove_character(&mut self, ctx: &mut Context) {
         if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             if current_terminal.text.len() > 0 {
                 let text_len = current_terminal.text.len();
@@ -210,7 +211,7 @@ impl Scene {
         }
     }
 
-    fn terminal_add_character(&mut self, ctx: &mut Context, text: String) {
+    pub fn terminal_add_character(&mut self, ctx: &mut Context, text: String) {
         if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             if current_terminal.text.len() <= TERMINAL_LIMIT {
                 let new_terminal_text = format!("{}{}", current_terminal.text, text);
@@ -250,43 +251,7 @@ impl event::EventHandler for Scene {
         }
 
         if self.input == InputState::World {
-            if !repeat {
-                self.movement_timer = Duration::from_millis(MOVEMENT_SPEED);
-
-                match keycode {
-                    Keycode::Left => {
-                        self.player.movement(Direction::Left, Direction::Right);
-                    },
-                    Keycode::Right => {
-                        self.player.movement(Direction::Right, Direction::Left);
-                    },
-                    Keycode::Up => {
-                        self.player.movement(Direction::Up, Direction::Down);
-                    },
-                    Keycode::Down => {
-                        self.player.movement(Direction::Down, Direction::Up);
-                    },
-                    _ => ()
-                }
-            } else {
-                if let None = self.player.movement.last() {
-                    match keycode {
-                        Keycode::Left => {
-                            self.player.movement(Direction::Left, Direction::Right);
-                        },
-                        Keycode::Right => {
-                            self.player.movement(Direction::Right, Direction::Left);
-                        },
-                        Keycode::Up => {
-                            self.player.movement(Direction::Up, Direction::Down);
-                        },
-                        Keycode::Down => {
-                            self.player.movement(Direction::Down, Direction::Up);
-                        },
-                        _ => ()
-                    }
-                }
-            }
+            world::key_down_event(self, _ctx, keycode, _keymod, repeat);
         }
     }
 
@@ -300,36 +265,7 @@ impl event::EventHandler for Scene {
 
         match self.input {
             InputState::World => {
-                match keycode {
-                    Keycode::Left => {
-                        self.player.remove_movement(Direction::Left);
-                    },
-                    Keycode::Right => {
-                        self.player.remove_movement(Direction::Right);
-                    },
-                    Keycode::Up => {
-                        self.player.remove_movement(Direction::Up);
-                    },
-                    Keycode::Down => {
-                        self.player.remove_movement(Direction::Down);
-                    },
-                    Keycode::Return => {
-                        if self.insight_view {
-                            self.interact_with_circuitry();
-                        } else {
-                            self.interact_with_door();
-                            self.interact_with_terminal(ctx);
-                        }
-                    },
-                    Keycode::I => {
-                        self.input = InputState::Inventory;
-                    },
-                    Keycode::Insert => {
-                        self.input = InputState::Edit;
-                        self.edit_selection = self.get_edit_selection();
-                    },
-                    _ => ()
-                }
+                world::key_up_event(self, ctx, keycode, _keymod, _repeat);
             },
             InputState::Terminal => {
                 match keycode {

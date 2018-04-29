@@ -12,6 +12,7 @@ mod player;
 mod objects;
 mod misc;
 mod constants;
+mod mode;
 
 use std::env;
 use std::path;
