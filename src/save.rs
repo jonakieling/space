@@ -61,6 +61,17 @@ pub fn save_scene(scene: &Scene) {
     let bytes: Vec<u8> = bincode::serialize(&level_circuitry).unwrap();
     File::create("dev-level/circuitry.bin").unwrap().write_all(&bytes).unwrap();
 
+    let mut level_generators: Vec<(i32, i32, Generator)> = vec![];
+    for (pos, item) in scene.generators.iter().enumerate() {
+        if let Some(ref generator) = *item {
+            let x = pos as i32 % LEVEL_SIZE;
+            let y = pos as i32 / LEVEL_SIZE;
+            level_generators.push((x, y, generator.clone()));
+        }
+    }
+    let bytes: Vec<u8> = bincode::serialize(&level_generators).unwrap();
+    File::create("dev-level/generators.bin").unwrap().write_all(&bytes).unwrap();
+
     let file = File::create("dev-level.tar").unwrap();
     let mut a = Builder::new(file);
     a.append_dir_all("dev-level", "dev-level").unwrap();
@@ -100,6 +111,12 @@ pub fn load_scene(scene: &mut Scene) {
                     let level_circuitry: Vec<(i32, i32, Circuitry)> = bincode::deserialize_from(file).unwrap();
                     for circuitry in level_circuitry {
                         scene.circuitry.insert(circuitry.0, circuitry.1, circuitry.2);
+                    }
+                },
+                "generators" => {
+                    let level_generators: Vec<(i32, i32, Generator)> = bincode::deserialize_from(file).unwrap();
+                    for generator in level_generators {
+                        scene.generators.insert(generator.0, generator.1, generator.2);
                     }
                 },
                 "player" => {

@@ -87,6 +87,10 @@ impl Scene {
             found_collision = true;
         }
 
+        if let Some(&Some(_)) = self.generators.get(self.player.front_tile.x, self.player.front_tile.y) {
+            found_collision = true;
+        }
+
         if let Some(&Some(ref door)) = self.doors.get(self.player.front_tile.x, self.player.front_tile.y) {
             if let DoorStatus::Closed = door.status {
                 found_collision = true;
