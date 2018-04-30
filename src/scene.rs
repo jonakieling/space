@@ -157,7 +157,7 @@ impl Scene {
             if let &Some(_) = generator {
                 for (circuitry_pos, circuitry) in self.circuitry.iter_mut().enumerate() {
                     if let &mut Some(ref mut circuitry) = circuitry {
-                        if Position::to_two_d(circuitry_pos as i32).dist(&Position::to_two_d(generator_pos as i32)) <= 10.0 {
+                        if Position::from_int(circuitry_pos as i32).dist(&Position::from_int(generator_pos as i32)) <= 10.0 {
                             circuitry.powered = true;
                         }
                     }
@@ -341,7 +341,7 @@ impl event::EventHandler for Scene {
                 }
             }
         } else if self.input == InputState::Circuitry {
-            let front_index = self.player.front_tile.to_one_d();
+            let front_index = self.player.front_tile.to_int();
             if let Some(ref circuitry) = self.current_circuitry() {
                 circuitry.draw(front_index as i32, ctx)?;
             }

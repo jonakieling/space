@@ -20,11 +20,11 @@ impl Position {
         ((other.x - self.x).pow(2) as f32 + (other.y - self.y).pow(2) as f32).sqrt()
     }
 
-    pub fn to_one_d(self) -> i32 {
+    pub fn to_int(self) -> i32 {
         self.x + self.y * LEVEL_SIZE
     }
 
-    pub fn to_two_d(pos: i32) -> Position {
+    pub fn from_int(pos: i32) -> Position {
         Position {
             x: pos % LEVEL_SIZE,
             y: pos / LEVEL_SIZE
