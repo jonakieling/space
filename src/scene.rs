@@ -283,7 +283,7 @@ impl event::EventHandler for Scene {
     }
 
     fn text_input_event(&mut self, ctx: &mut Context, text: String) {
-        if let InputState::Terminal = self.input {
+        if self.input == InputState::Terminal {
             self.terminal_add_character(ctx, text);
         }
     }
@@ -318,13 +318,13 @@ impl event::EventHandler for Scene {
 
         for (pos, terminal) in self.terminals.iter().enumerate() {
             if let &Some(ref current_terminal) = terminal {
-                Terminal::draw(pos as i32, &current_terminal.front, ctx)?;
+                current_terminal.draw(pos as i32, ctx)?;
             }
         }
 
         for (pos, item) in self.doors.iter().enumerate() {
             if let &Some(ref door) = item {
-                Door::draw(door, pos as i32, ctx)?;
+                door.draw(pos as i32, ctx)?;
             }
         }
 
@@ -337,13 +337,13 @@ impl event::EventHandler for Scene {
         if self.insight_view {
             for (pos, circuitry) in self.circuitry.iter().enumerate() {
                 if let &Some(ref circuitry) = circuitry {
-                    Circuitry::draw(circuitry, pos as i32, ctx)?;
+                    circuitry.draw(pos as i32, ctx)?;
                 }
             }
         } else if self.input == InputState::Circuitry {
             let front_index = self.player.front_tile.to_one_d();
             if let Some(ref circuitry) = self.current_circuitry() {
-                Circuitry::draw(circuitry, front_index as i32, ctx)?;
+                circuitry.draw(front_index as i32, ctx)?;
             }
         }
 
