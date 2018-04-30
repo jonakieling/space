@@ -1,15 +1,16 @@
-use tar::{Builder, Archive};
 use std::fs;
 use std::fs::File;
 use std::io::Write;
+
+use tar::{Builder, Archive};
 use bincode;
+
+use constants::LEVEL_SIZE;
+use storage::SelectionStorage;
 use scene::*;
 use player::Player;
 use objects::*;
 use misc::*;
-use storage::SelectionStorage;
-
-pub const LEVEL_SIZE: i32 = 40;
 
 pub fn save_scene(scene: &Scene) {
     fs::create_dir("dev-level").unwrap();

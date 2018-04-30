@@ -5,7 +5,7 @@ extern crate serde_derive;
 extern crate bincode;
 extern crate tar;
 
-mod save;
+mod level;
 mod scene;
 mod storage;
 mod player;
@@ -31,12 +31,12 @@ fn main() {
 	
     let scene = &mut scene::Scene::new(ctx).unwrap();
 
-    save::load_scene(scene);
+    level::load_scene(scene);
 
     if let Err(e) = event::run(ctx, scene) {
         writeln!(&mut std::io::stderr(), "error: {}", e).expect("couldn't write error to stderr");
         std::process::exit(1);
     }
 
-    save::save_scene(scene);
+    level::save_scene(scene);
 }

@@ -268,124 +268,16 @@ impl event::EventHandler for Scene {
                 world::key_up_event(self, ctx, keycode, _keymod, _repeat);
             },
             InputState::Terminal => {
-                match keycode {
-                    Keycode::Backspace => {
-                        self.terminal_remove_character(ctx);
-                    },
-                    Keycode::Escape => {
-                        self.clear_terminal(ctx);
-                    },
-                    _ => ()
-                }
+                terminal::key_up_event(self, ctx, keycode, _keymod, _repeat);
             },
             InputState::Edit => {
-                match keycode {
-                    Keycode::Escape => {
-                        self.input = InputState::World;
-                    },
-                    Keycode::Left => {
-                        self.edit_cursor = &self.edit_cursor + &Direction::Left.value();
-                        self.edit_selection = self.get_edit_selection();
-                    },
-                    Keycode::Right => {
-                        self.edit_cursor = &self.edit_cursor + &Direction::Right.value();
-                        self.edit_selection = self.get_edit_selection();
-                    },
-                    Keycode::Up => {
-                        self.edit_cursor = &self.edit_cursor + &Direction::Up.value();
-                        self.edit_selection = self.get_edit_selection();
-                    },
-                    Keycode::Down => {
-                        self.edit_cursor = &self.edit_cursor + &Direction::Down.value();
-                        self.edit_selection = self.get_edit_selection();
-                    },
-                    Keycode::Delete => {
-                        self.walls.remove(self.edit_cursor.x, self.edit_cursor.y);
-                        self.doors.remove(self.edit_cursor.x, self.edit_cursor.y);
-                        self.terminals.remove(self.edit_cursor.x, self.edit_cursor.y);
-                        self.circuitry.remove(self.edit_cursor.x, self.edit_cursor.y);
-                        self.generators.remove(self.edit_cursor.x, self.edit_cursor.y);
-                        self.update_power();
-                    },
-                    Keycode::W => {
-                        self.walls.insert(self.edit_cursor.x, self.edit_cursor.y, Wall {});
-                    },
-                    Keycode::C => {
-                        self.circuitry.insert(self.edit_cursor.x, self.edit_cursor.y, Circuitry {parts: SelectionStorage::new(), powered: false});
-                        self.update_power();
-                    },
-                    Keycode::G => {
-                        self.generators.insert(self.edit_cursor.x, self.edit_cursor.y, Generator {});
-                        self.update_power();
-                    },
-                    Keycode::D => {
-                        self.doors.insert(self.edit_cursor.x, self.edit_cursor.y, Door { status: DoorStatus::Closed});
-                    },
-                    Keycode::T => {
-                        self.terminals.insert(self.edit_cursor.x, self.edit_cursor.y, Terminal { text: Box::new(String::new()), front: Direction::Down});
-                    },
-                    Keycode::Tab => {
-                        if let Some(&mut Some(ref mut door)) = self.doors.get_mut(self.edit_cursor.x, self.edit_cursor.y) {
-                            match door.status {
-                                DoorStatus::Open => {
-                                    door.status = DoorStatus::Closed;
-                                },
-                                DoorStatus::Closed => {
-                                    door.status = DoorStatus::Open;
-                                }
-                            }
-                        }
-                        if let Some(&mut Some(ref mut terminal)) = self.terminals.get_mut(self.edit_cursor.x, self.edit_cursor.y) {
-                            match terminal.front {
-                                Direction::Up => {
-                                    terminal.front = Direction::Right;
-                                },
-                                Direction::Right => {
-                                    terminal.front = Direction::Down;
-                                },
-                                Direction::Down => {
-                                    terminal.front = Direction::Left;
-                                },
-                                Direction::Left => {
-                                    terminal.front = Direction::Up;
-                                },
-                            }
-                        }
-                    },
-                    _ => ()
-                }
+                edit::key_up_event(self, ctx, keycode, _keymod, _repeat);
             },
             InputState::Inventory => {
-                match keycode {
-                    Keycode::I => {
-                        self.input = InputState::World;
-                    },
-                    Keycode::Up => {
-                        self.player.inventory.prev();
-                    },
-                    Keycode::Down => {
-                        self.player.inventory.next();
-                    },
-                    _ => ()
-                }
+                inventory::key_up_event(self, ctx, keycode, _keymod, _repeat);
             },
             InputState::Circuitry => {
-                match keycode {
-                    Keycode::Escape => {
-                        self.input = InputState::World;
-                    },
-                    Keycode::Up => {
-                        if let Some(current_circuitry) = self.current_circuitry() {
-                            current_circuitry.parts.prev();
-                        }
-                    },
-                    Keycode::Down => {
-                        if let Some(current_circuitry) = self.current_circuitry() {
-                            current_circuitry.parts.next();
-                        }
-                    },
-                    _ => ()
-                }
+                circuitry::key_up_event(self, ctx, keycode, _keymod, _repeat);
             }
         }
     }
@@ -420,38 +312,38 @@ impl event::EventHandler for Scene {
 
         for (pos, wall) in self.walls.iter().enumerate() {
             if let &Some(_) = wall {
-                draw_wall(pos as i32, ctx)?;
+                Wall::draw(pos as i32, ctx)?;
             }
         }
 
         for (pos, terminal) in self.terminals.iter().enumerate() {
             if let &Some(ref current_terminal) = terminal {
-                draw_terminal(pos as i32, &current_terminal.front, ctx)?;
+                Terminal::draw(pos as i32, &current_terminal.front, ctx)?;
             }
         }
 
         for (pos, item) in self.doors.iter().enumerate() {
             if let &Some(ref door) = item {
-                draw_door(door, pos as i32, ctx)?;
+                Door::draw(door, pos as i32, ctx)?;
             }
         }
 
         for (pos, generator) in self.generators.iter().enumerate() {
             if let &Some(_) = generator {
-                draw_generator(pos as i32, ctx)?;
+                Generator::draw(pos as i32, ctx)?;
             }
         }
 
         if self.insight_view {
             for (pos, circuitry) in self.circuitry.iter().enumerate() {
                 if let &Some(ref circuitry) = circuitry {
-                    draw_circuitry(circuitry, pos as i32, ctx)?;
+                    Circuitry::draw(circuitry, pos as i32, ctx)?;
                 }
             }
         } else if self.input == InputState::Circuitry {
             let front_index = self.player.front_tile.to_one_d();
             if let Some(ref circuitry) = self.current_circuitry() {
-                draw_circuitry(circuitry, front_index as i32, ctx)?;
+                Circuitry::draw(circuitry, front_index as i32, ctx)?;
             }
         }
 
@@ -548,88 +440,6 @@ fn draw_selection<T: Clone + Debug>(selection: &SelectionStorage<T>, ctx: &mut C
         }
         graphics::draw(ctx, &item_graphics, graphics::Point2::new(771.0 - item_graphics.width() as f32, 20.0 + (inventory_item_position * 25.0)), 0.0)?;
         inventory_item_position += 1.0;
-    }
-
-    Ok(())
-}
-
-fn draw_wall(pos: i32, ctx: &mut Context) -> GameResult<()> {
-    let x = pos % LEVEL_SIZE;
-    let y = pos / LEVEL_SIZE;
-    graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
-
-    Ok(())
-}
-
-fn draw_circuitry(circuitry: &Circuitry, pos: i32, ctx: &mut Context) -> GameResult<()> {
-    let x = pos % LEVEL_SIZE;
-    let y = pos / LEVEL_SIZE;
-    graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 0.1,})?;
-    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 3.0, (y * GRID_SIZE) as f32 + 3.0, 15.0, 15.0))?;
-    if circuitry.powered {
-        graphics::set_color(ctx, graphics::Color{r: 0.5, g: 0.8, b: 0.5, a: 0.8,})?;
-    }
-    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 5.0, (y * GRID_SIZE) as f32 + 5.0, 11.0, 11.0))?;
-
-    Ok(())
-}
-
-fn draw_generator(pos: i32, ctx: &mut Context) -> GameResult<()> {
-    let x = pos % LEVEL_SIZE;
-    let y = pos / LEVEL_SIZE;
-    graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 0.1,})?;
-    graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32 + 3.0, (y * GRID_SIZE) as f32 + 3.0, 15.0, 15.0))?;
-
-    graphics::set_color(ctx, graphics::Color{r: 0.8, g: 1.0, b: 0.8, a: 1.0,})?;
-    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 5.0, (y * GRID_SIZE) as f32 + 5.0, 11.0, 11.0))?;
-
-    Ok(())
-}
-
-fn draw_door(door: &Door, pos: i32, ctx: &mut Context) -> GameResult<()> {
-    let x = pos % LEVEL_SIZE;
-    let y = pos / LEVEL_SIZE;
-    match door.status {
-        DoorStatus::Open => {
-            graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
-            graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
-        },
-        DoorStatus::Closed => {
-            graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
-            graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
-        },
-    }
-
-    Ok(())
-}
-
-fn draw_terminal(pos: i32, direction: &Direction, ctx: &mut Context) -> GameResult<()> {
-    let x = pos % LEVEL_SIZE;
-    let y = pos / LEVEL_SIZE;
-    graphics::set_color(ctx, graphics::BLACK)?;
-    graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
-    graphics::set_color(ctx, graphics::Color{r: 0.5, g: 0.8, b: 0.5, a: 1.0,})?;
-    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
-    match *direction {
-        Direction::Up => {
-            let front = graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 3.0);
-            graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
-        },
-        Direction::Down => {
-            let front = graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32 + (direction.value().y as f32 * 17.0), 21.0, 4.0);
-            graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
-            
-        },
-        Direction::Right => {
-            let front = graphics::Rect::new((x * GRID_SIZE) as f32 + (direction.value().x as f32 * 17.0), (y * GRID_SIZE) as f32 + (direction.value().y as f32), 4.0, 21.0);
-            graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
-            
-        },
-        Direction::Left => {
-            let front = graphics::Rect::new((x * GRID_SIZE) as f32 + (direction.value().x as f32), (y * GRID_SIZE) as f32 + (direction.value().y as f32), 4.0, 21.0);
-            graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
-            
-        },
     }
 
     Ok(())
