@@ -1,4 +1,5 @@
 use std::cmp::max;
+use std::fmt::Debug;
 use std::slice;
 use constants::LEVEL_SIZE;
 
@@ -7,16 +8,16 @@ pub struct PositionLevelStorage<T: Clone> {
     storage: Box<Vec<Option<T>>>
 }
 
-impl<T: Clone> PositionLevelStorage<T> {
+impl<T: Clone + Debug> PositionLevelStorage<T> {
     pub fn new() -> PositionLevelStorage<T> {
         PositionLevelStorage {
-            storage: Box::new(vec![None; (LEVEL_SIZE * LEVEL_SIZE) as usize])
+            storage: Box::new(Vec::new())
         }
     }
     
     pub fn get(&self, x: i32, y: i32) -> Option<&Option<T>> {
-        if x <= LEVEL_SIZE && y <= LEVEL_SIZE  {
-            let position = x + y * LEVEL_SIZE;
+        let position = x + y * LEVEL_SIZE;
+        if position < self.storage.len() as i32 {
             self.storage.get(position as usize)
         } else {
             None
@@ -24,8 +25,8 @@ impl<T: Clone> PositionLevelStorage<T> {
     }
 
     pub fn get_mut(&mut self, x: i32, y: i32) -> Option<&mut Option<T>> {
-        if x <= LEVEL_SIZE && y <= LEVEL_SIZE  {
-            let position = x + y * LEVEL_SIZE;
+        let position = x + y * LEVEL_SIZE;
+        if position < self.storage.len() as i32 {
             self.storage.get_mut(position as usize)
         } else {
             None
@@ -33,16 +34,19 @@ impl<T: Clone> PositionLevelStorage<T> {
     }
 
     pub fn insert(&mut self, x: i32, y: i32, item: T) {
-        if x <= LEVEL_SIZE && y <= LEVEL_SIZE  {
-            let position = x + y * LEVEL_SIZE;
+        let position = x + y * LEVEL_SIZE;
+        if position < self.storage.len() as i32 {
             self.storage.remove(position as usize);
+            self.storage.insert(position as usize, Some(item));
+        } else {
+            self.storage.resize(position as usize, None);
             self.storage.insert(position as usize, Some(item));
         }
     }
 
     pub fn remove(&mut self, x: i32, y: i32) {
-        if x <= LEVEL_SIZE && y <= LEVEL_SIZE  {
-            let position = x + y * LEVEL_SIZE;
+        let position = x + y * LEVEL_SIZE;
+        if position < self.storage.len() as i32 {
             self.storage.remove(position as usize);
             self.storage.insert(position as usize, None);
         }

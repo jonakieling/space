@@ -12,7 +12,7 @@ use storage::*;
 use objects::*;
 use misc::*;
 use constants::*;
-use mode::*;
+use input::*;
 
 pub struct Scene {
     pub movement_timer: Duration,

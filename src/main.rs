@@ -12,7 +12,7 @@ mod player;
 mod objects;
 mod misc;
 mod constants;
-mod mode;
+mod input;
 
 use std::env;
 use std::path;
@@ -31,12 +31,12 @@ fn main() {
 	
     let scene = &mut scene::Scene::new(ctx).unwrap();
 
-    level::load_scene(scene);
+    level::load_scene(scene, "dev-level.tar");
 
     if let Err(e) = event::run(ctx, scene) {
         writeln!(&mut std::io::stderr(), "error: {}", e).expect("couldn't write error to stderr");
         std::process::exit(1);
     }
 
-    level::save_scene(scene);
+    level::save_scene(scene, "dev-level.tar");
 }
