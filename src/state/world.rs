@@ -12,6 +12,8 @@ use objects::*;
 use misc::*;
 use constants::*;
 use input::*;
+use GameState;
+use level;
 
 pub struct Scene {
     pub movement_timer: Duration,
@@ -26,6 +28,10 @@ pub struct Scene {
     pub edit_cursor: Position,
     pub edit_selection: SelectionStorage<String>,
     pub insight_view: bool,
+}
+
+impl GameState for Scene {
+    // todo: transitions
 }
 
 impl Scene {
@@ -132,11 +138,9 @@ impl Scene {
             match door.status {
                 DoorStatus::Closed => {
                     door.status = DoorStatus::Open;
-                    println!("door opened");
                 },
                 DoorStatus::Open => {
                     door.status = DoorStatus::Closed;
-                    println!("door closed");
                 },
             }
         }
@@ -186,8 +190,6 @@ impl Scene {
                 self.input = InputState::Terminal;
                 let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
                 self.terminal_text = graphics::Text::new(ctx, &current_terminal.text, &font).unwrap();
-            } else {
-                println!("this is not the front of the terminal");
             }
         }
     }
@@ -285,6 +287,12 @@ impl event::EventHandler for Scene {
         if self.input == InputState::Terminal {
             self.terminal_add_character(ctx, text);
         }
+    }
+
+    fn quit_event(&mut self, _ctx: &mut Context) -> bool {
+        level::save_scene(self, "auto-save.tar");
+
+        false
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {

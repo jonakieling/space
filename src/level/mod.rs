@@ -6,7 +6,7 @@ use tar::{Builder, Archive};
 use bincode;
 
 use constants::LEVEL_SIZE;
-use scene::world::*;
+use state::world::*;
 use player::Player;
 use objects::*;
 use misc::Position;

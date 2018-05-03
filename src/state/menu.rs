@@ -1,6 +1,7 @@
 use ggez::{graphics, Context, event::*, GameResult};
 
 use storage::SelectionStorage;
+use GameState;
 
 pub struct Scene {
 	saves: SelectionStorage<String>,
@@ -17,6 +18,10 @@ impl Scene {
 
     	Ok(menu)
     }
+}
+
+impl GameState for Scene {
+    // todo: transitions
 }
 
 impl EventHandler for Scene {

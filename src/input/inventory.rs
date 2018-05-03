@@ -1,7 +1,7 @@
 use ggez::Context;
 use ggez::event::{Keycode, Mod};
 
-use scene::world::Scene;
+use state::world::Scene;
 use misc::*;
 
 

@@ -1,7 +1,7 @@
 use ggez::Context;
 use ggez::event::{Keycode, Mod};
 
-use scene::world::Scene;
+use state::world::Scene;
 
 pub fn key_up_event(scene: &mut Scene, ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
     match keycode {

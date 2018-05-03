@@ -1,4 +1,4 @@
-use scene::world::*;
+use state::world::*;
 use player::Player;
 use objects::*;
 use storage::SelectionStorage;
