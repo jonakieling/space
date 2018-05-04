@@ -145,7 +145,7 @@ pub fn load_scene(scene: &mut Scene, filename: &str) {
         }
         println!("game loaded: from file {}", filename);
     } else {
-        static_levels::_static_level0(scene);
+        static_levels::static_level0(scene);
     }
     
 }

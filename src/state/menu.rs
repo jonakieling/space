@@ -37,6 +37,8 @@ impl Scene {
             }
         }
 
+        menu.saves.insert("empty".to_string());
+
     	Ok(menu)
     }
 }
@@ -44,9 +46,15 @@ impl Scene {
 impl GameState for Scene {
     fn change_state(&self, ctx: &mut Context) -> Option<Box<GameState>> {
         if let Some(ref savegame) = self.loading {
-            let mut world = world::Scene::new(ctx).unwrap();
-            level::load_scene(&mut world, savegame);
-            Some(Box::new(world))
+            if savegame == "empty" {
+                let mut world = world::Scene::new(ctx).unwrap();
+                level::static_levels::static_level0(&mut world);
+                Some(Box::new(world))
+            } else {
+                let mut world = world::Scene::new(ctx).unwrap();
+                level::load_scene(&mut world, savegame);
+                Some(Box::new(world))
+            }
         } else {
             None
         }
