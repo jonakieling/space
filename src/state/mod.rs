@@ -3,11 +3,49 @@ use std::fmt::Debug;
 use ggez::GameResult;
 use ggez::Context;
 use ggez::graphics;
+use ggez::event::*;
 
 use storage::SelectionStorage;
 
 pub mod world;
 pub mod menu;
+
+pub trait GameState: EventHandler {
+    fn change_state(&self, ctx: &mut Context) -> Option<Box<GameState>>;
+}
+
+pub struct Game {
+    pub state: Box<GameState>
+}
+
+impl EventHandler for Game {
+    fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
+        if let Some(scene) = self.state.change_state(ctx) {
+            self.state = scene;
+        }
+        self.state.update(ctx)
+    }
+
+    fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
+        self.state.draw(ctx)
+    }
+
+    fn key_down_event(&mut self, ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
+        self.state.key_down_event(ctx, keycode, keymod, repeat)
+    }
+
+    fn key_up_event(&mut self, ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
+        self.state.key_up_event(ctx, keycode, keymod, repeat)
+    }
+
+    fn text_input_event(&mut self, ctx: &mut Context, text: String) {
+        self.state.text_input_event(ctx, text)
+    }
+
+    fn quit_event(&mut self, ctx: &mut Context) -> bool {
+        self.state.quit_event(ctx)
+    }
+}
 
 fn draw_selection<T: Clone + Debug>(selection: &SelectionStorage<T>, ctx: &mut Context, cursor: bool) -> GameResult<()> {
     let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();

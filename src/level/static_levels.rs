@@ -103,6 +103,8 @@ pub fn _static_level0(scene: &mut Scene) {
 
 
 pub fn _static_ship_tech_2_1(scene: &mut Scene) {
+    scene.backdrop = String::from("/realm_of_sol__0000s_0001_2.1.png");
+
     scene.walls.insert(6, 8, Wall {});
     scene.walls.insert(7, 8, Wall {});
     scene.walls.insert(8, 8, Wall {});

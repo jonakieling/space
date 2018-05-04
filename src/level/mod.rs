@@ -16,13 +16,14 @@ pub mod static_levels;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Save {
     name: String,
+    backdrop: String,
     offset: Position
 }
 
 pub fn save_scene(scene: &Scene, filename: &str) {
     fs::create_dir("temp-save").unwrap();
 
-    let save_info = Save { name: String::from(filename), offset: Position { x: 0, y: 0} };
+    let save_info = Save { name: String::from(filename), backdrop: scene.backdrop.clone(), offset: Position { x: 0, y: 0} };
     let bytes: Vec<u8> = bincode::serialize(&save_info).unwrap();
     File::create("temp-save/save-meta.bin").unwrap().write_all(&bytes).unwrap();
 
@@ -134,6 +135,10 @@ pub fn load_scene(scene: &mut Scene, filename: &str) {
                 "player" => {
                     let level_player: Player = bincode::deserialize_from(file).unwrap();
                     scene.player = level_player;
+                },
+                "save-meta" => {
+                    let level_info: Save = bincode::deserialize_from(file).unwrap();
+                    scene.backdrop = level_info.backdrop;
                 },
                 _ => (),
             }

@@ -18,60 +18,28 @@ use std::env;
 use std::path;
 use std::io::Write;
 
-use ggez::{Context, conf, event::*, GameResult};
+use ggez::{Context, conf, event::*};
 
 use state::*;
-
-trait GameState: EventHandler {
-    // add code here
-}
-
-struct Game {
-    state: Box<GameState>
-}
-
-impl EventHandler for Game {
-    fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
-        self.state.update(ctx)
-    }
-
-    fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        self.state.draw(ctx)
-    }
-
-    fn key_down_event(&mut self, ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
-        self.state.key_down_event(ctx, keycode, keymod, repeat)
-    }
-
-    fn key_up_event(&mut self, ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
-        self.state.key_up_event(ctx, keycode, keymod, repeat)
-    }
-
-    fn text_input_event(&mut self, ctx: &mut Context, text: String) {
-        self.state.text_input_event(ctx, text)
-    }
-
-    fn quit_event(&mut self, ctx: &mut Context) -> bool {
-        self.state.quit_event(ctx)
-    }
-}
 
 fn main() {
     let c = conf::Conf::new();
     let ctx = &mut Context::load_from_conf("Space", "Jonathan Kieling", c).unwrap();
 
-    if let Ok(manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
+    if let Ok(ref manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
         let mut path = path::PathBuf::from(manifest_dir);
         path.push("res");
         ctx.filesystem.mount(&path, true);
+
+        let mut path = path::PathBuf::from(manifest_dir);
+        path.push("saves");
+        ctx.filesystem.mount(&path, true);
 	}
     
-    // let menu = menu::Scene::new(ctx).unwrap();
-    let mut world = world::Scene::new(ctx).unwrap();
-    level::load_scene(&mut world, "auto-save.tar");
+    let menu = menu::Scene::new(ctx).unwrap();
 
     let game = &mut Game {
-        state: Box::new(world)
+        state: Box::new(menu)
     };
 
     if let Err(e) = run(ctx, game) {

@@ -1,27 +1,56 @@
+use std::fs;
+
 use ggez::{graphics, Context, event::*, GameResult};
 
 use storage::SelectionStorage;
 use GameState;
+use level;
+use state::world;
 
 pub struct Scene {
 	saves: SelectionStorage<String>,
-
+    loading: Option<String>
 }
 
 impl Scene {
     pub fn new(_ctx: &mut Context) -> GameResult<Scene> {
     	let mut menu = Scene {
     		saves: SelectionStorage::new(),
+            loading: None
     	};
 
-    	menu.saves.insert(String::from("dev-level.tar"));
+        for entry in fs::read_dir("levels")? {
+            let dir = entry?;
+            if let Some(extension) = dir.path().extension() {
+                if extension == "tar" {
+                    menu.saves.insert(String::from(dir.path().to_str().unwrap()));
+                }
+            }
+        }
+
+        for entry in fs::read_dir("saves")? {
+            let dir = entry?;
+            if let Some(extension) = dir.path().extension() {
+                if extension == "tar" {
+                    menu.saves.insert(String::from(dir.path().to_str().unwrap()));
+                }
+            }
+        }
 
     	Ok(menu)
     }
 }
 
 impl GameState for Scene {
-    // todo: transitions
+    fn change_state(&self, ctx: &mut Context) -> Option<Box<GameState>> {
+        if let Some(ref savegame) = self.loading {
+            let mut world = world::Scene::new(ctx).unwrap();
+            level::load_scene(&mut world, savegame);
+            Some(Box::new(world))
+        } else {
+            None
+        }
+    }
 }
 
 impl EventHandler for Scene {
@@ -36,6 +65,9 @@ impl EventHandler for Scene {
 	        Keycode::Down => {
 	            self.saves.next();
 	        },
+            Keycode::Return => {
+                self.loading = Some(self.saves.current().unwrap().clone())
+            },
 	        _ => ()
 	    }
     }
@@ -43,7 +75,7 @@ impl EventHandler for Scene {
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx);
 
-        super::draw_selection(&self.saves, ctx, false)?;
+        super::draw_selection(&self.saves, ctx, true)?;
 
         graphics::present(ctx);
 

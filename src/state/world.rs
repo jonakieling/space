@@ -24,6 +24,7 @@ pub struct Scene {
     pub circuitry: PositionLevelStorage<Circuitry>,
     pub generators: PositionLevelStorage<Generator>,
     pub terminal_text: graphics::Text,
+    pub backdrop: String,
     pub input: InputState,
     pub edit_cursor: Position,
     pub edit_selection: SelectionStorage<String>,
@@ -31,13 +32,15 @@ pub struct Scene {
 }
 
 impl GameState for Scene {
-    // todo: transitions
+    fn change_state(&self, _ctx: &mut Context) -> Option<Box<GameState>> {
+        None
+    }
 }
 
 impl Scene {
-    pub fn new(_ctx: &mut Context) -> GameResult<Scene> {
+    pub fn new(ctx: &mut Context) -> GameResult<Scene> {
 
-        let font = graphics::Font::new(_ctx, "/04B_03.TTF", 12).unwrap();
+        let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
         
         // initialize player and level object storages
         // state and object are loaded seperatly
@@ -72,7 +75,8 @@ impl Scene {
             terminals,
             circuitry,
             generators,
-            terminal_text: graphics::Text::new(_ctx, "", &font)?,
+            terminal_text: graphics::Text::new(ctx, "", &font)?,
+            backdrop: String::from("/none.png"),
             input: InputState::World,
             edit_cursor: Position {x: 0, y: 0},
             edit_selection: SelectionStorage::new(),
@@ -290,7 +294,7 @@ impl event::EventHandler for Scene {
     }
 
     fn quit_event(&mut self, _ctx: &mut Context) -> bool {
-        level::save_scene(self, "auto-save.tar");
+        level::save_scene(self, "saves/auto-save.tar");
 
         false
     }
@@ -298,12 +302,14 @@ impl event::EventHandler for Scene {
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx);
 
-        let mut ship = graphics::Image::new(ctx, "/realm_of_sol__0000s_0001_2.1.png")?;
-        ship.set_filter(graphics::FilterMode::Nearest);
+
+        let mut backdrop = graphics::Image::new(ctx, "/realm_of_sol__0000s_0001_2.1.png")?;
+        backdrop.set_filter(graphics::FilterMode::Nearest);
+
         let dst = graphics::Point2::new(20.0, 20.0);
         graphics::draw_ex(
             ctx,
-            &ship,
+            &backdrop,
             graphics::DrawParam {
                 // src: src,
                 dest: dst,
