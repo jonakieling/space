@@ -72,6 +72,9 @@ pub fn key_up_event(scene: &mut Scene, ctx: &mut Context, keycode: Keycode, _key
         Keycode::I => {
             scene.input = InputState::Inventory;
         },
+        Keycode::Escape => {
+            scene.input = InputState::Menu;
+        },
         Keycode::Insert => {
             scene.input = InputState::Edit;
             scene.edit_selection = scene.get_edit_selection();

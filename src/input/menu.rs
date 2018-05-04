@@ -1,7 +1,7 @@
 use ggez::Context;
 use ggez::event::{Keycode, Mod};
 
-use state::world::Scene;
+use state::world::{Scene, MenuOption};
 use misc::*;
 
 
@@ -10,14 +10,17 @@ pub fn key_up_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _ke
         Keycode::Escape => {
             scene.input = InputState::World;
         },
-        Keycode::I => {
-            scene.input = InputState::World;
-        },
         Keycode::Up => {
-            scene.player.inventory.prev();
+            scene.menu.prev();
         },
         Keycode::Down => {
-            scene.player.inventory.next();
+            scene.menu.next();
+        },
+        Keycode::Return => {
+            match *scene.menu.current().unwrap() {
+                MenuOption::Save => println!("saving"),
+                MenuOption::Quit => println!("quitting"),
+            }
         },
         _ => ()
     }

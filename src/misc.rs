@@ -68,5 +68,6 @@ pub enum InputState {
     World,
     Edit,
     Inventory,
-    Circuitry
+    Circuitry,
+    Menu
 }

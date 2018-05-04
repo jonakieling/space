@@ -15,6 +15,12 @@ use input::*;
 use GameState;
 use level;
 
+#[derive(Debug, Clone)]
+pub enum MenuOption {
+    Save,
+    Quit
+}
+
 pub struct Scene {
     pub movement_timer: Duration,
     pub player: Player,
@@ -28,6 +34,7 @@ pub struct Scene {
     pub input: InputState,
     pub edit_cursor: Position,
     pub edit_selection: SelectionStorage<String>,
+    pub menu: SelectionStorage<MenuOption>,
     pub insight_view: bool,
 }
 
@@ -66,6 +73,11 @@ impl Scene {
         let terminals = <PositionLevelStorage<Terminal>>::new();
         let circuitry = <PositionLevelStorage<Circuitry>>::new();
         let generators = <PositionLevelStorage<Generator>>::new();
+
+
+        let mut menu = SelectionStorage::new();
+        menu.insert(MenuOption::Save);
+        menu.insert(MenuOption::Quit);
         
         let mut scene = Scene {
             movement_timer: Duration::from_millis(0),
@@ -80,6 +92,7 @@ impl Scene {
             input: InputState::World,
             edit_cursor: Position {x: 0, y: 0},
             edit_selection: SelectionStorage::new(),
+            menu,
             insight_view: false,
         };
 
@@ -283,6 +296,9 @@ impl event::EventHandler for Scene {
             },
             InputState::Circuitry => {
                 circuitry::key_up_event(self, ctx, keycode, _keymod, _repeat);
+            },
+            InputState::Menu => {
+                menu::key_up_event(self, ctx, keycode, _keymod, _repeat);
             }
         }
     }
@@ -303,7 +319,7 @@ impl event::EventHandler for Scene {
         graphics::clear(ctx);
 
 
-        let mut backdrop = graphics::Image::new(ctx, "/realm_of_sol__0000s_0001_2.1.png")?;
+        let mut backdrop = graphics::Image::new(ctx, &self.backdrop)?;
         backdrop.set_filter(graphics::FilterMode::Nearest);
 
         let dst = graphics::Point2::new(20.0, 20.0);
@@ -385,11 +401,13 @@ impl event::EventHandler for Scene {
             super::draw_selection(&self.current_circuitry().unwrap().parts, ctx, true)?;
         }
 
-        if self.input == InputState::Edit {
-            super::draw_selection(&self.edit_selection, ctx, false)?;
+        if self.input == InputState::Menu {
+            super::draw_selection(&self.menu, ctx, true)?;
         }
 
         if self.input == InputState::Edit {
+            super::draw_selection(&self.edit_selection, ctx, false)?;
+
             graphics::set_color(ctx, graphics::Color{r: 0.2, g: 0.8, b: 0.2, a: 1.0,})?;
             let edit_cursor = graphics::Rect::new(self.edit_cursor.viewport_x(), self.edit_cursor.viewport_y(), 21.0, 21.0);
             graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), edit_cursor)?;
@@ -411,9 +429,12 @@ impl event::EventHandler for Scene {
             },
             InputState::Inventory => {
                 super::draw_input_state("Inventory", ctx)?;
-            }
+            },
             InputState::Circuitry => {
                 super::draw_input_state("Circuitry", ctx)?;
+            },
+            InputState::Menu => {
+                super::draw_input_state("Menu", ctx)?;
             },
         }
 
