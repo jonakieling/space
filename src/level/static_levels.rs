@@ -9,6 +9,21 @@ pub fn static_level0(scene: &mut Scene) {
     scene.backdrop = String::from("/realm_of_sol__0000s_0000_1.1.png");
     let mut inventory = SelectionStorage::new();
     inventory.insert(Item::Paper);
+    let mut dialog = SelectionStorage::new();
+    dialog.insert(Node {
+        value: DialogItem {
+            text: "Hi".to_string(),
+            response: "Hello".to_string()
+        },
+        children: SelectionStorage::new()
+    });
+    dialog.insert(Node {
+        value: DialogItem {
+            text: "Bye".to_string(),
+            response: "Goodbye".to_string()
+        },
+        children: SelectionStorage::new()
+    });
     let npc_gnoerf = NPC {
         name: "Gnoerf".to_string(),
         direction: Direction::Left,
@@ -16,10 +31,10 @@ pub fn static_level0(scene: &mut Scene) {
         dialog: Tree {
             root: Node {
                 value: DialogItem {
-                    text: "Hi".to_string(),
+                    text: "".to_string(),
                     response: "...".to_string()
                 },
-                children: Vec::new()
+                children: dialog
             }
         },
         inventory

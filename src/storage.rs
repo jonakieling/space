@@ -115,12 +115,12 @@ impl<T: Clone> SelectionStorage<T> {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct Tree<T> {
+pub struct Tree<T: Clone> {
     pub root: Node<T>
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct Node<T> {
+pub struct Node<T: Clone> {
     pub value: T,
-    pub children: Vec<Option<Node<T>>>
+    pub children: SelectionStorage<Node<T>>
 }

@@ -14,6 +14,7 @@ use constants::*;
 use input::*;
 use GameState;
 use level;
+use dialog::*;
 
 #[derive(Debug, Clone)]
 pub enum MenuOption {
@@ -32,6 +33,7 @@ pub struct Scene {
     pub generators: PositionLevelStorage<Generator>,
     pub npc: PositionLevelStorage<NPC>,
     pub terminal_text: graphics::Text,
+    pub dialog: Option<Node<DialogItem>>,
     pub backdrop: String,
     pub input: InputState,
     pub edit_cursor: Position,
@@ -99,6 +101,7 @@ impl Scene {
             generators,
             npc,
             terminal_text: graphics::Text::new(ctx, "", &font)?,
+            dialog: None,
             backdrop: String::from("/none.png"),
             input: InputState::World,
             edit_cursor: Position {x: 0, y: 0},
@@ -232,6 +235,7 @@ impl Scene {
                 Direction::Up => npc.direction = Direction::Down,
                 Direction::Right => npc.direction = Direction::Left,
             }
+            self.dialog = Some(npc.dialog.root.clone());
             self.input = InputState::NPC;
         }
     }
@@ -431,17 +435,15 @@ impl event::EventHandler for Scene {
 
         if self.input == InputState::NPC {
             super::draw_selection(&self.current_npc().unwrap().inventory, ctx, false)?;
+            if let Some(ref dialog) = self.dialog {
+                super::draw_dialog(dialog, ctx)?;
+            }
         }
 
         self.player.draw(ctx)?;
 
         if let InputState::Terminal = self.input {
-            graphics::set_color(ctx, graphics::BLACK)?;
-            let console = graphics::Rect::new(740.0 - self.terminal_text.width() as f32 + 20.0, 20.0, self.terminal_text.width() as f32 + 20.0, 20.0);
-            graphics::rectangle(ctx, graphics::DrawMode::Fill, console)?;
-            graphics::set_color(ctx, graphics::WHITE)?;
-            graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), console)?;
-            graphics::draw(ctx, &self.terminal_text, graphics::Point2::new(750.0 - self.terminal_text.width() as f32 + 20.0, 20.0), 0.0)?;
+            super::draw_text(ctx, &self.terminal_text)?;
         }
 
         if self.input == InputState::Inventory {
