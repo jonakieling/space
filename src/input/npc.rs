@@ -15,9 +15,9 @@ pub fn key_up_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _ke
             scene.input = InputState::World;
         },
         Keycode::Return => {
-        	let mut dialog = scene.dialog.clone().unwrap();
+        	let mut dialog = scene.dialog.clone();
         	if dialog.children.iter().len() > 0 {
-        		scene.dialog = Some(dialog.children.current().unwrap().clone());	
+        		scene.dialog = dialog.children.current().unwrap().clone();	
         	} else {
 	    		if let Some(npc) = scene.current_npc() {
 	        	    npc.direction = npc.look_at;
@@ -26,14 +26,10 @@ pub fn key_up_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _ke
         	}
         },
         Keycode::Up => {
-        	if let Some(ref mut dialog) = scene.dialog {
-            	dialog.children.prev();
-        	}
+            scene.dialog.children.prev();
         },
         Keycode::Down => {
-        	if let Some(ref mut dialog) = scene.dialog {
-            	dialog.children.next();
-        	}
+            scene.dialog.children.next();
         },
         _ => ()
     }

@@ -33,7 +33,7 @@ pub struct Scene {
     pub generators: PositionLevelStorage<Generator>,
     pub npc: PositionLevelStorage<NPC>,
     pub terminal_text: graphics::Text,
-    pub dialog: Option<Node<DialogItem>>,
+    pub dialog: Node<DialogItem>,
     pub backdrop: String,
     pub input: InputState,
     pub edit_cursor: Position,
@@ -101,7 +101,13 @@ impl Scene {
             generators,
             npc,
             terminal_text: graphics::Text::new(ctx, "", &font)?,
-            dialog: None,
+            dialog: Node {
+                value: DialogItem {
+                    text: "".to_string(),
+                    response: "".to_string()
+                },
+                children: SelectionStorage::new()
+            },
             backdrop: String::from("/none.png"),
             input: InputState::World,
             edit_cursor: Position {x: 0, y: 0},
@@ -235,7 +241,7 @@ impl Scene {
                 Direction::Up => npc.direction = Direction::Down,
                 Direction::Right => npc.direction = Direction::Left,
             }
-            self.dialog = Some(npc.dialog.root.clone());
+            self.dialog = npc.dialog.root.clone();
             self.input = InputState::NPC;
         }
     }
@@ -435,9 +441,7 @@ impl event::EventHandler for Scene {
 
         if self.input == InputState::NPC {
             super::draw_selection(&self.current_npc().unwrap().inventory, ctx, false)?;
-            if let Some(ref dialog) = self.dialog {
-                super::draw_dialog(dialog, ctx)?;
-            }
+            super::draw_dialog(&self.dialog, ctx)?;
         }
 
         self.player.draw(ctx)?;
