@@ -4,12 +4,15 @@ use std::io::Write;
 
 use tar::{Builder, Archive};
 use bincode;
+use serde_yaml;
 
 use constants::LEVEL_SIZE;
 use state::world::*;
 use player::Player;
 use objects::*;
 use misc::Position;
+use storage::Tree;
+use dialog::*;
 
 pub mod static_levels;
 
@@ -95,6 +98,15 @@ pub fn save_scene(scene: &Scene, filename: &str) {
     }
     let bytes: Vec<u8> = bincode::serialize(&level_npc).unwrap();
     File::create("temp-save/npc.bin").unwrap().write_all(&bytes).unwrap();
+
+    let mut level_npc_dialog: Vec<Tree<DialogItem>> = vec![];
+    for item in scene.npc.iter() {
+        if let Some(ref npc) = *item {
+            level_npc_dialog.push(npc.dialog.clone());
+        }
+    }
+    let yaml = serde_yaml::to_string(&level_npc_dialog).unwrap();
+    File::create("temp-save/npc-dialog.yaml").unwrap().write_all(&yaml.as_bytes()).unwrap();
 
     let file = File::create(filename).unwrap();
     let mut a = Builder::new(file);

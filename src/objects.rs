@@ -4,7 +4,8 @@ use ggez::graphics;
 
 use constants::{LEVEL_SIZE, GRID_SIZE};
 use misc::Direction;
-use storage::SelectionStorage;
+use storage::{SelectionStorage, Tree};
+use dialog::DialogItem;
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 pub struct Wall { }
@@ -137,6 +138,7 @@ pub enum Item {
     Cable,
     Isolation,
     Adapter,
+    Paper,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -144,7 +146,8 @@ pub struct NPC {
 	pub name: String,
     pub direction: Direction,
     pub look_at: Direction,
-    pub dialog: SelectionStorage<String>
+    pub dialog: Tree<DialogItem>,
+    pub inventory: SelectionStorage<Item>,
 }
 
 impl NPC {

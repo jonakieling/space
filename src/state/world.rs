@@ -429,6 +429,10 @@ impl event::EventHandler for Scene {
             }
         }
 
+        if self.input == InputState::NPC {
+            super::draw_selection(&self.current_npc().unwrap().inventory, ctx, false)?;
+        }
+
         self.player.draw(ctx)?;
 
         if let InputState::Terminal = self.input {

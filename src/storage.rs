@@ -113,3 +113,14 @@ impl<T: Clone> SelectionStorage<T> {
         self.storage.iter()
     }
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct Tree<T> {
+    pub root: Node<T>
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct Node<T> {
+    pub value: T,
+    pub children: Vec<Option<Node<T>>>
+}

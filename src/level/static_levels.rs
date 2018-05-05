@@ -1,16 +1,28 @@
 use state::world::*;
 use player::Player;
 use objects::*;
-use storage::SelectionStorage;
+use storage::{SelectionStorage, Tree, Node};
 use misc::*;
+use dialog::*;
 
 pub fn static_level0(scene: &mut Scene) {
     scene.backdrop = String::from("/realm_of_sol__0000s_0000_1.1.png");
+    let mut inventory = SelectionStorage::new();
+    inventory.insert(Item::Paper);
     let npc_gnoerf = NPC {
         name: "Gnoerf".to_string(),
         direction: Direction::Left,
         look_at: Direction::Left,
-        dialog: SelectionStorage::new()
+        dialog: Tree {
+            root: Node {
+                value: DialogItem {
+                    text: "Hi".to_string(),
+                    response: "...".to_string()
+                },
+                children: Vec::new()
+            }
+        },
+        inventory
     };
     scene.npc.insert(12, 12, npc_gnoerf);
     println!("game loaded: static level0");

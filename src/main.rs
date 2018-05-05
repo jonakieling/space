@@ -1,5 +1,6 @@
 extern crate ggez;
 extern crate serde;
+extern crate serde_yaml;
 #[macro_use]
 extern crate serde_derive;
 extern crate bincode;
@@ -13,6 +14,7 @@ mod objects;
 mod misc;
 mod constants;
 mod input;
+mod dialog;
 
 use std::env;
 use std::path;
