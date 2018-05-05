@@ -5,6 +5,14 @@ use storage::SelectionStorage;
 use misc::*;
 
 pub fn static_level0(scene: &mut Scene) {
+    scene.backdrop = String::from("/realm_of_sol__0000s_0000_1.1.png");
+    let npc_gnoerf = NPC {
+        name: "Gnoerf".to_string(),
+        direction: Direction::Left,
+        look_at: Direction::Left,
+        dialog: SelectionStorage::new()
+    };
+    scene.npc.insert(12, 12, npc_gnoerf);
     println!("game loaded: static level0");
 }
 

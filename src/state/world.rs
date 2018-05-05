@@ -30,6 +30,7 @@ pub struct Scene {
     pub terminals: PositionLevelStorage<Terminal>,
     pub circuitry: PositionLevelStorage<Circuitry>,
     pub generators: PositionLevelStorage<Generator>,
+    pub npc: PositionLevelStorage<NPC>,
     pub terminal_text: graphics::Text,
     pub backdrop: String,
     pub input: InputState,
@@ -80,6 +81,7 @@ impl Scene {
         let terminals = <PositionLevelStorage<Terminal>>::new();
         let circuitry = <PositionLevelStorage<Circuitry>>::new();
         let generators = <PositionLevelStorage<Generator>>::new();
+        let npc = <PositionLevelStorage<NPC>>::new();
 
 
         let mut menu = SelectionStorage::new();
@@ -95,6 +97,7 @@ impl Scene {
             terminals,
             circuitry,
             generators,
+            npc,
             terminal_text: graphics::Text::new(ctx, "", &font)?,
             backdrop: String::from("/none.png"),
             input: InputState::World,
@@ -125,6 +128,10 @@ impl Scene {
             found_collision = true;
         }
 
+        if let Some(&Some(_)) = self.npc.get(self.player.front_tile.x, self.player.front_tile.y) {
+            found_collision = true;
+        }
+
         if let Some(&Some(ref door)) = self.doors.get(self.player.front_tile.x, self.player.front_tile.y) {
             if let DoorStatus::Closed = door.status {
                 found_collision = true;
@@ -137,23 +144,31 @@ impl Scene {
     pub fn get_edit_selection(&mut self) -> SelectionStorage<String> {
         let mut selection_storage: SelectionStorage<String> = SelectionStorage::new();
         if let Some(&Some(_)) = self.walls.get(self.edit_cursor.x, self.edit_cursor.y) {
-            selection_storage.insert(String::from("Wall"));
+            selection_storage.insert("Wall".to_string());
         }
         
         if let Some(&Some(_)) = self.doors.get(self.edit_cursor.x, self.edit_cursor.y) {
-            selection_storage.insert(String::from("Door"));
+            selection_storage.insert("Door".to_string());
         }
         
         if let Some(&Some(_)) = self.terminals.get(self.edit_cursor.x, self.edit_cursor.y) {
-            selection_storage.insert(String::from("Terminal"));
+            selection_storage.insert("Terminal".to_string());
         }
         
         if let Some(&Some(_)) = self.circuitry.get(self.edit_cursor.x, self.edit_cursor.y) {
-            selection_storage.insert(String::from("Circuitry"));
+            selection_storage.insert("Circuitry".to_string());
         }
         
         if let Some(&Some(_)) = self.generators.get(self.edit_cursor.x, self.edit_cursor.y) {
-            selection_storage.insert(String::from("Generator"));
+            selection_storage.insert("Generator".to_string());
+        }
+        
+        if let Some(&Some(ref npc)) = self.npc.get(self.edit_cursor.x, self.edit_cursor.y) {
+            selection_storage.insert(npc.name.clone());
+        }
+
+        if self.edit_cursor.x == self.player.position.x && self.edit_cursor.y == self.player.position.y {
+            selection_storage.insert("Player".to_string());
         }
 
         selection_storage
@@ -204,6 +219,26 @@ impl Scene {
     pub fn current_circuitry(&mut self) -> Option<&mut Circuitry>{
         if let Some(&mut Some(ref mut current_circuitry)) = self.circuitry.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             Some(current_circuitry)
+        } else {
+            None
+        }
+    }
+
+    pub fn interact_with_npc(&mut self) {
+        if let Some(&mut Some(ref mut npc)) = self.npc.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+            match self.player.direction {
+                Direction::Down => npc.direction = Direction::Up,
+                Direction::Left => npc.direction = Direction::Right,
+                Direction::Up => npc.direction = Direction::Down,
+                Direction::Right => npc.direction = Direction::Left,
+            }
+            self.input = InputState::NPC;
+        }
+    }
+
+    pub fn current_npc(&mut self) -> Option<&mut NPC>{
+        if let Some(&mut Some(ref mut current_npc)) = self.npc.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+            Some(current_npc)
         } else {
             None
         }
@@ -308,6 +343,9 @@ impl event::EventHandler for Scene {
             },
             InputState::Menu => {
                 menu::key_up_event(self, ctx, keycode, _keymod, _repeat);
+            },
+            InputState::NPC => {
+                npc::key_up_event(self, ctx, keycode, _keymod, _repeat);
             }
         }
     }
@@ -385,13 +423,13 @@ impl event::EventHandler for Scene {
             }
         }
 
-        graphics::set_color(ctx, graphics::BLACK)?;
-        let player = graphics::Rect::new(self.player.position.viewport_x(), self.player.position.viewport_y(), 20.0, 20.0);
-        graphics::rectangle(ctx, graphics::DrawMode::Fill, player)?;
+        for (pos, npc) in self.npc.iter().enumerate() {
+            if let &Some(ref npc) = npc {
+                npc.draw(pos as i32, ctx)?;
+            }
+        }
 
-        graphics::set_color(ctx, graphics::WHITE)?;
-        let face = graphics::Rect::new(self.player.position.viewport_x() + 5.0 + (self.player.direction.value().viewport_x() * 0.2), self.player.position.viewport_y() + 5.0 + (self.player.direction.value().viewport_y() * 0.2), 10.0, 10.0);
-        graphics::rectangle(ctx, graphics::DrawMode::Fill, face)?;
+        self.player.draw(ctx)?;
 
         if let InputState::Terminal = self.input {
             graphics::set_color(ctx, graphics::BLACK)?;
@@ -444,6 +482,10 @@ impl event::EventHandler for Scene {
             },
             InputState::Menu => {
                 super::draw_input_state("Menu", ctx)?;
+            },
+            InputState::NPC => {
+                let current_npc = self.current_npc().unwrap();
+                super::draw_input_state(&current_npc.name, ctx)?;
             },
         }
 

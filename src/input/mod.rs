@@ -4,3 +4,4 @@ pub mod world;
 pub mod inventory;
 pub mod circuitry;
 pub mod menu;
+pub mod npc;

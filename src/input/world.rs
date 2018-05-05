@@ -65,6 +65,7 @@ pub fn key_up_event(scene: &mut Scene, ctx: &mut Context, keycode: Keycode, _key
             if scene.insight_view {
                 scene.interact_with_circuitry();
             } else {
+                scene.interact_with_npc();
                 scene.interact_with_door();
                 scene.interact_with_terminal(ctx);
             }

@@ -69,5 +69,6 @@ pub enum InputState {
     Edit,
     Inventory,
     Circuitry,
-    Menu
+    Menu,
+    NPC
 }

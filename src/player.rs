@@ -1,3 +1,7 @@
+use ggez::GameResult;
+use ggez::Context;
+use ggez::graphics;
+
 use misc::{Position, Direction};
 use objects::{Item, Terminal};
 use storage::SelectionStorage;
@@ -45,5 +49,16 @@ impl Player {
         if let Some(&resulting_movement) = self.movement.last() {
             self.direction = resulting_movement;
         }
+    }
+
+    pub fn draw(&self, ctx: &mut Context) -> GameResult<()> {
+        graphics::set_color(ctx, graphics::BLACK)?;
+        let player = graphics::Rect::new(self.position.viewport_x(), self.position.viewport_y(), 20.0, 20.0);
+        graphics::rectangle(ctx, graphics::DrawMode::Fill, player)?;
+
+        graphics::set_color(ctx, graphics::WHITE)?;
+        let face = graphics::Rect::new(self.position.viewport_x() + 5.0 + (self.direction.value().viewport_x() * 0.2), self.position.viewport_y() + 5.0 + (self.direction.value().viewport_y() * 0.2), 10.0, 10.0);
+        graphics::rectangle(ctx, graphics::DrawMode::Fill, face)?;
+        Ok(())
     }
 }

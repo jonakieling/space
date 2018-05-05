@@ -138,3 +138,26 @@ pub enum Item {
     Isolation,
     Adapter,
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct NPC {
+	pub name: String,
+    pub direction: Direction,
+    pub look_at: Direction,
+    pub dialog: SelectionStorage<String>
+}
+
+impl NPC {
+    pub fn draw(&self, pos: i32, ctx: &mut Context) -> GameResult<()> {
+	    let x = pos % LEVEL_SIZE;
+	    let y = pos / LEVEL_SIZE;
+        graphics::set_color(ctx, graphics::BLACK)?;
+        let npc = graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0);
+        graphics::rectangle(ctx, graphics::DrawMode::Fill, npc)?;
+
+        graphics::set_color(ctx, graphics::WHITE)?;
+        let face = graphics::Rect::new((x * GRID_SIZE) as f32 + 5.0 + (self.direction.value().viewport_x() * 0.2), (y * GRID_SIZE) as f32 + 5.0 + (self.direction.value().viewport_y() * 0.2), 10.0, 10.0);
+        graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), face)?;
+        Ok(())
+	}
+}
