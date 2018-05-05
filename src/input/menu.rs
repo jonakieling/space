@@ -21,10 +21,12 @@ pub fn key_up_event(scene: &mut Scene, ctx: &mut Context, keycode: Keycode, _key
             match *scene.menu.current().unwrap() {
                 MenuOption::Save => {
                     save_scene(scene, "saves/auto-save.tar");
-                    scene.input = InputState::World;
                 },
                 MenuOption::Quit => {
                     ctx.quit().expect("game should have quit");
+                },
+                MenuOption::Menu => {
+                    scene.main_menu = true;
                 },
             }
         },

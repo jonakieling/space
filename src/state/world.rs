@@ -18,7 +18,8 @@ use level;
 #[derive(Debug, Clone)]
 pub enum MenuOption {
     Save,
-    Quit
+    Quit,
+    Menu
 }
 
 pub struct Scene {
@@ -36,11 +37,17 @@ pub struct Scene {
     pub edit_selection: SelectionStorage<String>,
     pub menu: SelectionStorage<MenuOption>,
     pub insight_view: bool,
+    pub main_menu: bool
 }
 
 impl GameState for Scene {
-    fn change_state(&self, _ctx: &mut Context) -> Option<Box<GameState>> {
-        None
+    fn change_state(&self, ctx: &mut Context) -> Option<Box<GameState>> {
+        if self.main_menu {
+            let menu = super::menu::Scene::new(ctx).unwrap();
+            Some(Box::new(menu))
+        } else {
+            None
+        }
     }
 }
 
@@ -77,6 +84,7 @@ impl Scene {
 
         let mut menu = SelectionStorage::new();
         menu.insert(MenuOption::Save);
+        menu.insert(MenuOption::Menu);
         menu.insert(MenuOption::Quit);
         
         let mut scene = Scene {
@@ -94,6 +102,7 @@ impl Scene {
             edit_selection: SelectionStorage::new(),
             menu,
             insight_view: false,
+            main_menu: false
         };
 
         scene.update_power();
