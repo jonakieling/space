@@ -35,7 +35,7 @@ thoughts before implmentation.
 * stations
 * objects (✓)
 * ships
-* npc
+* npc (✓)
 
 ## interaction
 * conversations
