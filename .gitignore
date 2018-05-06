@@ -4,3 +4,5 @@
 *.sublime-project
 /saves/*
 !/saves/.gitkeep
+SDL2.dll
+SDL2.lib
