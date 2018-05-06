@@ -38,7 +38,7 @@ thoughts before implmentation.
 * npc (✓)
 
 ## interaction
-* conversations
+* conversations (✓)
 * terminals, consoles (✓)
 * space flight
 * inventory (✓)
