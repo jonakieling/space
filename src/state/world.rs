@@ -31,7 +31,8 @@ pub enum InputState {
     Inventory,
     Circuitry,
     Menu,
-    Npc
+    Npc,
+    NpcTrade
 }
 
 pub struct Scene {
@@ -368,7 +369,15 @@ impl event::EventHandler for Scene {
             },
             InputState::Npc => {
                 npc::key_up_event(self, ctx, keycode, _keymod, _repeat);
-            }
+            },
+            InputState::NpcTrade => {
+                if keycode == Keycode::Escape {
+                    self.input = InputState::World;
+                    if let Some(npc) = self.current_npc() {
+                        npc.direction = npc.look_at;
+                    }
+                }
+            },
         }
     }
 
@@ -508,6 +517,9 @@ impl event::EventHandler for Scene {
             InputState::Npc => {
                 let current_npc = self.current_npc().unwrap();
                 super::draw_input_state(&current_npc.name, ctx)?;
+            },
+            InputState::NpcTrade => {
+                super::draw_input_state("Trade", ctx)?;
             },
         }
 

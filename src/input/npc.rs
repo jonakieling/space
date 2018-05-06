@@ -2,6 +2,7 @@ use ggez::Context;
 use ggez::event::{Keycode, Mod};
 
 use state::world::{Scene, InputState};
+use dialog::DialogAction;
 
 
 pub fn key_up_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
@@ -16,6 +17,15 @@ pub fn key_up_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _ke
         Keycode::Return => {
         	let mut dialog = scene.dialog.clone();
         	if dialog.children.iter().len() > 0 {
+                if let Some(dialog_item) = dialog.children.current() {
+                    if let Some(ref action) = dialog_item.value.action {
+                        match *action {
+                            DialogAction::Trade => {
+                                scene.input = InputState::NpcTrade;
+                            }
+                        }
+                    }
+                }
         		scene.dialog = dialog.children.current().unwrap().clone();	
         	} else {
 	    		if let Some(npc) = scene.current_npc() {
