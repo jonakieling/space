@@ -4,7 +4,7 @@ use ggez::Context;
 use ggez::event::{Keycode, Mod};
 
 use constants::MOVEMENT_SPEED;
-use state::world::Scene;
+use state::world::{Scene, InputState};
 use misc::*;
 
 pub fn key_down_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, repeat: bool) {

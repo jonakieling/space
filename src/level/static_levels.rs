@@ -10,17 +10,28 @@ pub fn static_level0(scene: &mut Scene) {
     let mut inventory = SelectionStorage::new();
     inventory.insert(Item::Paper);
     let mut dialog = SelectionStorage::new();
-    dialog.insert(Node {
+    let mut dialog2 = SelectionStorage::new();
+    dialog2.insert(Node {
         value: DialogItem {
-            text: "Hi".to_string(),
-            response: "Hello".to_string()
+            text: "Trade".to_string(),
+            response: "Here are my goods".to_string(),
+            action: Some(DialogAction::Trade)
         },
         children: SelectionStorage::new()
     });
     dialog.insert(Node {
         value: DialogItem {
+            text: "Hi".to_string(),
+            response: "Hello".to_string(),
+            action: None
+        },
+        children: dialog2
+    });
+    dialog.insert(Node {
+        value: DialogItem {
             text: "Bye".to_string(),
-            response: "Goodbye".to_string()
+            response: "Goodbye".to_string(),
+            action: None
         },
         children: SelectionStorage::new()
     });
@@ -32,7 +43,8 @@ pub fn static_level0(scene: &mut Scene) {
             root: Node {
                 value: DialogItem {
                     text: "".to_string(),
-                    response: "...".to_string()
+                    response: "...".to_string(),
+                    action: None
                 },
                 children: dialog
             }

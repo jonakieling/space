@@ -1,7 +1,7 @@
 use ggez::Context;
 use ggez::event::{Keycode, Mod};
 
-use state::world::Scene;
+use state::world::{Scene, InputState};
 use misc::*;
 use objects::*;
 use storage::*;

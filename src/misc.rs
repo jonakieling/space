@@ -61,14 +61,3 @@ impl Direction {
         }
     }
 }
-
-#[derive(Debug, Copy, Clone, PartialEq)]
-pub enum InputState {
-    Terminal,
-    World,
-    Edit,
-    Inventory,
-    Circuitry,
-    Menu,
-    NPC
-}

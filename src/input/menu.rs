@@ -1,8 +1,7 @@
 use ggez::Context;
 use ggez::event::{Keycode, Mod};
 
-use state::world::{Scene, MenuOption};
-use misc::*;
+use state::world::{Scene, MenuOption, InputState};
 use level::save_scene;
 
 

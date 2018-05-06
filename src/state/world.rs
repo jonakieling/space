@@ -23,6 +23,17 @@ pub enum MenuOption {
     Menu
 }
 
+#[derive(Debug, Copy, Clone, PartialEq)]
+pub enum InputState {
+    Terminal,
+    World,
+    Edit,
+    Inventory,
+    Circuitry,
+    Menu,
+    NPC
+}
+
 pub struct Scene {
     pub movement_timer: Duration,
     pub player: Player,
@@ -104,7 +115,8 @@ impl Scene {
             dialog: Node {
                 value: DialogItem {
                     text: "".to_string(),
-                    response: "".to_string()
+                    response: "".to_string(),
+                    action: None
                 },
                 children: SelectionStorage::new()
             },
