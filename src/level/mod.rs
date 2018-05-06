@@ -88,7 +88,7 @@ pub fn save_scene(scene: &Scene, filename: &str) {
     let bytes: Vec<u8> = bincode::serialize(&level_generators).unwrap();
     File::create("temp-save/generators.bin").unwrap().write_all(&bytes).unwrap();
 
-    let mut level_npc: Vec<(i32, i32, NPC)> = vec![];
+    let mut level_npc: Vec<(i32, i32, Npc)> = vec![];
     for (pos, item) in scene.npc.iter().enumerate() {
         if let Some(ref npc) = *item {
             let x = pos as i32 % LEVEL_SIZE;
@@ -156,7 +156,7 @@ pub fn load_scene(scene: &mut Scene, filename: &str) {
                     }
                 },
                 "npc" => {
-                    let level_npc: Vec<(i32, i32, NPC)> = bincode::deserialize_from(file).unwrap();
+                    let level_npc: Vec<(i32, i32, Npc)> = bincode::deserialize_from(file).unwrap();
                     for npc in level_npc {
                         scene.npc.insert(npc.0, npc.1, npc.2);
                     }

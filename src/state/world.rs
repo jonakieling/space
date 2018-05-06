@@ -31,7 +31,7 @@ pub enum InputState {
     Inventory,
     Circuitry,
     Menu,
-    NPC
+    Npc
 }
 
 pub struct Scene {
@@ -42,7 +42,7 @@ pub struct Scene {
     pub terminals: PositionLevelStorage<Terminal>,
     pub circuitry: PositionLevelStorage<Circuitry>,
     pub generators: PositionLevelStorage<Generator>,
-    pub npc: PositionLevelStorage<NPC>,
+    pub npc: PositionLevelStorage<Npc>,
     pub terminal_text: graphics::Text,
     pub dialog: Node<DialogItem>,
     pub backdrop: String,
@@ -94,7 +94,7 @@ impl Scene {
         let terminals = <PositionLevelStorage<Terminal>>::new();
         let circuitry = <PositionLevelStorage<Circuitry>>::new();
         let generators = <PositionLevelStorage<Generator>>::new();
-        let npc = <PositionLevelStorage<NPC>>::new();
+        let npc = <PositionLevelStorage<Npc>>::new();
 
 
         let mut menu = SelectionStorage::new();
@@ -254,11 +254,11 @@ impl Scene {
                 Direction::Right => npc.direction = Direction::Left,
             }
             self.dialog = npc.dialog.root.clone();
-            self.input = InputState::NPC;
+            self.input = InputState::Npc;
         }
     }
 
-    pub fn current_npc(&mut self) -> Option<&mut NPC>{
+    pub fn current_npc(&mut self) -> Option<&mut Npc>{
         if let Some(&mut Some(ref mut current_npc)) = self.npc.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             Some(current_npc)
         } else {
@@ -366,7 +366,7 @@ impl event::EventHandler for Scene {
             InputState::Menu => {
                 menu::key_up_event(self, ctx, keycode, _keymod, _repeat);
             },
-            InputState::NPC => {
+            InputState::Npc => {
                 npc::key_up_event(self, ctx, keycode, _keymod, _repeat);
             }
         }
@@ -451,7 +451,7 @@ impl event::EventHandler for Scene {
             }
         }
 
-        if self.input == InputState::NPC {
+        if self.input == InputState::Npc {
             super::draw_selection(&self.current_npc().unwrap().inventory, ctx, false)?;
             super::draw_dialog(&self.dialog, ctx)?;
         }
@@ -505,7 +505,7 @@ impl event::EventHandler for Scene {
             InputState::Menu => {
                 super::draw_input_state("Menu", ctx)?;
             },
-            InputState::NPC => {
+            InputState::Npc => {
                 let current_npc = self.current_npc().unwrap();
                 super::draw_input_state(&current_npc.name, ctx)?;
             },

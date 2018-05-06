@@ -142,7 +142,7 @@ pub enum Item {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct NPC {
+pub struct Npc {
 	pub name: String,
     pub direction: Direction,
     pub look_at: Direction,
@@ -150,7 +150,7 @@ pub struct NPC {
     pub inventory: SelectionStorage<Item>,
 }
 
-impl NPC {
+impl Npc {
     pub fn draw(&self, pos: i32, ctx: &mut Context) -> GameResult<()> {
 	    let x = pos % LEVEL_SIZE;
 	    let y = pos / LEVEL_SIZE;

@@ -35,7 +35,7 @@ pub fn static_level0(scene: &mut Scene) {
         },
         children: SelectionStorage::new()
     });
-    let npc_gnoerf = NPC {
+    let npc_gnoerf = Npc {
         name: "Gnoerf".to_string(),
         direction: Direction::Left,
         look_at: Direction::Left,
