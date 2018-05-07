@@ -15,9 +15,8 @@ pub fn key_up_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _ke
             scene.input = InputState::World;
         },
         Keycode::Return => {
-        	let mut dialog = scene.dialog.clone();
-        	if dialog.children.iter().len() > 0 {
-                if let Some(dialog_item) = dialog.children.current() {
+        	if scene.dialog.children.iter().len() > 0 {
+                if let Some(dialog_item) = scene.dialog.children.current() {
                     if let Some(ref action) = dialog_item.value.action {
                         match *action {
                             DialogAction::Trade => {
@@ -26,7 +25,7 @@ pub fn key_up_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _ke
                         }
                     }
                 }
-        		scene.dialog = dialog.children.current().unwrap().clone();	
+        		scene.dialog = scene.dialog.children.current().unwrap().clone();	
         	} else {
 	    		if let Some(npc) = scene.current_npc() {
 	        	    npc.direction = npc.look_at;
