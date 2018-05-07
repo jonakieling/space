@@ -53,7 +53,7 @@ pub fn key_up_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _ke
             scene.terminals.insert(scene.edit_cursor.x, scene.edit_cursor.y, Terminal { text: Box::new(String::new()), front: Direction::Down});
         },
         Keycode::Tab => {
-            if let Some(&mut Some(ref mut door)) = scene.doors.get_mut(scene.edit_cursor.x, scene.edit_cursor.y) {
+            if let Some(ref mut door) = scene.doors.get_mut(scene.edit_cursor.x, scene.edit_cursor.y) {
                 match door.status {
                     DoorStatus::Open => {
                         door.status = DoorStatus::Closed;
@@ -63,7 +63,7 @@ pub fn key_up_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _ke
                     }
                 }
             }
-            if let Some(&mut Some(ref mut terminal)) = scene.terminals.get_mut(scene.edit_cursor.x, scene.edit_cursor.y) {
+            if let Some(ref mut terminal) = scene.terminals.get_mut(scene.edit_cursor.x, scene.edit_cursor.y) {
                 match terminal.front {
                     Direction::Up => {
                         terminal.front = Direction::Right;

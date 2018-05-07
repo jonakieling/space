@@ -138,23 +138,23 @@ impl Scene {
     pub fn check_player_collision(&self) -> bool {
         let mut found_collision = false;
 
-        if let Some(&Some(_)) = self.walls.get(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(_) = self.walls.get(self.player.front_tile.x, self.player.front_tile.y) {
             found_collision = true;
         }
 
-        if let Some(&Some(_)) = self.terminals.get(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(_) = self.terminals.get(self.player.front_tile.x, self.player.front_tile.y) {
             found_collision = true;
         }
 
-        if let Some(&Some(_)) = self.generators.get(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(_) = self.generators.get(self.player.front_tile.x, self.player.front_tile.y) {
             found_collision = true;
         }
 
-        if let Some(&Some(_)) = self.npc.get(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(_) = self.npc.get(self.player.front_tile.x, self.player.front_tile.y) {
             found_collision = true;
         }
 
-        if let Some(&Some(ref door)) = self.doors.get(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(door) = self.doors.get(self.player.front_tile.x, self.player.front_tile.y) {
             if let DoorStatus::Closed = door.status {
                 found_collision = true;
             }
@@ -165,27 +165,27 @@ impl Scene {
 
     pub fn get_edit_selection(&mut self) -> SelectionStorage<String> {
         let mut selection_storage: SelectionStorage<String> = SelectionStorage::new();
-        if let Some(&Some(_)) = self.walls.get(self.edit_cursor.x, self.edit_cursor.y) {
+        if let Some(_) = self.walls.get(self.edit_cursor.x, self.edit_cursor.y) {
             selection_storage.insert("Wall".to_string());
         }
         
-        if let Some(&Some(_)) = self.doors.get(self.edit_cursor.x, self.edit_cursor.y) {
+        if let Some(_) = self.doors.get(self.edit_cursor.x, self.edit_cursor.y) {
             selection_storage.insert("Door".to_string());
         }
         
-        if let Some(&Some(_)) = self.terminals.get(self.edit_cursor.x, self.edit_cursor.y) {
+        if let Some(_) = self.terminals.get(self.edit_cursor.x, self.edit_cursor.y) {
             selection_storage.insert("Terminal".to_string());
         }
         
-        if let Some(&Some(_)) = self.circuitry.get(self.edit_cursor.x, self.edit_cursor.y) {
+        if let Some(_) = self.circuitry.get(self.edit_cursor.x, self.edit_cursor.y) {
             selection_storage.insert("Circuitry".to_string());
         }
         
-        if let Some(&Some(_)) = self.generators.get(self.edit_cursor.x, self.edit_cursor.y) {
+        if let Some(_) = self.generators.get(self.edit_cursor.x, self.edit_cursor.y) {
             selection_storage.insert("Generator".to_string());
         }
         
-        if let Some(&Some(ref npc)) = self.npc.get(self.edit_cursor.x, self.edit_cursor.y) {
+        if let Some(npc) = self.npc.get(self.edit_cursor.x, self.edit_cursor.y) {
             selection_storage.insert(npc.name.clone());
         }
 
@@ -197,7 +197,7 @@ impl Scene {
     }
 
     pub fn interact_with_door(&mut self) {
-        if let Some(&mut Some(ref mut door)) = self.doors.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(door) = self.doors.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             match door.status {
                 DoorStatus::Closed => {
                     door.status = DoorStatus::Open;
@@ -233,13 +233,13 @@ impl Scene {
     }
 
     pub fn interact_with_circuitry(&mut self) {
-        if let Some(&mut Some(_)) = self.circuitry.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(_) = self.circuitry.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             self.input = InputState::Circuitry;
         }
     }
 
     pub fn current_circuitry(&mut self) -> Option<&mut Circuitry>{
-        if let Some(&mut Some(ref mut current_circuitry)) = self.circuitry.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(current_circuitry) = self.circuitry.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             Some(current_circuitry)
         } else {
             None
@@ -247,7 +247,7 @@ impl Scene {
     }
 
     pub fn interact_with_npc(&mut self) {
-        if let Some(&mut Some(ref mut npc)) = self.npc.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(npc) = self.npc.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             match self.player.direction {
                 Direction::Down => npc.direction = Direction::Up,
                 Direction::Left => npc.direction = Direction::Right,
@@ -260,7 +260,7 @@ impl Scene {
     }
 
     pub fn current_npc(&mut self) -> Option<&mut Npc>{
-        if let Some(&mut Some(ref mut current_npc)) = self.npc.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(current_npc) = self.npc.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             Some(current_npc)
         } else {
             None
@@ -268,7 +268,7 @@ impl Scene {
     }
 
     pub fn interact_with_terminal(&mut self, ctx: &mut Context) {
-        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(current_terminal) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             let terminal_front_tile = &self.player.front_tile + &current_terminal.front.value();
             if terminal_front_tile == self.player.position {
                 self.input = InputState::Terminal;
@@ -285,7 +285,7 @@ impl Scene {
     }
 
     pub fn terminal_remove_character(&mut self, ctx: &mut Context) {
-        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(current_terminal) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             if current_terminal.text.len() > 0 {
                 let text_len = current_terminal.text.len();
                 current_terminal.text.split_off(text_len - 1);
@@ -297,7 +297,7 @@ impl Scene {
     }
 
     pub fn terminal_add_character(&mut self, ctx: &mut Context, text: String) {
-        if let Some(&mut Some(ref mut current_terminal)) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(current_terminal) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             if current_terminal.text.len() <= TERMINAL_LIMIT {
                 let new_terminal_text = format!("{}{}", current_terminal.text, text);
                 current_terminal.text = Box::new(new_terminal_text);
@@ -449,7 +449,7 @@ impl event::EventHandler for Scene {
             }
         } else if self.input == InputState::Circuitry {
             let front_index = self.player.front_tile.to_int();
-            if let Some(ref circuitry) = self.current_circuitry() {
+            if let Some(circuitry) = self.current_circuitry() {
                 circuitry.draw(front_index as i32, ctx)?;
             }
         }

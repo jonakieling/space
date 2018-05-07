@@ -15,19 +15,27 @@ impl<T: Clone + Debug> PositionLevelStorage<T> {
         }
     }
     
-    pub fn get(&self, x: i32, y: i32) -> Option<&Option<T>> {
+    pub fn get(&self, x: i32, y: i32) -> Option<&T> {
         let position = x + y * LEVEL_SIZE;
         if position < self.storage.len() as i32 {
-            self.storage.get(position as usize)
+            if let Some(&Some(ref item)) = self.storage.get(position as usize) {
+                Some(item)
+            } else {
+                None
+            }
         } else {
             None
         }
     }
 
-    pub fn get_mut(&mut self, x: i32, y: i32) -> Option<&mut Option<T>> {
+    pub fn get_mut(&mut self, x: i32, y: i32) -> Option<&mut T> {
         let position = x + y * LEVEL_SIZE;
         if position < self.storage.len() as i32 {
-            self.storage.get_mut(position as usize)
+            if let Some(&mut Some(ref mut item)) = self.storage.get_mut(position as usize) {
+                Some(item)
+            } else {
+                None
+            }
         } else {
             None
         }
