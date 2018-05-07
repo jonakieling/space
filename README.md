@@ -15,6 +15,8 @@ developed on linux
 * hold `left ctrl` to show *circuitry*, you can list the items by pressing `Enter` (switch through with `↑` and `↓`, and close it with `i`)
 * press `Insert` to switch to *edit mode*
 
+* and there is Gnoerf, to whom you may speak but beware, there is nothing but emptiness behind his words
+
 # edit mode
 pressing `Insert`
 * move the *cursor* with `↑`,`→`,`↓` and `←`
