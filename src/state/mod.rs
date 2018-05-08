@@ -94,20 +94,28 @@ fn draw_input_state(state: &str, ctx: &mut Context) -> GameResult<()> {
     Ok(())
 }
 
+#[derive(PartialEq, Clone)]
 pub enum TradeArea {
-    Left,
-    Right
+    LeftSource,
+    LeftTarget,
+    RightSource,
+    RightTarget
 }
 
-fn draw_trade_area(source: &SelectionStorage<Item>, target: &SelectionStorage<Item>, ctx: &mut Context, area: TradeArea) -> GameResult<()> {
+fn draw_trade_area(selection: &SelectionStorage<Item>, ctx: &mut Context, area: TradeArea, active: TradeArea) -> GameResult<()> {
+    let active = area == active;
     match area {
-        TradeArea::Left => {
-            draw_selection_with_parameters(&source, ctx, Position { x: 60, y: 50 }, Orientation::Right, false)?;
-            draw_selection_with_parameters(&target, ctx, Position { x: 260, y: 50 }, Orientation::Left, false)?;
+        TradeArea::LeftSource => {
+            draw_selection_with_parameters(&selection, ctx, Position { x: 180, y: 80 }, Orientation::Left, active)?;
         },
-        TradeArea::Right => {
-            draw_selection_with_parameters(&target, ctx, Position { x: 400, y: 50 }, Orientation::Left, false)?;
-            draw_selection_with_parameters(&source, ctx, Position { x: 600, y: 50 }, Orientation::Right, false)?;
+        TradeArea::LeftTarget => {
+            draw_selection_with_parameters(&selection, ctx, Position { x: 220, y: 80 }, Orientation::Right, active)?;
+        },
+        TradeArea::RightTarget => {
+            draw_selection_with_parameters(&selection, ctx, Position { x: 540, y: 80 }, Orientation::Left, active)?;
+        },
+        TradeArea::RightSource => {
+            draw_selection_with_parameters(&selection, ctx, Position { x: 580, y: 80 }, Orientation::Right, active)?;
         },
     }
 
@@ -118,6 +126,28 @@ fn draw_selection_with_parameters<T: Clone + ToString>(selection: &SelectionStor
     let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
     let mut inventory_item_position = 0.0;
     let current_item = selection.current_index();
+
+    if selection.iter().len() == 0 {
+        let empty_text = graphics::Text::new(ctx, "empty", &font).unwrap();
+        let offset;
+        match orientation {
+            Orientation::Left => {
+                offset = empty_text.width() as f32;
+            },
+            Orientation::Right => {
+                offset = 0.0;
+            },
+        }
+        let empty_text_box = graphics::Rect::new(position.x as f32 - offset, position.y as f32, empty_text.width() as f32 + 20.0, 20.0);
+
+        graphics::set_color(ctx, graphics::BLACK)?;
+        graphics::draw(ctx, &empty_text, graphics::Point2::new(position.x as f32 + 11.0 - offset, position.y as f32), 0.0)?;
+        if cursor {
+            graphics::set_color(ctx, graphics::WHITE)?;
+            graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), empty_text_box)?;
+        }
+    }
+
     for (pos, item) in selection.iter().enumerate() {
         let item_text = item.to_string();
         let item_graphics = graphics::Text::new(ctx, &item_text, &font).unwrap();

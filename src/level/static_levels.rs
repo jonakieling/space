@@ -9,6 +9,9 @@ pub fn static_level0(scene: &mut Scene) {
     scene.backdrop = String::from("/realm_of_sol__0000s_0000_1.1.png");
     let mut inventory = SelectionStorage::new();
     inventory.insert(Item::Paper);
+    inventory.insert(Item::Paper);
+    inventory.insert(Item::Communicator);
+
     let mut dialog = SelectionStorage::new();
     let mut dialog2 = SelectionStorage::new();
     dialog2.insert(Node {
@@ -56,7 +59,6 @@ pub fn static_level0(scene: &mut Scene) {
     let mut inventory = <SelectionStorage<Item>>::new();
     inventory.insert(Item::Log);
     inventory.insert(Item::PilotLicense);
-    inventory.insert(Item::Communicator);
     inventory.insert(Item::Terminal);
     scene.player.inventory = inventory;
     

@@ -110,6 +110,21 @@ impl<T: Clone> SelectionStorage<T> {
         }
     }
 
+    pub fn extract_current(&mut self) -> Option<T> {
+        if self.storage.len() != 0 {
+            let item = self.storage.get(self.current_selection).unwrap().clone();
+            self.storage.remove(self.current_selection);
+
+            if self.storage.len() <= self.current_selection && self.current_selection > 0 {
+                self.current_selection -= 1;
+            }
+
+            Some(item)
+        } else {
+            None
+        }
+    }
+
     pub fn current_index(&self) -> usize {
         self.current_selection
     }

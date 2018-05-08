@@ -60,6 +60,7 @@ pub struct Scene {
     pub menu: SelectionStorage<MenuOption>,
     pub player_trade_area: SelectionStorage<Item>,
     pub npc_trade_area: SelectionStorage<Item>,
+    pub active_trade_area: TradeArea,
     pub insight_view: bool,
     pub main_menu: bool
 }
@@ -137,6 +138,7 @@ impl Scene {
             menu,
             player_trade_area: SelectionStorage::new(),
             npc_trade_area: SelectionStorage::new(),
+            active_trade_area: TradeArea::RightSource,
             insight_view: false,
             main_menu: false
         };
@@ -278,6 +280,16 @@ impl Scene {
         }
     }
 
+    pub fn reset_trade_areas(&mut self) {
+        while let Some(item) = self.npc_trade_area.extract_current() {
+            self.current_npc().unwrap().inventory.insert(item);
+        }
+
+        while let Some(item) = self.player_trade_area.extract_current() {
+            self.player.inventory.insert(item);
+        }
+    }
+
     pub fn interact_with_terminal(&mut self, ctx: &mut Context) {
         if let Some(current_terminal) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             let terminal_front_tile = &self.player.front_tile + &current_terminal.front.value();
@@ -394,6 +406,7 @@ impl event::EventHandler for Scene {
     }
 
     fn quit_event(&mut self, _ctx: &mut Context) -> bool {
+        self.reset_trade_areas();
         level::save_scene(self, "saves/auto-save.tar");
 
         false
@@ -467,7 +480,6 @@ impl event::EventHandler for Scene {
         }
 
         if self.input == InputState::Npc {
-            super::draw_selection(&self.current_npc().unwrap().inventory, ctx, false)?;
             super::draw_dialog(&self.dialog, ctx)?;
         }
 
@@ -475,8 +487,10 @@ impl event::EventHandler for Scene {
 
         if self.input == InputState::NpcTrade {
             let npc_inventory = self.current_npc().unwrap().inventory.clone();
-            super::draw_trade_area(&npc_inventory, &self.npc_trade_area, ctx, TradeArea::Left)?;
-            super::draw_trade_area(&self.player.inventory, &self.player_trade_area, ctx, TradeArea::Right)?;
+            super::draw_trade_area(&npc_inventory, ctx, TradeArea::LeftSource, self.active_trade_area.clone())?;
+            super::draw_trade_area(&self.npc_trade_area, ctx, TradeArea::LeftTarget, self.active_trade_area.clone())?;
+            super::draw_trade_area(&self.player_trade_area, ctx, TradeArea::RightTarget, self.active_trade_area.clone())?;
+            super::draw_trade_area(&self.player.inventory, ctx, TradeArea::RightSource, self.active_trade_area.clone())?;
         }
 
         if let InputState::Terminal = self.input {
