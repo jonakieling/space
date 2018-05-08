@@ -15,7 +15,7 @@ developed on linux
 * hold `Left Ctrl` to show *circuitry*, you can list the items by pressing `Enter` (switch through with `↑` and `↓`, and close it with `Escape`)
 * press `Insert` to switch to *edit mode*
 * and there is *Gnoerf* you can talk to him and select dialog by pressing `Enter` (change dialog options with `↑` and `↓`)
-* when *trading* with *Gnoerf* you can switch between the *inventories* and *trade areas* with `←` and `→`, change the item cursor of the current selection with `↑` and `↓` and move *items* from and to an *inventory* with `Return`
+* when *trading* with *Gnoerf* you can switch between the *inventories* and *trade areas* with `←` and `→`, change the item cursor of the current selection with `↑` and `↓` and move *items* from and to an *inventory* with `Tab`, `Return` does the trade.
 
 # edit mode
 pressing `Insert`

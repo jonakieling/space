@@ -15,7 +15,16 @@ pub fn key_up_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _ke
                 npc.direction = npc.look_at;
             }
         },
-        Keycode::Return => {
+        Keycode::Return => {    
+            while let Some(item) = scene.npc_trade_area.extract_current() {
+                scene.player.inventory.insert(item);
+            }
+
+            while let Some(item) = scene.player_trade_area.extract_current() {
+                scene.current_npc().unwrap().inventory.insert(item);
+            }
+        },
+        Keycode::Tab => {
             match scene.active_trade_area {
                 TradeArea::LeftSource => {
                     let item = scene.current_npc().unwrap().inventory.extract_current();
