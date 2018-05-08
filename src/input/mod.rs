@@ -5,3 +5,4 @@ pub mod inventory;
 pub mod circuitry;
 pub mod menu;
 pub mod npc;
+pub mod npc_trade;

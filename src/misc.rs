@@ -61,3 +61,8 @@ impl Direction {
         }
     }
 }
+
+pub enum Orientation {
+    Left,
+    Right
+}

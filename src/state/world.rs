@@ -15,6 +15,7 @@ use input::*;
 use GameState;
 use level;
 use dialog::*;
+use super::TradeArea;
 
 #[derive(Debug, Clone)]
 pub enum MenuOption {
@@ -51,6 +52,8 @@ pub struct Scene {
     pub edit_cursor: Position,
     pub edit_selection: SelectionStorage<String>,
     pub menu: SelectionStorage<MenuOption>,
+    pub player_trade_area: SelectionStorage<Item>,
+    pub npc_trade_area: SelectionStorage<Item>,
     pub insight_view: bool,
     pub main_menu: bool
 }
@@ -126,6 +129,8 @@ impl Scene {
             edit_cursor: Position {x: 0, y: 0},
             edit_selection: SelectionStorage::new(),
             menu,
+            player_trade_area: SelectionStorage::new(),
+            npc_trade_area: SelectionStorage::new(),
             insight_view: false,
             main_menu: false
         };
@@ -371,12 +376,7 @@ impl event::EventHandler for Scene {
                 npc::key_up_event(self, ctx, keycode, _keymod, _repeat);
             },
             InputState::NpcTrade => {
-                if keycode == Keycode::Escape {
-                    self.input = InputState::World;
-                    if let Some(npc) = self.current_npc() {
-                        npc.direction = npc.look_at;
-                    }
-                }
+                npc_trade::key_up_event(self, ctx, keycode, _keymod, _repeat);
             },
         }
     }
@@ -466,6 +466,12 @@ impl event::EventHandler for Scene {
         }
 
         self.player.draw(ctx)?;
+
+        if self.input == InputState::NpcTrade {
+            let npc_inventory = self.current_npc().unwrap().inventory.clone();
+            super::draw_trade_area(&npc_inventory, &self.npc_trade_area, ctx, TradeArea::Left)?;
+            super::draw_trade_area(&self.player.inventory, &self.player_trade_area, ctx, TradeArea::Right)?;
+        }
 
         if let InputState::Terminal = self.input {
             super::draw_text(ctx, &self.terminal_text)?;

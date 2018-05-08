@@ -5,9 +5,10 @@ use ggez::Context;
 use ggez::graphics;
 use ggez::event::*;
 
-use storage::SelectionStorage;
-use storage::Node;
+use storage::{SelectionStorage, Node};
 use dialog::DialogItem;
+use objects::Item;
+use misc::{Orientation, Position};
 
 pub mod world;
 pub mod menu;
@@ -70,41 +71,13 @@ fn draw_dialog(dialog: &Node<DialogItem>, ctx: &mut Context) -> GameResult<()> {
     graphics::set_color(ctx, graphics::WHITE)?;
     graphics::draw(ctx, &text, graphics::Point2::new(310.0, 400.0), 0.0)?;
     
-    let mut dialog_item_position = 0.0;
-    let current_item = dialog.children.current_index();
-    for (pos, item) in dialog.children.iter().enumerate() {
-        let item_graphics = graphics::Text::new(ctx, &item.value.text, &font).unwrap();
-        let dialog_item_box = graphics::Rect::new(300.0, 430.0 + (dialog_item_position * 25.0), item_graphics.width() as f32 + 20.0, 20.0);
-        graphics::set_color(ctx, graphics::BLACK)?;
-        graphics::rectangle(ctx, graphics::DrawMode::Fill, dialog_item_box)?;
-        graphics::set_color(ctx, graphics::WHITE)?;
-        if pos == current_item {
-            graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), dialog_item_box)?;
-        }
-        graphics::draw(ctx, &item_graphics, graphics::Point2::new(311.0, 430.0 + (dialog_item_position * 25.0)), 0.0)?;
-        dialog_item_position += 1.0;
-    }
+    draw_selection_with_parameters(&dialog.children, ctx, Position { x: 300, y: 430 }, Orientation::Right, true)?;
 
     Ok(())
 }
 
 fn draw_selection<T: Clone + Debug>(selection: &SelectionStorage<T>, ctx: &mut Context, cursor: bool) -> GameResult<()> {
-    let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
-    let mut inventory_item_position = 0.0;
-    let current_item = selection.current_index();
-    for (pos, item) in selection.iter().enumerate() {
-        let item_text = format!("{:?}", item);
-        let item_graphics = graphics::Text::new(ctx, &item_text, &font).unwrap();
-        let inventory_box = graphics::Rect::new(760.0 - (item_graphics.width() as f32), 20.0 + (inventory_item_position * 25.0), item_graphics.width() as f32 + 20.0, 20.0);
-        graphics::set_color(ctx, graphics::BLACK)?;
-        graphics::rectangle(ctx, graphics::DrawMode::Fill, inventory_box)?;
-        graphics::set_color(ctx, graphics::WHITE)?;
-        if pos == current_item && cursor {
-            graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), inventory_box)?;
-        }
-        graphics::draw(ctx, &item_graphics, graphics::Point2::new(771.0 - item_graphics.width() as f32, 20.0 + (inventory_item_position * 25.0)), 0.0)?;
-        inventory_item_position += 1.0;
-    }
+    draw_selection_with_parameters(&selection, ctx, Position { x: 760, y: 20 }, Orientation::Left, cursor)?;
 
     Ok(())
 }
@@ -119,6 +92,56 @@ fn draw_input_state(state: &str, ctx: &mut Context) -> GameResult<()> {
     graphics::set_color(ctx, graphics::WHITE)?;
     graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), input_state_box)?;
     graphics::draw(ctx, &input_state_graphics, graphics::Point2::new(30.0, 20.0), 0.0)?;
+
+    Ok(())
+}
+
+pub enum TradeArea {
+    Left,
+    Right
+}
+
+fn draw_trade_area(source: &SelectionStorage<Item>, target: &SelectionStorage<Item>, ctx: &mut Context, area: TradeArea) -> GameResult<()> {
+    match area {
+        TradeArea::Left => {
+            draw_selection_with_parameters(&source, ctx, Position { x: 60, y: 50 }, Orientation::Right, false)?;
+            draw_selection_with_parameters(&target, ctx, Position { x: 260, y: 50 }, Orientation::Left, false)?;
+        },
+        TradeArea::Right => {
+            draw_selection_with_parameters(&target, ctx, Position { x: 400, y: 50 }, Orientation::Left, false)?;
+            draw_selection_with_parameters(&source, ctx, Position { x: 600, y: 50 }, Orientation::Right, false)?;
+        },
+    }
+
+    Ok(())
+}
+
+fn draw_selection_with_parameters<T: Clone + Debug>(selection: &SelectionStorage<T>, ctx: &mut Context, position: Position, orientation: Orientation, cursor: bool) -> GameResult<()> {
+    let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
+    let mut inventory_item_position = 0.0;
+    let current_item = selection.current_index();
+    for (pos, item) in selection.iter().enumerate() {
+        let item_text = format!("{:?}", item);
+        let item_graphics = graphics::Text::new(ctx, &item_text, &font).unwrap();
+        let mut offset;
+        match orientation {
+            Orientation::Left => {
+                offset = item_graphics.width() as f32;
+            },
+            Orientation::Right => {
+                offset = 0.0;
+            },
+        }
+        let inventory_box = graphics::Rect::new(position.x as f32 - offset, position.y as f32 + (inventory_item_position * 25.0), item_graphics.width() as f32 + 20.0, 20.0);
+        graphics::set_color(ctx, graphics::BLACK)?;
+        graphics::rectangle(ctx, graphics::DrawMode::Fill, inventory_box)?;
+        graphics::set_color(ctx, graphics::WHITE)?;
+        if pos == current_item && cursor {
+            graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), inventory_box)?;
+        }
+        graphics::draw(ctx, &item_graphics, graphics::Point2::new(position.x as f32 + 11.0 - offset, position.y as f32 + (inventory_item_position * 25.0)), 0.0)?;
+        inventory_item_position += 1.0;
+    }
 
     Ok(())
 }
