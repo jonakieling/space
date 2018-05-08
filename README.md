@@ -9,13 +9,13 @@ developed on linux
 
 # and here is what you can do
 * move the black square with the white square face with `↑`,`→`,`↓` and `←`
-* open and close *doorss* by pressing `enter`
-* interact with *terminals* by pressing `enter` when standing in front of the front-facing side, edit by typing `Anything` and `Backspace` the text and exit with `Escape`
+* open and close *doors* by pressing `Return`
+* interact with *terminals* by pressing `Return` when standing in front of the front-facing side, edit by typing `Anything` and `Backspace` the text and exit with `Escape`
 * access the *inventory* with `i` and switch through the items with `↑` and `↓` (close it with `i`)
-* hold `left ctrl` to show *circuitry*, you can list the items by pressing `Enter` (switch through with `↑` and `↓`, and close it with `i`)
+* hold `Left Ctrl` to show *circuitry*, you can list the items by pressing `Enter` (switch through with `↑` and `↓`, and close it with `Escape`)
 * press `Insert` to switch to *edit mode*
-
-* and there is Gnoerf, to whom you may speak but beware, there is nothing but emptiness behind his words
+* and there is *Gnoerf* you can talk to him and select dialog by pressing `Enter` (change dialog options with `↑` and `↓`)
+* when *trading* with *Gnoerf* you can switch between the *inventories* and *trade areas* with `←` and `→`, change the item cursor of the current selection with `↑` and `↓` and move *items* from and to an *inventory* with `Return`
 
 # edit mode
 pressing `Insert`
