@@ -24,6 +24,12 @@ pub enum MenuOption {
     Menu
 }
 
+impl ToString for MenuOption {
+    fn to_string(&self) -> String {
+        format!("{:?}", self)
+    }
+}
+
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum InputState {
     Terminal,

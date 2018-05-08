@@ -2,6 +2,7 @@ use std::cmp::max;
 use std::fmt::Debug;
 use std::slice;
 use constants::LEVEL_SIZE;
+use dialog::DialogItem;
 
 #[derive(Clone)]
 pub struct PositionLevelStorage<T: Clone> {
@@ -131,4 +132,10 @@ pub struct Tree<T: Clone> {
 pub struct Node<T: Clone> {
     pub value: T,
     pub children: SelectionStorage<Node<T>>
+}
+
+impl ToString for Node<DialogItem> {
+    fn to_string(&self) -> String {
+        self.value.text.clone()
+    }
 }

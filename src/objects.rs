@@ -141,6 +141,12 @@ pub enum Item {
     Paper,
 }
 
+impl ToString for Item {
+    fn to_string(&self) -> String {
+        format!("{:?}", self)
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Npc {
 	pub name: String,

@@ -1,5 +1,3 @@
-use std::fmt::Debug;
-
 use ggez::GameResult;
 use ggez::Context;
 use ggez::graphics;
@@ -76,7 +74,7 @@ fn draw_dialog(dialog: &Node<DialogItem>, ctx: &mut Context) -> GameResult<()> {
     Ok(())
 }
 
-fn draw_selection<T: Clone + Debug>(selection: &SelectionStorage<T>, ctx: &mut Context, cursor: bool) -> GameResult<()> {
+fn draw_selection<T: Clone + ToString>(selection: &SelectionStorage<T>, ctx: &mut Context, cursor: bool) -> GameResult<()> {
     draw_selection_with_parameters(&selection, ctx, Position { x: 760, y: 20 }, Orientation::Left, cursor)?;
 
     Ok(())
@@ -116,12 +114,12 @@ fn draw_trade_area(source: &SelectionStorage<Item>, target: &SelectionStorage<It
     Ok(())
 }
 
-fn draw_selection_with_parameters<T: Clone + Debug>(selection: &SelectionStorage<T>, ctx: &mut Context, position: Position, orientation: Orientation, cursor: bool) -> GameResult<()> {
+fn draw_selection_with_parameters<T: Clone + ToString>(selection: &SelectionStorage<T>, ctx: &mut Context, position: Position, orientation: Orientation, cursor: bool) -> GameResult<()> {
     let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
     let mut inventory_item_position = 0.0;
     let current_item = selection.current_index();
     for (pos, item) in selection.iter().enumerate() {
-        let item_text = format!("{:?}", item);
+        let item_text = item.to_string();
         let item_graphics = graphics::Text::new(ctx, &item_text, &font).unwrap();
         let mut offset;
         match orientation {
