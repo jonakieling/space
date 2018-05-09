@@ -47,7 +47,7 @@ thoughts before implmentation.
 
 ## systems
 * object crafting
-* energy, circuits
+* energy, circuits (✓)
 * scanners, navigation
 * logs
 

@@ -1,4 +1,7 @@
 use std::time::Duration;
+use std::collections::VecDeque;
+use std::collections::BTreeSet;
+
 use ggez::timer;
 use ggez::GameResult;
 use ggez::Context;
@@ -232,13 +235,41 @@ impl Scene {
 
     pub fn update_power(&mut self) {
         self.reset_powert();
-        for (generator_pos, generator) in self.generators.iter().enumerate() {
+        for (generator_index, generator) in self.generators.iter().enumerate() {
+            let generator_pos = Position::from_int(generator_index as i32);
+            
             if let &Some(_) = generator {
-                for (circuitry_pos, circuitry) in self.circuitry.iter_mut().enumerate() {
-                    if let &mut Some(ref mut circuitry) = circuitry {
-                        if Position::from_int(circuitry_pos as i32).dist(&Position::from_int(generator_pos as i32)) <= 10.0 {
-                            circuitry.powered = true;
+                let mut open_set = VecDeque::new();
+                let mut closed_set: BTreeSet<Option<Position>> = BTreeSet::new();
+
+                {
+                    let mut root = generator_pos;
+                    open_set.push_back(root);
+
+                    while open_set.len() != 0 {
+                        let subtree_root = open_set.pop_front();
+
+                        if subtree_root == None {
+                            break;
                         }
+                        let subtree_root_position = subtree_root.unwrap();
+                        for neighbor in self.circuitry.get_neighbors_at(&subtree_root_position) {
+                            if closed_set.contains(&Some(neighbor)) {
+                                continue;
+                            }
+                            
+                            if let None = open_set.iter().find(|&&visited| (neighbor == visited)) {
+                                open_set.push_back(neighbor);
+                            }
+                        }
+
+                        closed_set.insert(subtree_root);
+                    }
+                }
+
+                for pos in closed_set {
+                    if let Some(ref mut circuitry) = self.circuitry.get_mut(pos.unwrap().x, pos.unwrap().y) {
+                        circuitry.powered = true;
                     }
                 }
             }

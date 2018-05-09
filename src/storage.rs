@@ -3,6 +3,7 @@ use std::fmt::Debug;
 use std::slice;
 use constants::LEVEL_SIZE;
 use dialog::DialogItem;
+use misc::Position;
 
 #[derive(Clone)]
 pub struct PositionLevelStorage<T: Clone> {
@@ -67,6 +68,24 @@ impl<T: Clone + Debug> PositionLevelStorage<T> {
 
     pub fn iter_mut(&mut self) -> slice::IterMut<Option<T>> {
         self.storage.iter_mut()
+    }
+
+    pub fn get_neighbors_at(&self, pos: &Position) -> Vec<Position> {
+        let mut neighbors = Vec::new();
+        if let Some(_) = self.get(pos.x + 1, pos.y) {
+            neighbors.push(Position { x: pos.x + 1, y: pos.y});
+        }
+        if let Some(_) = self.get(pos.x - 1, pos.y) {
+            neighbors.push(Position { x: pos.x - 1, y: pos.y});
+        }
+        if let Some(_) = self.get(pos.x, pos.y + 1) {
+            neighbors.push(Position { x: pos.x, y: pos.y + 1});
+        }
+        if let Some(_) = self.get(pos.x, pos.y - 1) {
+            neighbors.push(Position { x: pos.x, y: pos.y - 1 });
+        }
+
+        neighbors
     }
 }
 
