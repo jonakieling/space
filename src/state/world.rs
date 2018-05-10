@@ -48,6 +48,7 @@ pub enum InputState {
 pub struct Scene {
     pub movement_timer: Duration,
     pub player: Player,
+    pub craft_area: SelectionStorage<Item>,
     pub walls: PositionLevelStorage<Wall>,
     pub doors: PositionLevelStorage<Door>,
     pub terminals: PositionLevelStorage<Terminal>,
@@ -119,6 +120,7 @@ impl Scene {
         let mut scene = Scene {
             movement_timer: Duration::from_millis(0),
             player,
+            craft_area:  SelectionStorage::new(),
             walls,
             doors,
             terminals,
@@ -321,6 +323,12 @@ impl Scene {
         }
     }
 
+    pub fn reset_craft_area(&mut self) {
+        while let Some(item) = self.craft_area.extract_current() {
+            self.player.inventory.insert(item);
+        }
+    }
+
     pub fn interact_with_terminal(&mut self, ctx: &mut Context) {
         if let Some(current_terminal) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
             let terminal_front_tile = &self.player.front_tile + &current_terminal.front.value();
@@ -438,6 +446,7 @@ impl event::EventHandler for Scene {
 
     fn quit_event(&mut self, _ctx: &mut Context) -> bool {
         self.reset_trade_areas();
+        self.reset_trade_areas();
         level::save_scene(self, "saves/auto-save.tar");
 
         false
@@ -529,7 +538,8 @@ impl event::EventHandler for Scene {
         }
 
         if self.input == InputState::Inventory {
-            super::draw_selection(&self.player.inventory, ctx, true)?;
+            super::draw_selection_with_parameters(&self.player.inventory, ctx, Position {x: 770, y: 20}, Orientation::Left, true)?;
+            super::draw_selection_with_parameters(&self.craft_area, ctx, Position {x: 580, y: 20}, Orientation::Left, false)?;
         }
 
         if self.input == InputState::Circuitry {
