@@ -8,9 +8,9 @@ use dialog::*;
 pub fn static_level0(scene: &mut Scene) {
     scene.backdrop = String::from("/realm_of_sol__0000s_0000_1.1.png");
     let mut inventory = SelectionStorage::new();
-    inventory.insert(Item::Paper);
-    inventory.insert(Item::Paper);
+    inventory.insert(Item::DataChip);
     inventory.insert(Item::Communicator);
+    inventory.insert(Item::Terminal);
 
     let mut dialog = SelectionStorage::new();
     let mut dialog2 = SelectionStorage::new();
@@ -58,8 +58,6 @@ pub fn static_level0(scene: &mut Scene) {
     
     let mut inventory = <SelectionStorage<Item>>::new();
     inventory.insert(Item::Log);
-    inventory.insert(Item::PilotLicense);
-    inventory.insert(Item::Terminal);
     scene.player.inventory = inventory;
     
     println!("game loaded: static level0");
@@ -87,13 +85,7 @@ pub fn _static_ship_tech_2_1(scene: &mut Scene) {
     scene.doors.insert(Position::new(8, 11), Door {status: DoorStatus::Closed});
 
     let mut parts = SelectionStorage::new();
-    parts.insert(Item::Chip);
-    parts.insert(Item::Chip);
-    parts.insert(Item::Cable);
-    parts.insert(Item::Isolation);
-    parts.insert(Item::Isolation);
-    parts.insert(Item::Isolation);
-    parts.insert(Item::Adapter);
+    parts.insert(Item::PowerConductor);
     scene.circuitry.insert(Position::new(8, 13), Circuitry {parts, powered: false});
 
 
@@ -108,7 +100,6 @@ pub fn _static_ship_tech_2_1(scene: &mut Scene) {
     let player_front_tile = &player_direction.value() + &player_position;
     let mut inventory = <SelectionStorage<Item>>::new();
     inventory.insert(Item::Log);
-    inventory.insert(Item::PilotLicense);
     inventory.insert(Item::Communicator);
     inventory.insert(Item::Terminal);
     let player = Player {

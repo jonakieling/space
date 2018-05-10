@@ -73,7 +73,8 @@ pub struct Scene {
     pub npc_trade_area: SelectionStorage<Item>,
     pub active_trade_area: TradeArea,
     pub insight_view: bool,
-    pub main_menu: bool
+    pub main_menu: bool,
+    pub receipes: Vec<Receipe>
 }
 
 impl GameState for Scene {
@@ -123,6 +124,14 @@ impl Scene {
         menu.insert(MenuOption::Save);
         menu.insert(MenuOption::Menu);
         menu.insert(MenuOption::Quit);
+
+        let mut receipes = Vec::new();
+        receipes.push(
+            Receipe {
+                result: Item::Log,
+                incredients: vec![Item::MicroController, Item::DataChip]
+            }
+        );
         
         let mut scene = Scene {
             movement_timer: Duration::from_millis(0),
@@ -152,7 +161,8 @@ impl Scene {
             npc_trade_area: SelectionStorage::new(),
             active_trade_area: TradeArea::PlayerInventory,
             insight_view: false,
-            main_menu: false
+            main_menu: false,
+            receipes
         };
 
         scene.update_power();

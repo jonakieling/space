@@ -131,14 +131,27 @@ impl Generator {
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 pub enum Item {
     Log,
-    PilotLicense,
     Terminal,
     Communicator,
-    Chip,
-    Cable,
-    Isolation,
-    Adapter,
-    Paper,
+    Scanner,
+    PowerConductor,
+	DataChip,
+	MicroController
+}
+
+pub struct Receipe {
+	pub result: Item,
+	pub incredients: Vec<Item>
+}
+
+impl Receipe {
+	pub fn receipes_as_incredient(item: Item, receipes: Vec<Receipe>) -> Vec<Receipe> {
+		unimplemented!()
+	}
+	
+	pub fn from_item(item: Item, receipes: Vec<Receipe>) -> Receipe {
+		unimplemented!()
+	}
 }
 
 impl ToString for Item {
