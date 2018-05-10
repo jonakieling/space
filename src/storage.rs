@@ -1,7 +1,6 @@
 use std::cmp::max;
 use std::fmt::Debug;
 use std::slice;
-use constants::LEVEL_SIZE;
 use dialog::DialogItem;
 use misc::Position;
 
@@ -17,8 +16,8 @@ impl<T: Clone + Debug> PositionLevelStorage<T> {
         }
     }
     
-    pub fn get(&self, x: i32, y: i32) -> Option<&T> {
-        let position = x + y * LEVEL_SIZE;
+    pub fn get(&self, pos: Position) -> Option<&T> {
+        let position = pos.to_int();
         if position < self.storage.len() as i32 {
             if let Some(&Some(ref item)) = self.storage.get(position as usize) {
                 Some(item)
@@ -30,8 +29,8 @@ impl<T: Clone + Debug> PositionLevelStorage<T> {
         }
     }
 
-    pub fn get_mut(&mut self, x: i32, y: i32) -> Option<&mut T> {
-        let position = x + y * LEVEL_SIZE;
+    pub fn get_mut(&mut self, pos: Position) -> Option<&mut T> {
+        let position = pos.to_int();
         if position < self.storage.len() as i32 {
             if let Some(&mut Some(ref mut item)) = self.storage.get_mut(position as usize) {
                 Some(item)
@@ -43,8 +42,8 @@ impl<T: Clone + Debug> PositionLevelStorage<T> {
         }
     }
 
-    pub fn insert(&mut self, x: i32, y: i32, item: T) {
-        let position = x + y * LEVEL_SIZE;
+    pub fn insert(&mut self, pos: Position, item: T) {
+        let position = pos.to_int();
         if position < self.storage.len() as i32 {
             self.storage.remove(position as usize);
             self.storage.insert(position as usize, Some(item));
@@ -54,8 +53,8 @@ impl<T: Clone + Debug> PositionLevelStorage<T> {
         }
     }
 
-    pub fn remove(&mut self, x: i32, y: i32) {
-        let position = x + y * LEVEL_SIZE;
+    pub fn remove(&mut self, pos: Position) {
+        let position = pos.to_int();
         if position < self.storage.len() as i32 {
             self.storage.remove(position as usize);
             self.storage.insert(position as usize, None);
@@ -70,19 +69,19 @@ impl<T: Clone + Debug> PositionLevelStorage<T> {
         self.storage.iter_mut()
     }
 
-    pub fn get_neighbors_at(&self, pos: &Position) -> Vec<Position> {
+    pub fn get_neighbors_at(&self, pos: Position) -> Vec<Position> {
         let mut neighbors = Vec::new();
-        if let Some(_) = self.get(pos.x + 1, pos.y) {
-            neighbors.push(Position { x: pos.x + 1, y: pos.y});
+        if let Some(_) = self.get(pos.x_up()) {
+            neighbors.push(pos.x_up());
         }
-        if let Some(_) = self.get(pos.x - 1, pos.y) {
-            neighbors.push(Position { x: pos.x - 1, y: pos.y});
+        if let Some(_) = self.get(pos.x_down()) {
+            neighbors.push(pos.x_down());
         }
-        if let Some(_) = self.get(pos.x, pos.y + 1) {
-            neighbors.push(Position { x: pos.x, y: pos.y + 1});
+        if let Some(_) = self.get(pos.y_up()) {
+            neighbors.push(pos.y_up());
         }
-        if let Some(_) = self.get(pos.x, pos.y - 1) {
-            neighbors.push(Position { x: pos.x, y: pos.y - 1 });
+        if let Some(_) = self.get(pos.y_down()) {
+            neighbors.push(pos.y_down());
         }
 
         neighbors

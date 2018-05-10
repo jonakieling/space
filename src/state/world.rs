@@ -18,7 +18,6 @@ use input::*;
 use GameState;
 use level;
 use dialog::*;
-use super::TradeArea;
 
 #[derive(Debug, Clone)]
 pub enum MenuOption {
@@ -43,6 +42,14 @@ pub enum InputState {
     Menu,
     Npc,
     NpcTrade
+}
+
+#[derive(PartialEq, Clone)]
+pub enum TradeArea {
+    NpcInventory,
+    NpcStaging,
+    PlayerInventory,
+    PlayerStaging
 }
 
 pub struct Scene {
@@ -143,7 +150,7 @@ impl Scene {
             menu,
             player_trade_area: SelectionStorage::new(),
             npc_trade_area: SelectionStorage::new(),
-            active_trade_area: TradeArea::RightSource,
+            active_trade_area: TradeArea::PlayerInventory,
             insight_view: false,
             main_menu: false
         };
@@ -156,23 +163,23 @@ impl Scene {
     pub fn check_player_collision(&self) -> bool {
         let mut found_collision = false;
 
-        if let Some(_) = self.walls.get(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(_) = self.walls.get(self.player.front_tile) {
             found_collision = true;
         }
 
-        if let Some(_) = self.terminals.get(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(_) = self.terminals.get(self.player.front_tile) {
             found_collision = true;
         }
 
-        if let Some(_) = self.generators.get(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(_) = self.generators.get(self.player.front_tile) {
             found_collision = true;
         }
 
-        if let Some(_) = self.npc.get(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(_) = self.npc.get(self.player.front_tile) {
             found_collision = true;
         }
 
-        if let Some(door) = self.doors.get(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(door) = self.doors.get(self.player.front_tile) {
             if let DoorStatus::Closed = door.status {
                 found_collision = true;
             }
@@ -183,27 +190,27 @@ impl Scene {
 
     pub fn get_edit_selection(&mut self) -> SelectionStorage<String> {
         let mut selection_storage: SelectionStorage<String> = SelectionStorage::new();
-        if let Some(_) = self.walls.get(self.edit_cursor.x, self.edit_cursor.y) {
+        if let Some(_) = self.walls.get(self.edit_cursor) {
             selection_storage.insert("Wall".to_string());
         }
         
-        if let Some(_) = self.doors.get(self.edit_cursor.x, self.edit_cursor.y) {
+        if let Some(_) = self.doors.get(self.edit_cursor) {
             selection_storage.insert("Door".to_string());
         }
         
-        if let Some(_) = self.terminals.get(self.edit_cursor.x, self.edit_cursor.y) {
+        if let Some(_) = self.terminals.get(self.edit_cursor) {
             selection_storage.insert("Terminal".to_string());
         }
         
-        if let Some(_) = self.circuitry.get(self.edit_cursor.x, self.edit_cursor.y) {
+        if let Some(_) = self.circuitry.get(self.edit_cursor) {
             selection_storage.insert("Circuitry".to_string());
         }
         
-        if let Some(_) = self.generators.get(self.edit_cursor.x, self.edit_cursor.y) {
+        if let Some(_) = self.generators.get(self.edit_cursor) {
             selection_storage.insert("Generator".to_string());
         }
         
-        if let Some(npc) = self.npc.get(self.edit_cursor.x, self.edit_cursor.y) {
+        if let Some(npc) = self.npc.get(self.edit_cursor) {
             selection_storage.insert(npc.name.clone());
         }
 
@@ -215,7 +222,7 @@ impl Scene {
     }
 
     pub fn interact_with_door(&mut self) {
-        if let Some(door) = self.doors.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(door) = self.doors.get_mut(self.player.front_tile) {
             match door.status {
                 DoorStatus::Closed => {
                     door.status = DoorStatus::Open;
@@ -255,7 +262,7 @@ impl Scene {
                             break;
                         }
                         let subtree_root_position = subtree_root.unwrap();
-                        for neighbor in self.circuitry.get_neighbors_at(&subtree_root_position) {
+                        for neighbor in self.circuitry.get_neighbors_at(subtree_root_position) {
                             if closed_set.contains(&Some(neighbor)) {
                                 continue;
                             }
@@ -270,7 +277,7 @@ impl Scene {
                 }
 
                 for pos in closed_set {
-                    if let Some(ref mut circuitry) = self.circuitry.get_mut(pos.unwrap().x, pos.unwrap().y) {
+                    if let Some(ref mut circuitry) = self.circuitry.get_mut(pos.unwrap()) {
                         circuitry.powered = true;
                     }
                 }
@@ -279,13 +286,13 @@ impl Scene {
     }
 
     pub fn interact_with_circuitry(&mut self) {
-        if let Some(_) = self.circuitry.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(_) = self.circuitry.get_mut(self.player.front_tile) {
             self.input = InputState::Circuitry;
         }
     }
 
     pub fn current_circuitry(&mut self) -> Option<&mut Circuitry>{
-        if let Some(current_circuitry) = self.circuitry.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(current_circuitry) = self.circuitry.get_mut(self.player.front_tile) {
             Some(current_circuitry)
         } else {
             None
@@ -293,7 +300,7 @@ impl Scene {
     }
 
     pub fn interact_with_npc(&mut self) {
-        if let Some(npc) = self.npc.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(npc) = self.npc.get_mut(self.player.front_tile) {
             match self.player.direction {
                 Direction::Down => npc.direction = Direction::Up,
                 Direction::Left => npc.direction = Direction::Right,
@@ -306,7 +313,7 @@ impl Scene {
     }
 
     pub fn current_npc(&mut self) -> Option<&mut Npc>{
-        if let Some(current_npc) = self.npc.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(current_npc) = self.npc.get_mut(self.player.front_tile) {
             Some(current_npc)
         } else {
             None
@@ -330,7 +337,7 @@ impl Scene {
     }
 
     pub fn interact_with_terminal(&mut self, ctx: &mut Context) {
-        if let Some(current_terminal) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(current_terminal) = self.terminals.get_mut(self.player.front_tile) {
             let terminal_front_tile = &self.player.front_tile + &current_terminal.front.value();
             if terminal_front_tile == self.player.position {
                 self.input = InputState::Terminal;
@@ -347,7 +354,7 @@ impl Scene {
     }
 
     pub fn terminal_remove_character(&mut self, ctx: &mut Context) {
-        if let Some(current_terminal) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(current_terminal) = self.terminals.get_mut(self.player.front_tile) {
             if current_terminal.text.len() > 0 {
                 let text_len = current_terminal.text.len();
                 current_terminal.text.split_off(text_len - 1);
@@ -359,7 +366,7 @@ impl Scene {
     }
 
     pub fn terminal_add_character(&mut self, ctx: &mut Context, text: String) {
-        if let Some(current_terminal) = self.terminals.get_mut(self.player.front_tile.x, self.player.front_tile.y) {
+        if let Some(current_terminal) = self.terminals.get_mut(self.player.front_tile) {
             if current_terminal.text.len() <= TERMINAL_LIMIT {
                 let new_terminal_text = format!("{}{}", current_terminal.text, text);
                 current_terminal.text = Box::new(new_terminal_text);
@@ -368,6 +375,26 @@ impl Scene {
                 self.terminal_text = graphics::Text::new(ctx, &current_terminal.text, &font).unwrap();
             }
         }
+    }
+
+    fn draw_trade_area(&self, selection: &SelectionStorage<Item>, ctx: &mut Context, area: TradeArea) -> GameResult<()> {
+        let active = area == self.active_trade_area;
+        match area {
+            TradeArea::NpcInventory => {
+                super::draw_selection_with_parameters(&selection, ctx, Position { x: 180, y: 80 }, TextAlign::Left, active)?;
+            },
+            TradeArea::NpcStaging => {
+                super::draw_selection_with_parameters(&selection, ctx, Position { x: 220, y: 80 }, TextAlign::Right, active)?;
+            },
+            TradeArea::PlayerStaging => {
+                super::draw_selection_with_parameters(&selection, ctx, Position { x: 540, y: 80 }, TextAlign::Left, active)?;
+            },
+            TradeArea::PlayerInventory => {
+                super::draw_selection_with_parameters(&selection, ctx, Position { x: 580, y: 80 }, TextAlign::Right, active)?;
+            },
+        }
+
+        Ok(())
     }
 }
 
@@ -527,10 +554,10 @@ impl event::EventHandler for Scene {
 
         if self.input == InputState::NpcTrade {
             let npc_inventory = self.current_npc().unwrap().inventory.clone();
-            super::draw_trade_area(&npc_inventory, ctx, TradeArea::LeftSource, self.active_trade_area.clone())?;
-            super::draw_trade_area(&self.npc_trade_area, ctx, TradeArea::LeftTarget, self.active_trade_area.clone())?;
-            super::draw_trade_area(&self.player_trade_area, ctx, TradeArea::RightTarget, self.active_trade_area.clone())?;
-            super::draw_trade_area(&self.player.inventory, ctx, TradeArea::RightSource, self.active_trade_area.clone())?;
+            self.draw_trade_area(&npc_inventory, ctx, TradeArea::NpcInventory)?;
+            self.draw_trade_area(&self.npc_trade_area, ctx, TradeArea::NpcStaging)?;
+            self.draw_trade_area(&self.player_trade_area, ctx, TradeArea::PlayerStaging)?;
+            self.draw_trade_area(&self.player.inventory, ctx, TradeArea::PlayerInventory)?;
         }
 
         if let InputState::Terminal = self.input {
@@ -538,8 +565,8 @@ impl event::EventHandler for Scene {
         }
 
         if self.input == InputState::Inventory {
-            super::draw_selection_with_parameters(&self.player.inventory, ctx, Position {x: 770, y: 20}, Orientation::Left, true)?;
-            super::draw_selection_with_parameters(&self.craft_area, ctx, Position {x: 580, y: 20}, Orientation::Left, false)?;
+            super::draw_selection_with_parameters(&self.player.inventory, ctx, Position {x: 770, y: 20}, TextAlign::Left, true)?;
+            super::draw_selection_with_parameters(&self.craft_area, ctx, Position {x: 580, y: 20}, TextAlign::Left, false)?;
         }
 
         if self.input == InputState::Circuitry {

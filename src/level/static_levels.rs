@@ -54,7 +54,7 @@ pub fn static_level0(scene: &mut Scene) {
         },
         inventory
     };
-    scene.npc.insert(12, 12, npc_gnoerf);
+    scene.npc.insert(Position::new(12, 12), npc_gnoerf);
     
     let mut inventory = <SelectionStorage<Item>>::new();
     inventory.insert(Item::Log);
@@ -69,22 +69,22 @@ pub fn static_level0(scene: &mut Scene) {
 pub fn _static_ship_tech_2_1(scene: &mut Scene) {
     scene.backdrop = String::from("/realm_of_sol__0000s_0001_2.1.png");
 
-    scene.walls.insert(6, 8, Wall {});
-    scene.walls.insert(7, 8, Wall {});
-    scene.walls.insert(8, 8, Wall {});
-    scene.walls.insert(9, 8, Wall {});
-    scene.walls.insert(10, 8, Wall {});
+    scene.walls.insert(Position::new(6, 8), Wall {});
+    scene.walls.insert(Position::new(7, 8), Wall {});
+    scene.walls.insert(Position::new(8, 8), Wall {});
+    scene.walls.insert(Position::new(9, 8), Wall {});
+    scene.walls.insert(Position::new(10, 8), Wall {});
 
-    scene.walls.insert(6, 9, Wall {});
-    scene.walls.insert(6, 10, Wall {});
+    scene.walls.insert(Position::new(6, 9), Wall {});
+    scene.walls.insert(Position::new(6, 10), Wall {});
 
-    scene.walls.insert(7, 11, Wall {});
-    scene.walls.insert(9, 11, Wall {});
+    scene.walls.insert(Position::new(7, 11), Wall {});
+    scene.walls.insert(Position::new(9, 11), Wall {});
 
-    scene.walls.insert(10, 9, Wall {});
-    scene.walls.insert(10, 10, Wall {});
+    scene.walls.insert(Position::new(10, 9), Wall {});
+    scene.walls.insert(Position::new(10, 10), Wall {});
 
-    scene.doors.insert(8, 11, Door {status: DoorStatus::Closed});
+    scene.doors.insert(Position::new(8, 11), Door {status: DoorStatus::Closed});
 
     let mut parts = SelectionStorage::new();
     parts.insert(Item::Chip);
@@ -94,16 +94,16 @@ pub fn _static_ship_tech_2_1(scene: &mut Scene) {
     parts.insert(Item::Isolation);
     parts.insert(Item::Isolation);
     parts.insert(Item::Adapter);
-    scene.circuitry.insert(8, 13, Circuitry {parts, powered: false});
+    scene.circuitry.insert(Position::new(8, 13), Circuitry {parts, powered: false});
 
 
-    scene.terminals.insert(8, 9, Terminal {
+    scene.terminals.insert(Position::new(8, 9), Terminal {
         text: Box::new(String::new()),
         front: Direction::Down
     });
 
 
-    let player_position = Position { x: 8, y: 10 };
+    let player_position = Position::new(8, 10);
     let player_direction = Direction::Up;
     let player_front_tile = &player_direction.value() + &player_position;
     let mut inventory = <SelectionStorage<Item>>::new();

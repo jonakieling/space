@@ -128,37 +128,37 @@ pub fn load_scene(scene: &mut Scene, filename: &str) {
                 "walls" => {
                     let level_walls: Vec<(i32, i32, Wall)> = bincode::deserialize_from(file).unwrap();
                     for wall in level_walls {
-                        scene.walls.insert(wall.0, wall.1, wall.2);
+                        scene.walls.insert(Position {x: wall.0, y: wall.1}, wall.2);
                     }
                 },
                 "doors" => {
                     let level_doors: Vec<(i32, i32, Door)> = bincode::deserialize_from(file).unwrap();
                     for door in level_doors {
-                        scene.doors.insert(door.0, door.1, door.2);
+                        scene.doors.insert(Position {x: door.0, y: door.1}, door.2);
                     }
                 },
                 "terminals" => {
                     let level_terminals: Vec<(i32, i32, Terminal)> = bincode::deserialize_from(file).unwrap();
                     for terminal in level_terminals {
-                        scene.terminals.insert(terminal.0, terminal.1, terminal.2);
+                        scene.terminals.insert(Position {x: terminal.0, y: terminal.1}, terminal.2);
                     }
                 },
                 "circuitry" => {
                     let level_circuitry: Vec<(i32, i32, Circuitry)> = bincode::deserialize_from(file).unwrap();
                     for circuitry in level_circuitry {
-                        scene.circuitry.insert(circuitry.0, circuitry.1, circuitry.2);
+                        scene.circuitry.insert(Position {x: circuitry.0, y: circuitry.1}, circuitry.2);
                     }
                 },
                 "generators" => {
                     let level_generators: Vec<(i32, i32, Generator)> = bincode::deserialize_from(file).unwrap();
                     for generator in level_generators {
-                        scene.generators.insert(generator.0, generator.1, generator.2);
+                        scene.generators.insert(Position {x: generator.0, y: generator.1}, generator.2);
                     }
                 },
                 "npc" => {
                     let level_npc: Vec<(i32, i32, Npc)> = bincode::deserialize_from(file).unwrap();
                     for npc in level_npc {
-                        scene.npc.insert(npc.0, npc.1, npc.2);
+                        scene.npc.insert(Position {x: npc.0, y: npc.1}, npc.2);
                     }
                 },
                 "player" => {

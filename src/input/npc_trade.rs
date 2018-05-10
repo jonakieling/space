@@ -1,8 +1,7 @@
 use ggez::Context;
 use ggez::event::{Keycode, Mod};
 
-use state::world::{Scene, InputState};
-use state::TradeArea;
+use state::world::{Scene, InputState, TradeArea};
 
 
 pub fn key_up_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
@@ -26,25 +25,25 @@ pub fn key_up_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _ke
         },
         Keycode::Tab => {
             match scene.active_trade_area {
-                TradeArea::LeftSource => {
+                TradeArea::NpcInventory => {
                     let item = scene.current_npc().unwrap().inventory.extract_current();
                     if item.is_some() {
                         scene.npc_trade_area.insert(item.unwrap());
                     }
                 },
-                TradeArea::LeftTarget => {
+                TradeArea::NpcStaging => {
                     let item = scene.npc_trade_area.extract_current();
                     if item.is_some() {
                         scene.current_npc().unwrap().inventory.insert(item.unwrap());
                     }
                 },
-                TradeArea::RightTarget => {
+                TradeArea::PlayerStaging => {
                     let item = scene.player_trade_area.extract_current();
                     if item.is_some() {
                         scene.player.inventory.insert(item.unwrap());
                     }
                 },
-                TradeArea::RightSource => {
+                TradeArea::PlayerInventory => {
                     let item = scene.player.inventory.extract_current();
                     if item.is_some() {
                         scene.player_trade_area.insert(item.unwrap());
@@ -54,64 +53,64 @@ pub fn key_up_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _ke
         },
         Keycode::Right => {
             match scene.active_trade_area {
-                TradeArea::LeftSource => {
-                    scene.active_trade_area = TradeArea::LeftTarget;
+                TradeArea::NpcInventory => {
+                    scene.active_trade_area = TradeArea::NpcStaging;
                 },
-                TradeArea::LeftTarget => {
-                    scene.active_trade_area = TradeArea::RightTarget;
+                TradeArea::NpcStaging => {
+                    scene.active_trade_area = TradeArea::PlayerStaging;
                 },
-                TradeArea::RightTarget => {
-                    scene.active_trade_area = TradeArea::RightSource;
+                TradeArea::PlayerStaging => {
+                    scene.active_trade_area = TradeArea::PlayerInventory;
                 },
-                TradeArea::RightSource => {
-                    scene.active_trade_area = TradeArea::LeftSource;
+                TradeArea::PlayerInventory => {
+                    scene.active_trade_area = TradeArea::NpcInventory;
                 },
             }
         },
         Keycode::Left => {
             match scene.active_trade_area {
-                TradeArea::LeftSource => {
-                    scene.active_trade_area = TradeArea::RightSource;
+                TradeArea::NpcInventory => {
+                    scene.active_trade_area = TradeArea::PlayerInventory;
                 },
-                TradeArea::LeftTarget => {
-                    scene.active_trade_area = TradeArea::LeftSource;
+                TradeArea::NpcStaging => {
+                    scene.active_trade_area = TradeArea::NpcInventory;
                 },
-                TradeArea::RightTarget => {
-                    scene.active_trade_area = TradeArea::LeftTarget;
+                TradeArea::PlayerStaging => {
+                    scene.active_trade_area = TradeArea::NpcStaging;
                 },
-                TradeArea::RightSource => {
-                    scene.active_trade_area = TradeArea::RightTarget;
+                TradeArea::PlayerInventory => {
+                    scene.active_trade_area = TradeArea::PlayerStaging;
                 },
             }
         },
         Keycode::Up => {
             match scene.active_trade_area {
-                TradeArea::LeftSource => {
+                TradeArea::NpcInventory => {
                     scene.current_npc().unwrap().inventory.prev();
                 },
-                TradeArea::LeftTarget => {
+                TradeArea::NpcStaging => {
                     scene.npc_trade_area.prev();
                 },
-                TradeArea::RightTarget => {
+                TradeArea::PlayerStaging => {
                     scene.player_trade_area.prev();
                 },
-                TradeArea::RightSource => {
+                TradeArea::PlayerInventory => {
                     scene.player.inventory.prev();
                 },
             }
         },
         Keycode::Down => {
             match scene.active_trade_area {
-                TradeArea::LeftSource => {
+                TradeArea::NpcInventory => {
                     scene.current_npc().unwrap().inventory.next();
                 },
-                TradeArea::LeftTarget => {
+                TradeArea::NpcStaging => {
                     scene.npc_trade_area.next();
                 },
-                TradeArea::RightTarget => {
+                TradeArea::PlayerStaging => {
                     scene.player_trade_area.next();
                 },
-                TradeArea::RightSource => {
+                TradeArea::PlayerInventory => {
                     scene.player.inventory.next();
                 },
             }

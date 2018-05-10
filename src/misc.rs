@@ -8,6 +8,14 @@ pub struct Position {
 }
 
 impl Position {
+
+    pub fn new(x: i32, y: i32) -> Position {
+        Position {
+            x,
+            y
+        }
+    }
+
     pub fn viewport_x(self) -> f32 {
         (self.x * GRID_SIZE) as f32
     }
@@ -22,6 +30,34 @@ impl Position {
 
     pub fn to_int(self) -> i32 {
         self.x + self.y * LEVEL_SIZE
+    }
+
+    pub fn x_up(self) -> Position {
+        Position {
+            x: self.x + 1,
+            y: self.y
+        }
+    }
+
+    pub fn x_down(self) -> Position {
+        Position {
+            x: self.x - 1,
+            y: self.y
+        }
+    }
+
+    pub fn y_up(self) -> Position {
+        Position {
+            x: self.x,
+            y: self.y + 1
+        }
+    }
+
+    pub fn y_down(self) -> Position {
+        Position {
+            x: self.x,
+            y: self.y - 1
+        }
     }
 
     pub fn from_int(pos: i32) -> Position {
@@ -62,7 +98,7 @@ impl Direction {
     }
 }
 
-pub enum Orientation {
+pub enum TextAlign {
     Left,
     Right
 }

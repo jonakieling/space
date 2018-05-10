@@ -28,32 +28,32 @@ pub fn key_up_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _ke
             scene.edit_selection = scene.get_edit_selection();
         },
         Keycode::Delete => {
-            scene.walls.remove(scene.edit_cursor.x, scene.edit_cursor.y);
-            scene.doors.remove(scene.edit_cursor.x, scene.edit_cursor.y);
-            scene.terminals.remove(scene.edit_cursor.x, scene.edit_cursor.y);
-            scene.circuitry.remove(scene.edit_cursor.x, scene.edit_cursor.y);
-            scene.generators.remove(scene.edit_cursor.x, scene.edit_cursor.y);
+            scene.walls.remove(scene.edit_cursor);
+            scene.doors.remove(scene.edit_cursor);
+            scene.terminals.remove(scene.edit_cursor);
+            scene.circuitry.remove(scene.edit_cursor);
+            scene.generators.remove(scene.edit_cursor);
             scene.update_power();
         },
         Keycode::W => {
-            scene.walls.insert(scene.edit_cursor.x, scene.edit_cursor.y, Wall {});
+            scene.walls.insert(scene.edit_cursor, Wall {});
         },
         Keycode::C => {
-            scene.circuitry.insert(scene.edit_cursor.x, scene.edit_cursor.y, Circuitry {parts: SelectionStorage::new(), powered: false});
+            scene.circuitry.insert(scene.edit_cursor, Circuitry {parts: SelectionStorage::new(), powered: false});
             scene.update_power();
         },
         Keycode::G => {
-            scene.generators.insert(scene.edit_cursor.x, scene.edit_cursor.y, Generator {});
+            scene.generators.insert(scene.edit_cursor, Generator {});
             scene.update_power();
         },
         Keycode::D => {
-            scene.doors.insert(scene.edit_cursor.x, scene.edit_cursor.y, Door { status: DoorStatus::Closed});
+            scene.doors.insert(scene.edit_cursor, Door { status: DoorStatus::Closed});
         },
         Keycode::T => {
-            scene.terminals.insert(scene.edit_cursor.x, scene.edit_cursor.y, Terminal { text: Box::new(String::new()), front: Direction::Down});
+            scene.terminals.insert(scene.edit_cursor, Terminal { text: Box::new(String::new()), front: Direction::Down});
         },
         Keycode::Tab => {
-            if let Some(ref mut door) = scene.doors.get_mut(scene.edit_cursor.x, scene.edit_cursor.y) {
+            if let Some(ref mut door) = scene.doors.get_mut(scene.edit_cursor) {
                 match door.status {
                     DoorStatus::Open => {
                         door.status = DoorStatus::Closed;
@@ -63,7 +63,7 @@ pub fn key_up_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _ke
                     }
                 }
             }
-            if let Some(ref mut terminal) = scene.terminals.get_mut(scene.edit_cursor.x, scene.edit_cursor.y) {
+            if let Some(ref mut terminal) = scene.terminals.get_mut(scene.edit_cursor) {
                 match terminal.front {
                     Direction::Up => {
                         terminal.front = Direction::Right;
