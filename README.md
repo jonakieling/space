@@ -12,6 +12,7 @@ developed on linux
 * open and close *doors* by pressing `Return`
 * interact with *terminals* by pressing `Return` when standing in front of the front-facing side, edit by typing `Anything` and `Backspace` the text and exit with `Escape`
 * access the *inventory* with `i` and switch through the items with `↑` and `↓` (close it with `i`)
+* while your *inventory* is open you can put *items* into the *crafting area* by pressing `Tab`, `Return` combines them into a product. The first matching *receipe* is used to determine the resulting *item*.
 * hold `Left Ctrl` to show *circuitry*, you can list the items by pressing `Enter` (switch through with `↑` and `↓`, and close it with `Escape`)
 * press `Insert` to switch to *edit mode*
 * and there is *Gnoerf* you can talk to him and select dialog by pressing `Enter` (change dialog options with `↑` and `↓`)
@@ -46,7 +47,7 @@ thoughts before implmentation.
 * inventory (✓)
 
 ## systems
-* object crafting
+* object crafting (✓)
 * energy, circuits (✓)
 * scanners, navigation
 * logs

@@ -139,18 +139,27 @@ pub enum Item {
 	MicroController
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Receipe {
 	pub result: Item,
 	pub incredients: Vec<Item>
 }
 
 impl Receipe {
-	pub fn receipes_as_incredient(item: Item, receipes: Vec<Receipe>) -> Vec<Receipe> {
-		unimplemented!()
+	pub fn receipes_as_incredient<'a>(item: &Item, receipes: &'a Vec<Receipe>) -> Vec<&'a Receipe> {
+		receipes.iter().filter(|receipe| receipe.incredients.contains(item)).collect()
 	}
 	
-	pub fn from_item(item: Item, receipes: Vec<Receipe>) -> Receipe {
-		unimplemented!()
+	pub fn from_item<'a>(item: &Item, receipes: &'a Vec<Receipe>) -> Option<&'a Receipe> {
+		receipes.iter().filter(|receipe| receipe.result == *item).next()
+	}
+
+	pub fn receipe_match<'a>(items: &'a Vec<Item>, receipes: &'a Vec<Receipe>) -> Vec<&'a Receipe> {
+		receipes.iter().filter(|receipe| {
+			receipe.incredients.iter().all(|incredient| {
+				items.contains(incredient)
+			})
+		}).collect()
 	}
 }
 

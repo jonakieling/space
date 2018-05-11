@@ -154,6 +154,14 @@ impl<T: Clone> SelectionStorage<T> {
     pub fn iter(&self) -> slice::Iter<T> {
         self.storage.iter()
     }
+
+    pub fn clear(&mut self) {
+        self.storage.clear()
+    }
+
+    pub fn storage(&self) -> Vec<T> {
+        self.storage.clone()
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

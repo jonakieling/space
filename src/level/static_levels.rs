@@ -57,7 +57,8 @@ pub fn static_level0(scene: &mut Scene) {
     scene.npc.insert(Position::new(12, 12), npc_gnoerf);
     
     let mut inventory = <SelectionStorage<Item>>::new();
-    inventory.insert(Item::Log);
+    inventory.insert(Item::MicroController);
+    inventory.insert(Item::DataChip);
     scene.player.inventory = inventory;
     
     println!("game loaded: static level0");
