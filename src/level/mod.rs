@@ -171,6 +171,8 @@ pub fn load_scene(scene: &mut Scene, filename: &str) {
                 },
                 _ => (),
             }
+
+            scene.update_power();
         }
         println!("game loaded: from file {}", filename);
     } else {
