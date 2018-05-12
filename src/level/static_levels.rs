@@ -6,7 +6,7 @@ use misc::*;
 use dialog::*;
 
 pub fn static_level0(scene: &mut Scene) {
-    scene.backdrop = String::from("/realm_of_sol__0000s_0000_1.1.png");
+    scene.data.backdrop = String::from("/realm_of_sol__0000s_0000_1.1.png");
     let mut inventory = SelectionStorage::new();
     inventory.insert(Item::DataChip);
     inventory.insert(Item::Communicator);
@@ -54,47 +54,45 @@ pub fn static_level0(scene: &mut Scene) {
         },
         inventory
     };
-    scene.npc.insert(Position::new(12, 12), npc_gnoerf);
+    scene.data.npc.insert(Position::new(12, 12), npc_gnoerf);
     
     let mut inventory = <SelectionStorage<Item>>::new();
     inventory.insert(Item::MicroController);
     inventory.insert(Item::DataChip);
-    scene.player.inventory = inventory;
+    scene.data.player.inventory = inventory;
     
     println!("game loaded: static level0");
 }
 
 
 pub fn _static_ship_tech_2_1(scene: &mut Scene) {
-    scene.backdrop = String::from("/realm_of_sol__0000s_0001_2.1.png");
+    scene.data.backdrop = String::from("/realm_of_sol__0000s_0001_2.1.png");
 
-    scene.walls.insert(Position::new(6, 8), Wall {});
-    scene.walls.insert(Position::new(7, 8), Wall {});
-    scene.walls.insert(Position::new(8, 8), Wall {});
-    scene.walls.insert(Position::new(9, 8), Wall {});
-    scene.walls.insert(Position::new(10, 8), Wall {});
+    scene.data.walls.insert(Position::new(6, 8), Wall {});
+    scene.data.walls.insert(Position::new(7, 8), Wall {});
+    scene.data.walls.insert(Position::new(8, 8), Wall {});
+    scene.data.walls.insert(Position::new(9, 8), Wall {});
+    scene.data.walls.insert(Position::new(10, 8), Wall {});
 
-    scene.walls.insert(Position::new(6, 9), Wall {});
-    scene.walls.insert(Position::new(6, 10), Wall {});
+    scene.data.walls.insert(Position::new(6, 9), Wall {});
+    scene.data.walls.insert(Position::new(6, 10), Wall {});
 
-    scene.walls.insert(Position::new(7, 11), Wall {});
-    scene.walls.insert(Position::new(9, 11), Wall {});
+    scene.data.walls.insert(Position::new(7, 11), Wall {});
+    scene.data.walls.insert(Position::new(9, 11), Wall {});
 
-    scene.walls.insert(Position::new(10, 9), Wall {});
-    scene.walls.insert(Position::new(10, 10), Wall {});
+    scene.data.walls.insert(Position::new(10, 9), Wall {});
+    scene.data.walls.insert(Position::new(10, 10), Wall {});
 
-    scene.doors.insert(Position::new(8, 11), Door {status: DoorStatus::Closed});
+    scene.data.doors.insert(Position::new(8, 11), Door {status: DoorStatus::Closed});
 
     let mut parts = SelectionStorage::new();
     parts.insert(Item::PowerConductor);
-    scene.circuitry.insert(Position::new(8, 13), Circuitry {parts, powered: false});
+    scene.data.circuitry.insert(Position::new(8, 13), Circuitry {parts, powered: false});
 
-
-    scene.terminals.insert(Position::new(8, 9), Terminal {
+    scene.data.terminals.insert(Position::new(8, 9), Terminal {
         text: Box::new(String::new()),
         front: Direction::Down
     });
-
 
     let player_position = Position::new(8, 10);
     let player_direction = Direction::Up;
@@ -114,7 +112,7 @@ pub fn _static_ship_tech_2_1(scene: &mut Scene) {
             front: Direction::Down
         })
     };
-    scene.player = player;
+    scene.data.player = player;
 
     println!("game loaded: static ship tech 2.1");
 }

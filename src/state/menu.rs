@@ -13,7 +13,7 @@ pub struct Scene {
 }
 
 impl Scene {
-    pub fn new(_ctx: &mut Context) -> GameResult<Scene> {
+    pub fn new() -> GameResult<Scene> {
     	let mut menu = Scene {
     		saves: SelectionStorage::new(),
             loading: None
@@ -44,14 +44,14 @@ impl Scene {
 }
 
 impl GameState for Scene {
-    fn change_state(&self, ctx: &mut Context) -> Option<Box<GameState>> {
+    fn change_state(&self) -> Option<Box<GameState>> {
         if let Some(ref savegame) = self.loading {
             if savegame == "empty" {
-                let mut world = world::Scene::new(ctx).unwrap();
+                let mut world = world::Scene::new().unwrap();
                 level::static_levels::static_level0(&mut world);
                 Some(Box::new(world))
             } else {
-                let mut world = world::Scene::new(ctx).unwrap();
+                let mut world = world::Scene::new().unwrap();
                 level::load_scene(&mut world, savegame);
                 Some(Box::new(world))
             }

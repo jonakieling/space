@@ -1,85 +1,173 @@
 use std::time::Duration;
 
-use ggez::Context;
+use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
 use constants::MOVEMENT_SPEED;
-use state::world::{Scene, InputState};
+use state::{world::SceneData, draw_input_state, world::InputState};
 use misc::*;
+use input::IngameState;
 
-pub fn key_down_event(scene: &mut Scene, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, repeat: bool) {
-	if !repeat {
-        scene.movement_timer = Duration::from_millis(MOVEMENT_SPEED);
+pub struct State {
+    change_state: Option<InputState>
+}
 
-        match keycode {
-            Keycode::Left => {
-                scene.player.movement(Direction::Left, Direction::Right);
-            },
-            Keycode::Right => {
-                scene.player.movement(Direction::Right, Direction::Left);
-            },
-            Keycode::Up => {
-                scene.player.movement(Direction::Up, Direction::Down);
-            },
-            Keycode::Down => {
-                scene.player.movement(Direction::Down, Direction::Up);
-            },
-            _ => ()
+impl State {
+    pub fn new() -> State {
+    	State {
+            change_state: None
         }
-    } else {
-        if let None = scene.player.movement.last() {
-            match keycode {
-                Keycode::Left => {
-                    scene.player.movement(Direction::Left, Direction::Right);
-                },
-                Keycode::Right => {
-                    scene.player.movement(Direction::Right, Direction::Left);
-                },
-                Keycode::Up => {
-                    scene.player.movement(Direction::Up, Direction::Down);
-                },
-                Keycode::Down => {
-                    scene.player.movement(Direction::Down, Direction::Up);
-                },
-                _ => ()
+    }
+
+    fn interact_with_npc(&mut self, scene_data: &mut SceneData) {
+        if let Some(npc) = scene_data.npc.get_mut(scene_data.player.front_tile) {
+            match scene_data.player.direction {
+                Direction::Down => npc.direction = Direction::Up,
+                Direction::Left => npc.direction = Direction::Right,
+                Direction::Up => npc.direction = Direction::Down,
+                Direction::Right => npc.direction = Direction::Left,
+            }
+            scene_data.dialog = npc.dialog.root.clone();
+            self.change_state = Some(InputState::Npc);
+        }
+    }
+
+    fn interact_with_circuitry(&mut self, scene_data: &mut SceneData) {
+        if let Some(_) = scene_data.circuitry.get_mut(scene_data.player.front_tile) {
+            self.change_state = Some(InputState::Circuitry);
+        }
+    }
+
+    fn interact_with_terminal(&mut self, scene_data: &mut SceneData) {
+        if let Some(ref terminal) = scene_data.terminals.get_mut(scene_data.player.front_tile) {
+            let terminal_front_tile = &terminal.front.value() + &scene_data.player.front_tile;
+            if terminal_front_tile == scene_data.player.position {
+                self.change_state = Some(InputState::Terminal);
             }
         }
     }
 }
 
-pub fn key_up_event(scene: &mut Scene, ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
-	match keycode {
-        Keycode::Left => {
-            scene.player.remove_movement(Direction::Left);
-        },
-        Keycode::Right => {
-            scene.player.remove_movement(Direction::Right);
-        },
-        Keycode::Up => {
-            scene.player.remove_movement(Direction::Up);
-        },
-        Keycode::Down => {
-            scene.player.remove_movement(Direction::Down);
-        },
-        Keycode::Return => {
-            if scene.insight_view {
-                scene.interact_with_circuitry();
-            } else {
-                scene.interact_with_npc();
-                scene.interact_with_door();
-                scene.interact_with_terminal(ctx);
+impl IngameState for State {
+
+    fn change_state(&mut self) -> Option<Box<IngameState>> {
+        match self.change_state {
+            Some(InputState::World) => {
+                self.change_state = None;
+                Some(Box::new(super::world::State::new()))
+            },
+            Some(InputState::Edit) => {
+                self.change_state = None;
+                Some(Box::new(super::edit::State::new()))
+            },
+            Some(InputState::Menu) => {
+                self.change_state = None;
+                Some(Box::new(super::menu::State::new()))
+            },
+            Some(InputState::Npc) => {
+                self.change_state = None;
+                Some(Box::new(super::npc::State::new()))
+            },
+            Some(InputState::Terminal) => {
+                self.change_state = None;
+                Some(Box::new(super::terminal::State::new()))
+            },
+            Some(InputState::Inventory) => {
+                self.change_state = None;
+                Some(Box::new(super::inventory::State::new()))
+            },
+            Some(InputState::Circuitry) => {
+                self.change_state = None;
+                Some(Box::new(super::circuitry::State::new()))
+            },
+            _ => None,
+        }
+    }
+    
+    fn key_down_event(&mut self, scene_data: &mut SceneData, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, repeat: bool) {
+        if !repeat {
+            scene_data.movement_timer = Duration::from_millis(MOVEMENT_SPEED);
+
+            match keycode {
+                Keycode::Left => {
+                    scene_data.player.movement(Direction::Left, Direction::Right);
+                },
+                Keycode::Right => {
+                    scene_data.player.movement(Direction::Right, Direction::Left);
+                },
+                Keycode::Up => {
+                    scene_data.player.movement(Direction::Up, Direction::Down);
+                },
+                Keycode::Down => {
+                    scene_data.player.movement(Direction::Down, Direction::Up);
+                },
+                _ => ()
             }
-        },
-        Keycode::I => {
-            scene.input = InputState::Inventory;
-        },
-        Keycode::Escape => {
-            scene.input = InputState::Menu;
-        },
-        Keycode::Insert => {
-            scene.input = InputState::Edit;
-            scene.edit_selection = scene.get_edit_selection();
-        },
-        _ => ()
+        } else {
+            if let None = scene_data.player.movement.last() {
+                match keycode {
+                    Keycode::Left => {
+                        scene_data.player.movement(Direction::Left, Direction::Right);
+                    },
+                    Keycode::Right => {
+                        scene_data.player.movement(Direction::Right, Direction::Left);
+                    },
+                    Keycode::Up => {
+                        scene_data.player.movement(Direction::Up, Direction::Down);
+                    },
+                    Keycode::Down => {
+                        scene_data.player.movement(Direction::Down, Direction::Up);
+                    },
+                    _ => ()
+                }
+            }
+        }
+    }
+
+    fn key_up_event(&mut self, scene_data: &mut SceneData, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+        match keycode {
+            Keycode::Left => {
+                scene_data.player.remove_movement(Direction::Left);
+            },
+            Keycode::Right => {
+                scene_data.player.remove_movement(Direction::Right);
+            },
+            Keycode::Up => {
+                scene_data.player.remove_movement(Direction::Up);
+            },
+            Keycode::Down => {
+                scene_data.player.remove_movement(Direction::Down);
+            },
+            Keycode::Return => {
+                if scene_data.insight_view {
+                    self.interact_with_circuitry(scene_data);
+                } else {
+                    self.interact_with_terminal(scene_data);
+                    self.interact_with_npc(scene_data);
+                    scene_data.interact_with_door();
+                }
+            },
+            Keycode::I => {
+                self.change_state = Some(InputState::Inventory);
+            },
+            Keycode::Escape => {
+                self.change_state = Some(InputState::Menu);
+            },
+            Keycode::Insert => {
+                self.change_state = Some(InputState::Edit);
+            },
+            _ => ()
+        }
+    }
+
+    fn draw(&mut self, scene_data: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
+
+        if scene_data.insight_view {
+            draw_input_state("World insight", ctx)?;
+        } else {
+            draw_input_state("World", ctx)?;
+        }
+
+        Ok(())
     }
 }

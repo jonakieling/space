@@ -38,7 +38,7 @@ fn main() {
         ctx.filesystem.mount(&path, true);
 	}
     
-    let menu = menu::Scene::new(ctx).unwrap();
+    let menu = menu::Scene::new().unwrap();
 
     let game = &mut Game {
         state: Box::new(menu)

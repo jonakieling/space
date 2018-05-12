@@ -11,7 +11,7 @@ pub mod world;
 pub mod menu;
 
 pub trait GameState: EventHandler {
-    fn change_state(&self, ctx: &mut Context) -> Option<Box<GameState>>;
+    fn change_state(&self) -> Option<Box<GameState>> { None }
 }
 
 pub struct Game {
@@ -20,7 +20,7 @@ pub struct Game {
 
 impl EventHandler for Game {
     fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
-        if let Some(scene) = self.state.change_state(ctx) {
+        if let Some(scene) = self.state.change_state() {
             self.state = scene;
         }
         self.state.update(ctx)
@@ -47,7 +47,7 @@ impl EventHandler for Game {
     }
 }
 
-fn draw_text(ctx: &mut Context, text: &graphics::Text) -> GameResult<()> {
+pub fn draw_text(ctx: &mut Context, text: &graphics::Text) -> GameResult<()> {
     graphics::set_color(ctx, graphics::BLACK)?;
     let textbox = graphics::Rect::new(740.0 - text.width() as f32 + 20.0, 20.0, text.width() as f32 + 20.0, 20.0);
     graphics::rectangle(ctx, graphics::DrawMode::Fill, textbox)?;
@@ -58,7 +58,7 @@ fn draw_text(ctx: &mut Context, text: &graphics::Text) -> GameResult<()> {
     Ok(())
 }
 
-fn draw_dialog(dialog: &Node<DialogItem>, ctx: &mut Context) -> GameResult<()> {
+pub fn draw_dialog(dialog: &Node<DialogItem>, ctx: &mut Context) -> GameResult<()> {
     let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
     let text = graphics::Text::new(ctx, &dialog.value.response, &font)?;
 
@@ -73,13 +73,13 @@ fn draw_dialog(dialog: &Node<DialogItem>, ctx: &mut Context) -> GameResult<()> {
     Ok(())
 }
 
-fn draw_selection<T: Clone + ToString>(selection: &SelectionStorage<T>, ctx: &mut Context, cursor: bool) -> GameResult<()> {
+pub fn draw_selection<T: Clone + ToString>(selection: &SelectionStorage<T>, ctx: &mut Context, cursor: bool) -> GameResult<()> {
     draw_selection_with_parameters(&selection, ctx, Position { x: 760, y: 20 }, TextAlign::Left, cursor)?;
 
     Ok(())
 }
 
-fn draw_input_state(state: &str, ctx: &mut Context) -> GameResult<()> {
+pub fn draw_input_state(state: &str, ctx: &mut Context) -> GameResult<()> {
     let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
     let input_state_text = String::from(state);
     let input_state_graphics = graphics::Text::new(ctx, &input_state_text, &font).unwrap();
@@ -93,7 +93,7 @@ fn draw_input_state(state: &str, ctx: &mut Context) -> GameResult<()> {
     Ok(())
 }
 
-fn draw_selection_with_parameters<T: Clone + ToString>(selection: &SelectionStorage<T>, ctx: &mut Context, position: Position, orientation: TextAlign, cursor: bool) -> GameResult<()> {
+pub fn draw_selection_with_parameters<T: Clone + ToString>(selection: &SelectionStorage<T>, ctx: &mut Context, position: Position, orientation: TextAlign, cursor: bool) -> GameResult<()> {
     let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
     let mut inventory_item_position = 0.0;
     let current_item = selection.current_index();

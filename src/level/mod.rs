@@ -26,15 +26,15 @@ pub struct Save {
 pub fn save_scene(scene: &Scene, filename: &str) {
     fs::create_dir("temp-save").unwrap();
 
-    let save_info = Save { name: String::from(filename), backdrop: scene.backdrop.clone(), offset: Position { x: 0, y: 0} };
+    let save_info = Save { name: String::from(filename), backdrop: scene.data.backdrop.clone(), offset: Position { x: 0, y: 0} };
     let bytes: Vec<u8> = bincode::serialize(&save_info).unwrap();
     File::create("temp-save/save-meta.bin").unwrap().write_all(&bytes).unwrap();
 
-    let bytes: Vec<u8> = bincode::serialize(&scene.player).unwrap();
+    let bytes: Vec<u8> = bincode::serialize(&scene.data.player).unwrap();
     File::create("temp-save/player.bin").unwrap().write_all(&bytes).unwrap();
 
     let mut level_walls: Vec<(i32, i32, Wall)> = vec![];
-    for (pos, item) in scene.walls.iter().enumerate() {
+    for (pos, item) in scene.data.walls.iter().enumerate() {
         if let Some(ref wall) = *item {
             let x = pos as i32 % LEVEL_SIZE;
             let y = pos as i32 / LEVEL_SIZE;
@@ -45,7 +45,7 @@ pub fn save_scene(scene: &Scene, filename: &str) {
     File::create("temp-save/walls.bin").unwrap().write_all(&bytes).unwrap();
 
     let mut level_doors: Vec<(i32, i32, Door)> = vec![];
-    for (pos, item) in scene.doors.iter().enumerate() {
+    for (pos, item) in scene.data.doors.iter().enumerate() {
         if let Some(ref door) = *item {
             let x = pos as i32 % LEVEL_SIZE;
             let y = pos as i32 / LEVEL_SIZE;
@@ -56,7 +56,7 @@ pub fn save_scene(scene: &Scene, filename: &str) {
     File::create("temp-save/doors.bin").unwrap().write_all(&bytes).unwrap();
 
     let mut level_terminals: Vec<(i32, i32, Terminal)> = vec![];
-    for (pos, item) in scene.terminals.iter().enumerate() {
+    for (pos, item) in scene.data.terminals.iter().enumerate() {
         if let Some(ref terminal) = *item {
             let x = pos as i32 % LEVEL_SIZE;
             let y = pos as i32 / LEVEL_SIZE;
@@ -67,7 +67,7 @@ pub fn save_scene(scene: &Scene, filename: &str) {
     File::create("temp-save/terminals.bin").unwrap().write_all(&bytes).unwrap();
 
     let mut level_circuitry: Vec<(i32, i32, Circuitry)> = vec![];
-    for (pos, item) in scene.circuitry.iter().enumerate() {
+    for (pos, item) in scene.data.circuitry.iter().enumerate() {
         if let Some(ref circuitry) = *item {
             let x = pos as i32 % LEVEL_SIZE;
             let y = pos as i32 / LEVEL_SIZE;
@@ -78,7 +78,7 @@ pub fn save_scene(scene: &Scene, filename: &str) {
     File::create("temp-save/circuitry.bin").unwrap().write_all(&bytes).unwrap();
 
     let mut level_generators: Vec<(i32, i32, Generator)> = vec![];
-    for (pos, item) in scene.generators.iter().enumerate() {
+    for (pos, item) in scene.data.generators.iter().enumerate() {
         if let Some(ref generator) = *item {
             let x = pos as i32 % LEVEL_SIZE;
             let y = pos as i32 / LEVEL_SIZE;
@@ -89,7 +89,7 @@ pub fn save_scene(scene: &Scene, filename: &str) {
     File::create("temp-save/generators.bin").unwrap().write_all(&bytes).unwrap();
 
     let mut level_npc: Vec<(i32, i32, Npc)> = vec![];
-    for (pos, item) in scene.npc.iter().enumerate() {
+    for (pos, item) in scene.data.npc.iter().enumerate() {
         if let Some(ref npc) = *item {
             let x = pos as i32 % LEVEL_SIZE;
             let y = pos as i32 / LEVEL_SIZE;
@@ -100,7 +100,7 @@ pub fn save_scene(scene: &Scene, filename: &str) {
     File::create("temp-save/npc.bin").unwrap().write_all(&bytes).unwrap();
 
     let mut level_npc_dialog: Vec<Tree<DialogItem>> = vec![];
-    for item in scene.npc.iter() {
+    for item in scene.data.npc.iter() {
         if let Some(ref npc) = *item {
             level_npc_dialog.push(npc.dialog.clone());
         }
@@ -128,51 +128,51 @@ pub fn load_scene(scene: &mut Scene, filename: &str) {
                 "walls" => {
                     let level_walls: Vec<(i32, i32, Wall)> = bincode::deserialize_from(file).unwrap();
                     for wall in level_walls {
-                        scene.walls.insert(Position {x: wall.0, y: wall.1}, wall.2);
+                        scene.data.walls.insert(Position {x: wall.0, y: wall.1}, wall.2);
                     }
                 },
                 "doors" => {
                     let level_doors: Vec<(i32, i32, Door)> = bincode::deserialize_from(file).unwrap();
                     for door in level_doors {
-                        scene.doors.insert(Position {x: door.0, y: door.1}, door.2);
+                        scene.data.doors.insert(Position {x: door.0, y: door.1}, door.2);
                     }
                 },
                 "terminals" => {
                     let level_terminals: Vec<(i32, i32, Terminal)> = bincode::deserialize_from(file).unwrap();
                     for terminal in level_terminals {
-                        scene.terminals.insert(Position {x: terminal.0, y: terminal.1}, terminal.2);
+                        scene.data.terminals.insert(Position {x: terminal.0, y: terminal.1}, terminal.2);
                     }
                 },
                 "circuitry" => {
                     let level_circuitry: Vec<(i32, i32, Circuitry)> = bincode::deserialize_from(file).unwrap();
                     for circuitry in level_circuitry {
-                        scene.circuitry.insert(Position {x: circuitry.0, y: circuitry.1}, circuitry.2);
+                        scene.data.circuitry.insert(Position {x: circuitry.0, y: circuitry.1}, circuitry.2);
                     }
                 },
                 "generators" => {
                     let level_generators: Vec<(i32, i32, Generator)> = bincode::deserialize_from(file).unwrap();
                     for generator in level_generators {
-                        scene.generators.insert(Position {x: generator.0, y: generator.1}, generator.2);
+                        scene.data.generators.insert(Position {x: generator.0, y: generator.1}, generator.2);
                     }
                 },
                 "npc" => {
                     let level_npc: Vec<(i32, i32, Npc)> = bincode::deserialize_from(file).unwrap();
                     for npc in level_npc {
-                        scene.npc.insert(Position {x: npc.0, y: npc.1}, npc.2);
+                        scene.data.npc.insert(Position {x: npc.0, y: npc.1}, npc.2);
                     }
                 },
                 "player" => {
                     let level_player: Player = bincode::deserialize_from(file).unwrap();
-                    scene.player = level_player;
+                    scene.data.player = level_player;
                 },
                 "save-meta" => {
                     let level_info: Save = bincode::deserialize_from(file).unwrap();
-                    scene.backdrop = level_info.backdrop;
+                    scene.data.backdrop = level_info.backdrop;
                 },
                 _ => (),
             }
 
-            scene.update_power();
+            scene.data.update_power();
         }
         println!("game loaded: from file {}", filename);
     } else {
