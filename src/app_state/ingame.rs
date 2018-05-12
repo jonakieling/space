@@ -313,7 +313,7 @@ impl event::EventHandler for Scene {
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx);
 
-
+        graphics::set_color(ctx, graphics::WHITE)?;
         let mut backdrop = graphics::Image::new(ctx, &self.data.backdrop)?;
         backdrop.set_filter(graphics::FilterMode::Nearest);
 
