@@ -76,4 +76,4 @@ engine tech
 -----------
 
 * gui for selections and lists (✓)
-* scene/storage management (how to deal with space, ship, level, objects)
+* ~~scene/storage management (how to deal with space, ship, level, objects)~~ kiss
