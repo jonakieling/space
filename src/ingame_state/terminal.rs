@@ -1,9 +1,9 @@
 use ggez::{Context, GameResult, graphics};
 use ggez::event::{Keycode, Mod};
 
-use state::{draw_text, draw_input_state};
-use state::world::{SceneData, InputState};
-use input::IngameState;
+use app_state::{draw_text, draw_input_state};
+use app_state::ingame::{SceneData, InputState};
+use ingame_state::GameState;
 use constants::TERMINAL_LIMIT;
 
 pub struct State {
@@ -47,9 +47,9 @@ impl State {
     }
 }
 
-impl IngameState for State {
+impl GameState for State {
 
-    fn change_state(&mut self) -> Option<Box<IngameState>> {
+    fn change_state(&mut self) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;

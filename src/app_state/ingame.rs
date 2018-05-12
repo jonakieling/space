@@ -14,9 +14,9 @@ use storage::*;
 use objects::*;
 use misc::*;
 use constants::*;
-use input::*;
-use GameState;
-use level;
+use ingame_state::*;
+use AppState;
+use savegame::save_scene;
 use dialog::*;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -48,12 +48,12 @@ pub struct SceneData {
 }
 
 pub struct Scene {
-    pub current_ingame_state: Box<IngameState>,
+    pub current_ingame_state: Box<GameState>,
     pub data: SceneData
 }
 
-impl GameState for Scene {
-    fn change_state(&self) -> Option<Box<GameState>> {
+impl AppState for Scene {
+    fn change_state(&self) -> Option<Box<AppState>> {
         if self.data.main_menu {
             let menu = super::menu::Scene::new().unwrap();
             Some(Box::new(menu))
@@ -305,7 +305,7 @@ impl event::EventHandler for Scene {
     fn quit_event(&mut self, ctx: &mut Context) -> bool {
         self.current_ingame_state.quit_event(&mut self.data, ctx);
 
-        level::save_scene(self, "saves/auto-save.tar");
+        save_scene(self, "saves/auto-save.tar");
 
         false
     }

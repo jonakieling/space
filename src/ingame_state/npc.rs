@@ -2,8 +2,8 @@ use dialog::DialogAction;
 use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
-use state::{world::SceneData, draw_input_state, draw_dialog, world::InputState};
-use input::IngameState;
+use app_state::{ingame::SceneData, draw_input_state, draw_dialog, ingame::InputState};
+use ingame_state::GameState;
 
 pub struct State {
     change_state: Option<InputState>
@@ -17,9 +17,9 @@ impl State {
     }
 }
 
-impl IngameState for State {
+impl GameState for State {
 
-    fn change_state(&mut self) -> Option<Box<IngameState>> {
+    fn change_state(&mut self) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;

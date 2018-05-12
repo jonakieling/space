@@ -7,18 +7,18 @@ use storage::{SelectionStorage, Node};
 use dialog::DialogItem;
 use misc::{TextAlign, Position};
 
-pub mod world;
+pub mod ingame;
 pub mod menu;
 
-pub trait GameState: EventHandler {
-    fn change_state(&self) -> Option<Box<GameState>> { None }
+pub trait AppState: EventHandler {
+    fn change_state(&self) -> Option<Box<AppState>> { None }
 }
 
-pub struct Game {
-    pub state: Box<GameState>
+pub struct App {
+    pub state: Box<AppState>
 }
 
-impl EventHandler for Game {
+impl EventHandler for App {
     fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
         if let Some(scene) = self.state.change_state() {
             self.state = scene;

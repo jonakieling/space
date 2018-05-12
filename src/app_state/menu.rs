@@ -3,9 +3,9 @@ use std::fs;
 use ggez::{graphics, Context, event::*, GameResult};
 
 use storage::SelectionStorage;
-use GameState;
-use level;
-use state::world;
+use AppState;
+use savegame;
+use app_state::ingame;
 
 pub struct Scene {
 	saves: SelectionStorage<String>,
@@ -43,16 +43,16 @@ impl Scene {
     }
 }
 
-impl GameState for Scene {
-    fn change_state(&self) -> Option<Box<GameState>> {
+impl AppState for Scene {
+    fn change_state(&self) -> Option<Box<AppState>> {
         if let Some(ref savegame) = self.loading {
             if savegame == "empty" {
-                let mut world = world::Scene::new().unwrap();
-                level::static_levels::static_level0(&mut world);
+                let mut world = ingame::Scene::new().unwrap();
+                savegame::static_levels::static_level0(&mut world);
                 Some(Box::new(world))
             } else {
-                let mut world = world::Scene::new().unwrap();
-                level::load_scene(&mut world, savegame);
+                let mut world = ingame::Scene::new().unwrap();
+                savegame::load_scene(&mut world, savegame);
                 Some(Box::new(world))
             }
         } else {

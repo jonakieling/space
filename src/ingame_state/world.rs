@@ -4,9 +4,9 @@ use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
 use constants::MOVEMENT_SPEED;
-use state::{world::SceneData, draw_input_state, world::InputState};
+use app_state::{ingame::SceneData, draw_input_state, ingame::InputState};
 use misc::*;
-use input::IngameState;
+use ingame_state::GameState;
 
 pub struct State {
     change_state: Option<InputState>
@@ -48,9 +48,9 @@ impl State {
     }
 }
 
-impl IngameState for State {
+impl GameState for State {
 
-    fn change_state(&mut self) -> Option<Box<IngameState>> {
+    fn change_state(&mut self) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;

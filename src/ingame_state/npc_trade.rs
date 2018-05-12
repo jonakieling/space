@@ -1,8 +1,8 @@
 use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
-use state::{draw_selection_with_parameters, world::SceneData, world::InputState};
-use input::IngameState;
+use app_state::{draw_selection_with_parameters, ingame::SceneData, ingame::InputState};
+use ingame_state::GameState;
 use storage::SelectionStorage;
 use objects::Item;
 use misc::{Position, TextAlign};
@@ -63,9 +63,9 @@ impl State {
     }
 }
 
-impl IngameState for State {
+impl GameState for State {
 
-    fn change_state(&mut self) -> Option<Box<IngameState>> {
+    fn change_state(&mut self) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;

@@ -6,14 +6,14 @@ extern crate serde_derive;
 extern crate bincode;
 extern crate tar;
 
-mod level;
-mod state;
+mod savegame;
+mod app_state;
 mod storage;
 mod player;
 mod objects;
 mod misc;
 mod constants;
-mod input;
+mod ingame_state;
 mod dialog;
 
 use std::env;
@@ -22,7 +22,7 @@ use std::io::Write;
 
 use ggez::{Context, conf, event::*};
 
-use state::*;
+use app_state::*;
 
 fn main() {
     let c = conf::Conf::new();
@@ -40,7 +40,7 @@ fn main() {
     
     let menu = menu::Scene::new().unwrap();
 
-    let game = &mut Game {
+    let game = &mut App {
         state: Box::new(menu)
     };
 

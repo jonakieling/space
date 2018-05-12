@@ -1,5 +1,5 @@
 use ggez::{GameResult, Context, event::Keycode, event::Mod};
-use state::world::SceneData;
+use app_state::ingame::SceneData;
 
 pub mod edit;
 pub mod terminal;
@@ -10,8 +10,8 @@ pub mod menu;
 pub mod npc;
 pub mod npc_trade;
 
-pub trait IngameState {
-    fn change_state(&mut self) -> Option<Box<IngameState>> { None }
+pub trait GameState {
+    fn change_state(&mut self) -> Option<Box<GameState>> { None }
     
     fn update(&mut self, _scene_data: &mut SceneData) -> GameResult<()> {
         Ok(())

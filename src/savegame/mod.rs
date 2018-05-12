@@ -7,7 +7,7 @@ use bincode;
 use serde_yaml;
 
 use constants::LEVEL_SIZE;
-use state::world::*;
+use app_state::ingame::*;
 use player::Player;
 use objects::*;
 use misc::Position;
