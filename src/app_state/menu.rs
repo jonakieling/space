@@ -48,11 +48,11 @@ impl AppState for Scene {
         if let Some(ref savegame) = self.loading {
             if savegame == "empty" {
                 let mut world = ingame::Scene::new().unwrap();
-                savegame::static_levels::static_level0(&mut world);
+                savegame::static_levels::static_level0(&mut world.data);
                 Some(Box::new(world))
             } else {
                 let mut world = ingame::Scene::new().unwrap();
-                savegame::load_scene(&mut world, savegame);
+                savegame::load_scene(&mut world.data, savegame);
                 Some(Box::new(world))
             }
         } else {

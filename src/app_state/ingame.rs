@@ -55,6 +55,7 @@ pub struct Scene {
 impl AppState for Scene {
     fn change_state(&self) -> Option<Box<AppState>> {
         if self.data.main_menu {
+            save_scene(&self.data, "saves/auto-save.tar");
             let menu = super::menu::Scene::new().unwrap();
             Some(Box::new(menu))
         } else {
@@ -305,7 +306,7 @@ impl event::EventHandler for Scene {
     fn quit_event(&mut self, ctx: &mut Context) -> bool {
         self.current_ingame_state.quit_event(&mut self.data, ctx);
 
-        save_scene(self, "saves/auto-save.tar");
+        save_scene(&self.data, "saves/auto-save.tar");
 
         false
     }
