@@ -28,7 +28,8 @@ pub enum InputState {
     Circuitry,
     Menu,
     Npc,
-    NpcTrade
+    NpcTrade,
+    Log
 }
 
 pub struct SceneData {
@@ -83,7 +84,8 @@ impl Scene {
             terminal: Box::new(Terminal {
                 text: Box::new(String::new()),
                 front: Direction::Down
-            })
+            }),
+            log: SelectionStorage::new()
         };
 
         let walls = <PositionLevelStorage<Wall>>::new();

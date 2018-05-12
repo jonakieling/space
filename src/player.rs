@@ -3,7 +3,7 @@ use ggez::Context;
 use ggez::graphics;
 
 use misc::{Position, Direction};
-use objects::{Item, Terminal};
+use objects::{Item, Terminal, LogEntry};
 use storage::SelectionStorage;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -14,6 +14,7 @@ pub struct Player {
     pub front_tile: Position,
     pub inventory: SelectionStorage<Item>,
     pub terminal: Box<Terminal>,
+    pub log:SelectionStorage<LogEntry>
 }
 
 impl Player {

@@ -192,3 +192,15 @@ impl Npc {
         Ok(())
 	}
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct LogEntry {
+	pub title: String,
+	pub message: String
+}
+
+impl ToString for LogEntry {
+    fn to_string(&self) -> String {
+        self.title.clone()
+    }
+}

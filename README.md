@@ -68,7 +68,7 @@ systems
 * object crafting (✓)
 * energy, circuits (✓)
 * scanners, navigation
-* logs
+* logs (✓)
 
 thoughts after implmentation start.
 

@@ -8,16 +8,24 @@ use ingame_state::GameState;
 use misc::{Position, TextAlign};
 use storage::SelectionStorage;
 
+#[derive(PartialEq, Eq)]
+enum Mode {
+    Inventory,
+    Crafting
+}
+
 pub struct State {
     craft_area: SelectionStorage<Item>,
-    change_state: Option<InputState>
+    change_state: Option<InputState>,
+    mode: Mode
 }
 
 impl State {
     pub fn new() -> State {
     	State {
             craft_area:  SelectionStorage::new(),
-            change_state: None
+            change_state: None,
+            mode: Mode::Inventory
         }
     }
 
@@ -36,6 +44,10 @@ impl GameState for State {
                 self.change_state = None;
                 Some(Box::new(super::world::State::new()))
             },
+            Some(InputState::Log) => {
+                self.change_state = None;
+                Some(Box::new(super::log::State::new()))
+            },
             _ => None,
         }
     }
@@ -51,23 +63,63 @@ impl GameState for State {
                 self.change_state = Some(InputState::World);
             },
             Keycode::Up => {
-                scene_data.player.inventory.prev();
+                match self.mode {
+                    Mode::Crafting => self.craft_area.prev(),
+                    Mode::Inventory => scene_data.player.inventory.prev(),
+                };
             },
             Keycode::Down => {
-                scene_data.player.inventory.next();
+                match self.mode {
+                    Mode::Crafting => self.craft_area.next(),
+                    Mode::Inventory => scene_data.player.inventory.next(),
+                };
+            },
+            Keycode::Left => {
+                match self.mode {
+                    Mode::Crafting => self.mode = Mode::Inventory,
+                    Mode::Inventory => self.mode = Mode::Crafting,
+                }
+            },
+            Keycode::Right => {
+                match self.mode {
+                    Mode::Crafting => self.mode = Mode::Inventory,
+                    Mode::Inventory => self.mode = Mode::Crafting,
+                }
             },
             Keycode::Tab => {
-                let item = scene_data.player.inventory.extract_current();
-                if item.is_some() {
-                    self.craft_area.insert(item.unwrap());
+                match self.mode {
+                    Mode::Inventory => {
+                        let item = scene_data.player.inventory.extract_current();
+                        if item.is_some() {
+                            self.craft_area.insert(item.unwrap());
+                        }
+                    },
+                    Mode::Crafting => {
+                        let item = self.craft_area.extract_current();
+                        if item.is_some() {
+                            scene_data.player.inventory.insert(item.unwrap());
+                        }
+                    }
                 }
             },
             Keycode::Return => {
-                let ref crafts = &self.craft_area.storage();
-                let products = Receipe::receipe_match(crafts, &scene_data.receipes);
-                if let Some(receipe) = products.get(0) {
-                    self.craft_area.clear();
-                    scene_data.player.inventory.insert(receipe.result.clone());
+                match self.mode {
+                    Mode::Inventory => {
+                        match scene_data.player.inventory.current() {
+                            Some(Item::Log) => {
+                                self.change_state = Some(InputState::Log);
+                            },
+                            _ => (),
+                        }
+                    },
+                    Mode::Crafting => {
+                        let ref crafts = &self.craft_area.storage();
+                        let products = Receipe::receipe_match(crafts, &scene_data.receipes);
+                        if let Some(receipe) = products.get(0) {
+                            self.craft_area.clear();
+                            scene_data.player.inventory.insert(receipe.result.clone());
+                        }
+                    },
                 }
             }
             _ => ()
@@ -81,8 +133,9 @@ impl GameState for State {
     }
 
     fn draw(&mut self, scene_data: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
-        draw_selection_with_parameters(&scene_data.player.inventory, ctx, Position {x: 770, y: 20}, TextAlign::Left, true)?;
-        draw_selection_with_parameters(&self.craft_area, ctx, Position {x: 580, y: 20}, TextAlign::Left, false)?;
+        let cursor = self.mode == Mode::Inventory;
+        draw_selection_with_parameters(&scene_data.player.inventory, ctx, Position {x: 770, y: 20}, TextAlign::Left, cursor)?;
+        draw_selection_with_parameters(&self.craft_area, ctx, Position {x: 580, y: 20}, TextAlign::Left, !cursor)?;
 
         Ok(())
     }

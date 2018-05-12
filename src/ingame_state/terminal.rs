@@ -4,7 +4,8 @@ use ggez::event::{Keycode, Mod};
 use app_state::{draw_text, draw_input_state};
 use app_state::ingame::{SceneData, InputState};
 use ingame_state::GameState;
-use constants::TERMINAL_LIMIT;
+
+const TERMINAL_LIMIT: usize = 20;
 
 pub struct State {
     terminal_text: Option<String>,

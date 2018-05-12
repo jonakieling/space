@@ -110,7 +110,8 @@ pub fn _static_ship_tech_2_1(scene_data: &mut SceneData) {
         terminal: Box::new(Terminal {
             text: Box::new(String::new()),
             front: Direction::Down
-        })
+        }),
+        log: SelectionStorage::new()
     };
     scene_data.player = player;
 
