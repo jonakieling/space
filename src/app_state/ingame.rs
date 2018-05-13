@@ -29,7 +29,8 @@ pub enum InputState {
     Menu,
     Npc,
     NpcTrade,
-    Log
+    Log,
+    Storage
 }
 
 pub struct SceneData {
@@ -42,6 +43,7 @@ pub struct SceneData {
     pub circuitry: PositionLevelStorage<Circuitry>,
     pub generators: PositionLevelStorage<Generator>,
     pub npc: PositionLevelStorage<Npc>,
+    pub storages: PositionLevelStorage<Storage>,
     pub receipes: Vec<Receipe>,
     pub dialog: Node<DialogItem>,
     pub insight_view: bool,
@@ -94,6 +96,7 @@ impl Scene {
         let circuitry = <PositionLevelStorage<Circuitry>>::new();
         let generators = <PositionLevelStorage<Generator>>::new();
         let npc = <PositionLevelStorage<Npc>>::new();
+        let storages = <PositionLevelStorage<Storage>>::new();
         
         let mut receipes = Vec::new();
         receipes.push(
@@ -113,6 +116,7 @@ impl Scene {
             circuitry,
             generators,
             npc,
+            storages,
             receipes,
             dialog: Node {
                 value: DialogItem {
@@ -151,6 +155,10 @@ impl SceneData {
         }
 
         if let Some(_) = self.generators.get(self.player.front_tile) {
+            found_collision = true;
+        }
+
+        if let Some(_) = self.storages.get(self.player.front_tile) {
             found_collision = true;
         }
 
@@ -228,6 +236,14 @@ impl SceneData {
                     }
                 }
             }
+        }
+    }
+
+    pub fn current_storage(&mut self) -> Option<&mut Storage>{
+        if let Some(current_storage) = self.storages.get_mut(self.player.front_tile) {
+            Some(current_storage)
+        } else {
+            None
         }
     }
 
@@ -358,6 +374,12 @@ impl event::EventHandler for Scene {
         for (pos, generator) in self.data.generators.iter().enumerate() {
             if let &Some(_) = generator {
                 Generator::draw(pos as i32, ctx)?;
+            }
+        }
+
+        for (pos, item) in self.data.storages.iter().enumerate() {
+            if let &Some(ref storage) = item {
+                storage.draw(pos as i32, ctx)?;
             }
         }
 

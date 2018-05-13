@@ -48,6 +48,10 @@ impl State {
         if let Some(npc) = scene_data.npc.get(self.edit_cursor) {
             selection_storage.insert(npc.name.clone());
         }
+        
+        if let Some(_) = scene_data.storages.get(self.edit_cursor) {
+            selection_storage.insert("Storage".to_string());
+        }
 
         if self.edit_cursor.x == scene_data.player.position.x && self.edit_cursor.y == scene_data.player.position.y {
             selection_storage.insert("Player".to_string());
@@ -99,6 +103,7 @@ impl GameState for State {
                 scene_data.terminals.remove(self.edit_cursor);
                 scene_data.circuitry.remove(self.edit_cursor);
                 scene_data.generators.remove(self.edit_cursor);
+                scene_data.storages.remove(self.edit_cursor);
                 scene_data.update_power();
             },
             Keycode::W => {
@@ -111,6 +116,9 @@ impl GameState for State {
             Keycode::G => {
                 scene_data.generators.insert(self.edit_cursor, Generator {});
                 scene_data.update_power();
+            },
+            Keycode::S => {
+                scene_data.storages.insert(self.edit_cursor, Storage { content: SelectionStorage::new() });
             },
             Keycode::D => {
                 scene_data.doors.insert(self.edit_cursor, Door { status: DoorStatus::Closed});

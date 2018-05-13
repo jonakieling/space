@@ -28,18 +28,18 @@ impl GameState for State {
         }
     }
 
-    fn key_up_event(&mut self, scene: &mut SceneData, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, scene_data: &mut SceneData, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match keycode {
             Keycode::Escape => {
                 self.change_state = Some(InputState::World);
             },
             Keycode::Up => {
-                if let Some(current_circuitry) = scene.current_circuitry() {
+                if let Some(current_circuitry) = scene_data.current_circuitry() {
                     current_circuitry.parts.prev();
                 }
             },
             Keycode::Down => {
-                if let Some(current_circuitry) = scene.current_circuitry() {
+                if let Some(current_circuitry) = scene_data.current_circuitry() {
                     current_circuitry.parts.next();
                 }
             },
@@ -47,14 +47,14 @@ impl GameState for State {
         }
     }
 
-    fn draw(&mut self, scene: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, scene_data: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
 
         draw_input_state("Circuitry", ctx)?;
-        draw_selection(&scene.current_circuitry().unwrap().parts, ctx, true)?;
+        draw_selection(&scene_data.current_circuitry().unwrap().parts, ctx, true)?;
 
-        if !scene.insight_view {
-            let front_index = scene.player.front_tile.to_int();
-            if let Some(circuitry) = scene.current_circuitry() {
+        if !scene_data.insight_view {
+            let front_index = scene_data.player.front_tile.to_int();
+            if let Some(circuitry) = scene_data.current_circuitry() {
                 circuitry.draw(front_index as i32, ctx)?;
             }
         }

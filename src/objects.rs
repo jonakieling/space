@@ -194,13 +194,20 @@ impl Npc {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct LogEntry {
-	pub title: String,
-	pub message: String
+pub struct Storage {
+	pub content: SelectionStorage<Item>
 }
 
-impl ToString for LogEntry {
-    fn to_string(&self) -> String {
-        self.title.clone()
-    }
+impl Storage {
+    pub fn draw(&self, pos: i32, ctx: &mut Context) -> GameResult<()> {
+	    let x = pos % LEVEL_SIZE;
+	    let y = pos / LEVEL_SIZE;
+	    graphics::set_color(ctx, graphics::Color{r: 0.05, g: 0.05, b: 0.05, a: 1.0,})?;
+	    graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32 + 2.0, (y * GRID_SIZE) as f32 + 2.0, 17.0, 17.0))?;
+
+	    graphics::set_color(ctx, graphics::Color{r: 0.3, g: 0.3, b: 0.3, a: 1.0,})?;
+	    graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 4.0, (y * GRID_SIZE) as f32 + 4.0, 13.0, 13.0))?;
+
+	    Ok(())
+	}
 }

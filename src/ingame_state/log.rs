@@ -5,7 +5,7 @@ use app_state::{draw_text, draw_input_state, draw_selection_with_parameters};
 use app_state::ingame::{SceneData, InputState};
 use ingame_state::GameState;
 use misc::{Position, TextAlign};
-use objects::LogEntry;
+use player::LogEntry;
 
 const LOG_TITLE_LIMIT: usize = 10;
 const LOG_MESSAGE_LIMIT: usize = 20;

@@ -10,6 +10,7 @@ pub mod menu;
 pub mod npc;
 pub mod npc_trade;
 pub mod log;
+pub mod storage;
 
 pub trait GameState {
     fn change_state(&mut self) -> Option<Box<GameState>> { None }

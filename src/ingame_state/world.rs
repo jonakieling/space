@@ -38,6 +38,12 @@ impl State {
         }
     }
 
+    fn interact_with_storage(&mut self, scene_data: &mut SceneData) {
+        if let Some(_) = scene_data.storages.get_mut(scene_data.player.front_tile) {
+            self.change_state = Some(InputState::Storage);
+        }
+    }
+
     fn interact_with_terminal(&mut self, scene_data: &mut SceneData) {
         if let Some(ref terminal) = scene_data.terminals.get_mut(scene_data.player.front_tile) {
             let terminal_front_tile = &terminal.front.value() + &scene_data.player.front_tile;
@@ -79,6 +85,10 @@ impl GameState for State {
             Some(InputState::Circuitry) => {
                 self.change_state = None;
                 Some(Box::new(super::circuitry::State::new()))
+            },
+            Some(InputState::Storage) => {
+                self.change_state = None;
+                Some(Box::new(super::storage::State::new()))
             },
             _ => None,
         }
@@ -142,6 +152,7 @@ impl GameState for State {
                 if scene_data.insight_view {
                     self.interact_with_circuitry(scene_data);
                 } else {
+                    self.interact_with_storage(scene_data);
                     self.interact_with_terminal(scene_data);
                     self.interact_with_npc(scene_data);
                     scene_data.interact_with_door();

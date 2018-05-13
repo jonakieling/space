@@ -77,6 +77,17 @@ pub fn save_scene(scene_data: &SceneData, filename: &str) {
     let bytes: Vec<u8> = bincode::serialize(&level_circuitry).unwrap();
     File::create("temp-save/circuitry.bin").unwrap().write_all(&bytes).unwrap();
 
+    let mut level_storages: Vec<(i32, i32, Storage)> = vec![];
+    for (pos, item) in scene_data.storages.iter().enumerate() {
+        if let Some(ref storage) = *item {
+            let x = pos as i32 % LEVEL_SIZE;
+            let y = pos as i32 / LEVEL_SIZE;
+            level_storages.push((x, y, storage.clone()));
+        }
+    }
+    let bytes: Vec<u8> = bincode::serialize(&level_storages).unwrap();
+    File::create("temp-save/storages.bin").unwrap().write_all(&bytes).unwrap();
+
     let mut level_generators: Vec<(i32, i32, Generator)> = vec![];
     for (pos, item) in scene_data.generators.iter().enumerate() {
         if let Some(ref generator) = *item {
@@ -147,6 +158,12 @@ pub fn load_scene(scene_data: &mut SceneData, filename: &str) {
                     let level_circuitry: Vec<(i32, i32, Circuitry)> = bincode::deserialize_from(file).unwrap();
                     for circuitry in level_circuitry {
                         scene_data.circuitry.insert(Position {x: circuitry.0, y: circuitry.1}, circuitry.2);
+                    }
+                },
+                "storages" => {
+                    let level_storages: Vec<(i32, i32, Storage)> = bincode::deserialize_from(file).unwrap();
+                    for storage in level_storages {
+                        scene_data.storages.insert(Position {x: storage.0, y: storage.1}, storage.2);
                     }
                 },
                 "generators" => {

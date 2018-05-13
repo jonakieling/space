@@ -3,8 +3,20 @@ use ggez::Context;
 use ggez::graphics;
 
 use misc::{Position, Direction};
-use objects::{Item, Terminal, LogEntry};
+use objects::{Item, Terminal};
 use storage::SelectionStorage;
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct LogEntry {
+	pub title: String,
+	pub message: String
+}
+
+impl ToString for LogEntry {
+    fn to_string(&self) -> String {
+        self.title.clone()
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Player {
