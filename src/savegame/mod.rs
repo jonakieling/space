@@ -10,7 +10,7 @@ use constants::LEVEL_SIZE;
 use app_state::ingame::*;
 use player::Player;
 use objects::*;
-use misc::Position;
+use misc::{Position, Direction};
 use storage::{Tree, SelectionStorage};
 use dialog::*;
 
@@ -201,7 +201,7 @@ pub fn load_scene(scene_data: &mut SceneData, filename: &str) {
     
 }
 
-pub fn insert_walls(scene_data: &mut SceneData, walls: &Vec<(i32, i32)>) {
+pub fn insert_walls(scene_data: &mut SceneData, walls: Vec<(i32, i32)>) {
     for wall in walls {
         scene_data.walls.insert(
             Position { x: wall.0, y: wall.1 },
@@ -210,7 +210,7 @@ pub fn insert_walls(scene_data: &mut SceneData, walls: &Vec<(i32, i32)>) {
     }
 }
 
-pub fn insert_generator(scene_data: &mut SceneData, generators: &Vec<(i32, i32)>) {
+pub fn insert_generator(scene_data: &mut SceneData, generators: Vec<(i32, i32)>) {
     for generator in generators {
         scene_data.generators.insert(
             Position { x: generator.0, y: generator.1 },
@@ -219,16 +219,18 @@ pub fn insert_generator(scene_data: &mut SceneData, generators: &Vec<(i32, i32)>
     }
 }
 
-pub fn insert_cicuitry(scene_data: &mut SceneData, circuitry: &Vec<(i32, i32)>) {
+pub fn insert_circuitry(scene_data: &mut SceneData, circuitry: Vec<(i32, i32)>) {
+    let mut parts = SelectionStorage::new();
+    parts.insert(Item::PowerConductor);
     for circuit in circuitry {
         scene_data.circuitry.insert(
             Position { x: circuit.0, y: circuit.1 },
-            Circuitry { parts: SelectionStorage::new(), powered: false }
+            Circuitry { parts: parts.clone(), powered: false }
         );
     }
 }
 
-pub fn insert_storage(scene_data: &mut SceneData, storages: &Vec<(i32, i32)>) {
+pub fn insert_storage(scene_data: &mut SceneData, storages: Vec<(i32, i32)>) {
     for storage in storages {
         scene_data.storages.insert(
             Position { x: storage.0, y: storage.1 },
@@ -237,11 +239,33 @@ pub fn insert_storage(scene_data: &mut SceneData, storages: &Vec<(i32, i32)>) {
     }
 }
 
-pub fn insert_doors(scene_data: &mut SceneData, doors: &Vec<(i32, i32, DoorStatus)>) {
+pub fn insert_doors(scene_data: &mut SceneData, doors: Vec<(i32, i32, DoorStatus)>) {
     for door in doors {
         scene_data.doors.insert(
             Position { x: door.0, y: door.1 },
             Door { status: door.2 }
         );
     }
+}
+
+pub fn insert_player(scene_data: &mut SceneData, pos: (i32, i32), dir: Direction, inv: Vec<Item>) {
+    let player_position = Position::new(pos.0, pos.1);
+    let player_front_tile = &dir.value() + &player_position;
+    let mut inventory = <SelectionStorage<Item>>::new();
+    for item in inv {
+        inventory.insert(item);
+    }
+    let player = Player {
+        position: player_position,
+        movement: vec![],
+        direction: dir,
+        front_tile: player_front_tile,
+        inventory,
+        terminal: Box::new(Terminal {
+            text: Box::new(String::new()),
+            front: Direction::Down
+        }),
+        log: SelectionStorage::new()
+    };
+    scene_data.player = player;
 }

@@ -15,6 +15,7 @@ pub struct Scene {
 #[derive(Clone, Debug)]
 enum SaveType {
     File(String),
+    DevNpc,
     DevShip,
     DevStation,
     Empty
@@ -24,6 +25,7 @@ impl ToString for SaveType {
     fn to_string(&self) -> String {
         match self {
             &SaveType::Empty => "Empty".to_string(),
+            &SaveType::DevNpc => "DevNpc".to_string(),
             &SaveType::DevShip => "DevShip".to_string(),
             &SaveType::DevStation => "DevStation".to_string(),
             &SaveType::File(ref file) => file.clone(),
@@ -48,6 +50,7 @@ impl Scene {
         }
 
         menu.saves.insert(SaveType::Empty);
+        menu.saves.insert(SaveType::DevNpc);
         menu.saves.insert(SaveType::DevShip);
         menu.saves.insert(SaveType::DevStation);
 
@@ -64,9 +67,14 @@ impl AppState for Scene {
                     savegame::static_levels::empty(&mut world.data);
                     Some(Box::new(world))
                 },
+                SaveType::DevNpc => {
+                    let mut world = ingame::Scene::new().unwrap();
+                    savegame::static_levels::static_empty_npc(&mut world.data);
+                    Some(Box::new(world))
+                },
                 SaveType::DevShip => {
                     let mut world = ingame::Scene::new().unwrap();
-                    savegame::static_levels::static_ship_tech_2_1(&mut world.data);
+                    savegame::static_levels::static_ship_tech(&mut world.data);
                     Some(Box::new(world))
                 },
                 SaveType::DevStation => {
