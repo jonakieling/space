@@ -146,11 +146,11 @@ pub struct Receipe {
 }
 
 impl Receipe {
-	pub fn receipes_as_incredient<'a>(item: &Item, receipes: &'a Vec<Receipe>) -> Vec<&'a Receipe> {
+	pub fn _receipes_as_incredient<'a>(item: &Item, receipes: &'a Vec<Receipe>) -> Vec<&'a Receipe> {
 		receipes.iter().filter(|receipe| receipe.incredients.contains(item)).collect()
 	}
 	
-	pub fn from_item<'a>(item: &Item, receipes: &'a Vec<Receipe>) -> Option<&'a Receipe> {
+	pub fn _from_item<'a>(item: &Item, receipes: &'a Vec<Receipe>) -> Option<&'a Receipe> {
 		receipes.iter().filter(|receipe| receipe.result == *item).next()
 	}
 
