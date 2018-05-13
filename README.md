@@ -49,9 +49,9 @@ thoughts before implmentation.
 parts
 -----
 
-* stations
+* stations (✓ just levels)
 * objects (✓)
-* ships
+* ships (✓ just levels)
 * npc (✓)
 
 interaction
