@@ -11,7 +11,7 @@ use app_state::ingame::*;
 use player::Player;
 use objects::*;
 use misc::Position;
-use storage::Tree;
+use storage::{Tree, SelectionStorage};
 use dialog::*;
 
 pub mod static_levels;
@@ -199,4 +199,49 @@ pub fn load_scene(scene_data: &mut SceneData, filename: &str) {
         static_levels::empty(scene_data);
     }
     
+}
+
+pub fn insert_walls(scene_data: &mut SceneData, walls: &Vec<(i32, i32)>) {
+    for wall in walls {
+        scene_data.walls.insert(
+            Position { x: wall.0, y: wall.1 },
+            Wall { }
+        );
+    }
+}
+
+pub fn insert_generator(scene_data: &mut SceneData, generators: &Vec<(i32, i32)>) {
+    for generator in generators {
+        scene_data.generators.insert(
+            Position { x: generator.0, y: generator.1 },
+            Generator { }
+        );
+    }
+}
+
+pub fn insert_cicuitry(scene_data: &mut SceneData, circuitry: &Vec<(i32, i32)>) {
+    for circuit in circuitry {
+        scene_data.circuitry.insert(
+            Position { x: circuit.0, y: circuit.1 },
+            Circuitry { parts: SelectionStorage::new(), powered: false }
+        );
+    }
+}
+
+pub fn insert_storage(scene_data: &mut SceneData, storages: &Vec<(i32, i32)>) {
+    for storage in storages {
+        scene_data.storages.insert(
+            Position { x: storage.0, y: storage.1 },
+            Storage { content: SelectionStorage::new() }
+        );
+    }
+}
+
+pub fn insert_doors(scene_data: &mut SceneData, doors: &Vec<(i32, i32, DoorStatus)>) {
+    for door in doors {
+        scene_data.doors.insert(
+            Position { x: door.0, y: door.1 },
+            Door { status: door.2 }
+        );
+    }
 }
