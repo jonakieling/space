@@ -61,6 +61,10 @@ impl<T: Clone + Debug> PositionLevelStorage<T> {
         }
     }
 
+    pub fn clear(&mut self) {
+        self.storage.clear()
+    }
+
     pub fn iter(&self) -> slice::Iter<Option<T>> {
         self.storage.iter()
     }

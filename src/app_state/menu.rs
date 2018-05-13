@@ -8,8 +8,27 @@ use savegame;
 use app_state::ingame;
 
 pub struct Scene {
-	saves: SelectionStorage<String>,
-    loading: Option<String>
+	saves: SelectionStorage<SaveType>,
+    loading: Option<SaveType>
+}
+
+#[derive(Clone, Debug)]
+enum SaveType {
+    File(String),
+    DevShip,
+    DevStation,
+    Empty
+}
+
+impl ToString for SaveType {
+    fn to_string(&self) -> String {
+        match self {
+            &SaveType::Empty => "Empty".to_string(),
+            &SaveType::DevShip => "DevShip".to_string(),
+            &SaveType::DevStation => "DevStation".to_string(),
+            &SaveType::File(ref file) => file.clone(),
+        }
+    }
 }
 
 impl Scene {
@@ -19,25 +38,18 @@ impl Scene {
             loading: None
     	};
 
-        for entry in fs::read_dir("levels")? {
-            let dir = entry?;
-            if let Some(extension) = dir.path().extension() {
-                if extension == "tar" {
-                    menu.saves.insert(String::from(dir.path().to_str().unwrap()));
-                }
-            }
-        }
-
         for entry in fs::read_dir("saves")? {
             let dir = entry?;
             if let Some(extension) = dir.path().extension() {
                 if extension == "tar" {
-                    menu.saves.insert(String::from(dir.path().to_str().unwrap()));
+                    menu.saves.insert(SaveType::File(String::from(dir.path().to_str().unwrap())));
                 }
             }
         }
 
-        menu.saves.insert("empty".to_string());
+        menu.saves.insert(SaveType::Empty);
+        menu.saves.insert(SaveType::DevShip);
+        menu.saves.insert(SaveType::DevStation);
 
     	Ok(menu)
     }
@@ -46,14 +58,27 @@ impl Scene {
 impl AppState for Scene {
     fn change_state(&self) -> Option<Box<AppState>> {
         if let Some(ref savegame) = self.loading {
-            if savegame == "empty" {
-                let mut world = ingame::Scene::new().unwrap();
-                savegame::static_levels::static_level0(&mut world.data);
-                Some(Box::new(world))
-            } else {
-                let mut world = ingame::Scene::new().unwrap();
-                savegame::load_scene(&mut world.data, savegame);
-                Some(Box::new(world))
+            match savegame {
+                SaveType::Empty => {
+                    let mut world = ingame::Scene::new().unwrap();
+                    savegame::static_levels::empty(&mut world.data);
+                    Some(Box::new(world))
+                },
+                SaveType::DevShip => {
+                    let mut world = ingame::Scene::new().unwrap();
+                    savegame::static_levels::static_ship_tech_2_1(&mut world.data);
+                    Some(Box::new(world))
+                },
+                SaveType::DevStation => {
+                    let mut world = ingame::Scene::new().unwrap();
+                    savegame::static_levels::static_station_outpost(&mut world.data);
+                    Some(Box::new(world))
+                },
+                SaveType::File(savefile) => {
+                    let mut world = ingame::Scene::new().unwrap();
+                    savegame::load_scene(&mut world.data, savefile);
+                    Some(Box::new(world))
+                },
             }
         } else {
             None

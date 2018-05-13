@@ -129,6 +129,9 @@ pub fn save_scene(scene_data: &SceneData, filename: &str) {
 
 pub fn load_scene(scene_data: &mut SceneData, filename: &str) {
     if let Ok(file) = File::open(filename) {
+
+        scene_data.clear();
+
         let mut a = Archive::new(file);
 
         for file in a.entries().unwrap() {
@@ -193,7 +196,7 @@ pub fn load_scene(scene_data: &mut SceneData, filename: &str) {
         }
         println!("game loaded: from file {}", filename);
     } else {
-        static_levels::static_level0(scene_data);
+        static_levels::empty(scene_data);
     }
     
 }

@@ -108,7 +108,7 @@ impl Scene {
 
         let mut data = SceneData {
             movement_timer: Duration::from_millis(0),
-            backdrop: String::from("/none.png"),
+            backdrop: String::from(""),
             player,
             walls,
             doors,
@@ -143,6 +143,15 @@ impl Scene {
 }
 
 impl SceneData {
+    pub fn clear(&mut self) {
+        self.walls.clear();
+        self.doors.clear();
+        self.terminals.clear();
+        self.circuitry.clear();
+        self.generators.clear();
+        self.storages.clear();
+    }
+
     pub fn check_player_collision(&self) -> bool {
         let mut found_collision = false;
 
@@ -332,24 +341,26 @@ impl event::EventHandler for Scene {
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx);
 
-        graphics::set_color(ctx, graphics::WHITE)?;
-        let mut backdrop = graphics::Image::new(ctx, &self.data.backdrop)?;
-        backdrop.set_filter(graphics::FilterMode::Nearest);
+        if self.data.backdrop != "" {
+            graphics::set_color(ctx, graphics::WHITE)?;
+            let mut backdrop = graphics::Image::new(ctx, &self.data.backdrop)?;
+            backdrop.set_filter(graphics::FilterMode::Nearest);
 
-        let dst = graphics::Point2::new(20.0, 20.0);
-        graphics::draw_ex(
-            ctx,
-            &backdrop,
-            graphics::DrawParam {
-                // src: src,
-                dest: dst,
-                rotation: 0.0,
-                // offset: Point2::new(-16.0, 0.0),
-                scale: graphics::Point2::new(GRID_SIZE as f32, GRID_SIZE as f32),
-                // shear: shear,
-                ..Default::default()
-            },
-        )?;
+            let dst = graphics::Point2::new(20.0, 20.0);
+            graphics::draw_ex(
+                ctx,
+                &backdrop,
+                graphics::DrawParam {
+                    // src: src,
+                    dest: dst,
+                    rotation: 0.0,
+                    // offset: Point2::new(-16.0, 0.0),
+                    scale: graphics::Point2::new(GRID_SIZE as f32, GRID_SIZE as f32),
+                    // shear: shear,
+                    ..Default::default()
+                },
+            )?;
+        }
 
         graphics::set_color(ctx, graphics::BLACK)?;
 
