@@ -353,17 +353,14 @@ impl event::EventHandler for Scene {
             let mut backdrop = graphics::Image::new(ctx, &self.data.backdrop)?;
             backdrop.set_filter(graphics::FilterMode::Nearest);
 
-            let dst = graphics::Point2::new(24.0, 24.0);
+            let dst = graphics::Point2::new(GRID_SIZE as f32, GRID_SIZE as f32);
             graphics::draw_ex(
                 ctx,
                 &backdrop,
                 graphics::DrawParam {
-                    // src: src,
                     dest: dst,
                     rotation: 0.0,
-                    // offset: Point2::new(-16.0, 0.0),
                     scale: graphics::Point2::new(GRID_SIZE as f32, GRID_SIZE as f32),
-                    // shear: shear,
                     ..Default::default()
                 },
             )?;

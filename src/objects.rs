@@ -4,7 +4,7 @@ use ggez::GameResult;
 use ggez::Context;
 use ggez::graphics;
 
-use constants::{LEVEL_SIZE, GRID_SIZE};
+use constants::{LEVEL_SIZE, GRID_SIZE, PIXEL_SCALE};
 use misc::{Direction};
 use storage::{SelectionStorage, Tree};
 use dialog::DialogItem;
@@ -136,11 +136,11 @@ impl Circuitry {
 	    let x = pos % LEVEL_SIZE;
 	    let y = pos / LEVEL_SIZE;
 	    graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 0.1,})?;
-	    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 3.0, (y * GRID_SIZE) as f32 + 3.0, 19.0, 19.0))?;
+	    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 3.0, (y * GRID_SIZE) as f32 + 3.0, GRID_SIZE as f32 - 5.0, GRID_SIZE as f32 - 5.0))?;
 	    if self.powered {
 	        graphics::set_color(ctx, graphics::Color{r: 0.5, g: 0.8, b: 0.5, a: 0.8,})?;
 	    }
-	    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 5.0, (y * GRID_SIZE) as f32 + 5.0, 15.0, 15.0))?;
+	    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 5.0, (y * GRID_SIZE) as f32 + 5.0, GRID_SIZE as f32 - 9.0, GRID_SIZE as f32 - 9.0))?;
 
 	    Ok(())
 	}
@@ -253,18 +253,18 @@ pub fn draw_tile(ctx: &mut Context, tile_src: &str, tile_dst: graphics::Point2, 
 		match direction {
 			Some(Direction::Up) => {
                 rotation = PI;
-				tile_dst = graphics::Point2::new(tile_dst.x + 24.0, tile_dst.y + 24.0);
+				tile_dst = graphics::Point2::new(tile_dst.x + GRID_SIZE as f32, tile_dst.y + GRID_SIZE as f32);
 			},
 			Some(Direction::Down) => {
                 rotation = 0.0;
 			},
 			Some(Direction::Left) => {
                 rotation = FRAC_PI_2;
-				tile_dst = graphics::Point2::new(tile_dst.x + 24.0, tile_dst.y);
+				tile_dst = graphics::Point2::new(tile_dst.x + GRID_SIZE as f32, tile_dst.y);
 			},
 			Some(Direction::Right) => {
                 rotation = 3.0 * FRAC_PI_2;
-				tile_dst = graphics::Point2::new(tile_dst.x, tile_dst.y + 24.0);
+				tile_dst = graphics::Point2::new(tile_dst.x, tile_dst.y + GRID_SIZE as f32);
 			},
 			_ => {
                 rotation = 0.0;
@@ -277,7 +277,7 @@ pub fn draw_tile(ctx: &mut Context, tile_src: &str, tile_dst: graphics::Point2, 
 			graphics::DrawParam {
 				dest: tile_dst,
 				rotation: rotation,
-				scale: graphics::Point2::new(3.0, 3.0),
+				scale: graphics::Point2::new(PIXEL_SCALE as f32, PIXEL_SCALE as f32),
 				..Default::default()
 			},
 		)?;
