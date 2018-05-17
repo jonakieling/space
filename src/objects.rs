@@ -1,22 +1,60 @@
+use std::f32::consts::{PI, FRAC_PI_2};
+
 use ggez::GameResult;
 use ggez::Context;
 use ggez::graphics;
 
 use constants::{LEVEL_SIZE, GRID_SIZE};
-use misc::Direction;
+use misc::{Direction};
 use storage::{SelectionStorage, Tree};
 use dialog::DialogItem;
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
-pub struct Wall { }
+pub enum WallType {
+	Wall,
+	Corner,
+	T,
+	Cross
+}
+
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
+pub struct Wall {
+	pub wall_type: WallType,
+	pub face: Direction
+}
 
 impl Wall {
-	pub fn draw(pos: i32, ctx: &mut Context) -> GameResult<()> {
-	    let x = pos % LEVEL_SIZE;
-	    let y = pos / LEVEL_SIZE;
-	    graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
+	pub fn draw(&self, pos: i32, ctx: &mut Context) -> GameResult<()> {
+	    let x = pos % LEVEL_SIZE * GRID_SIZE;
+	    let y = pos / LEVEL_SIZE * GRID_SIZE;
 
-	    Ok(())
+		let image_src;
+		match self.wall_type {
+			WallType::Corner => {
+				image_src = "/corner.png";
+			},
+			_ => {
+				image_src = "/wall.png";
+			}
+		}
+
+		let dst = graphics::Point2::new(x as f32, y as f32);
+
+        draw_tile(ctx, image_src, dst, Some(self.face))
+	}
+}
+
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
+pub struct Floor { }
+
+impl Floor {
+	pub fn draw(pos: i32, ctx: &mut Context) -> GameResult<()> {
+	    let x = pos % LEVEL_SIZE * GRID_SIZE;
+	    let y = pos / LEVEL_SIZE * GRID_SIZE;
+
+		let dst = graphics::Point2::new(x as f32, y as f32);
+		
+        draw_tile(ctx, "/floor.png", dst, None)
 	}
 }
 
@@ -28,25 +66,29 @@ pub enum DoorStatus {
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 pub struct Door {
-    pub status: DoorStatus
+    pub status: DoorStatus,
+	pub face: Direction
 }
 
 impl Door {
     pub fn draw(&self, pos: i32, ctx: &mut Context) -> GameResult<()> {
-	    let x = pos % LEVEL_SIZE;
-	    let y = pos / LEVEL_SIZE;
-	    match self.status {
-	        DoorStatus::Open => {
-	            graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
-	            graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
-	        },
-	        DoorStatus::Closed => {
-	            graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 1.0,})?;
-	            graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
-	        },
-	    }
+	    let x = pos % LEVEL_SIZE * GRID_SIZE;
+	    let y = pos / LEVEL_SIZE * GRID_SIZE;
 
-	    Ok(())
+		graphics::set_color(ctx, graphics::WHITE)?;
+		let image_src;
+		match self.status {
+			DoorStatus::Open => {
+				image_src = "/floor.png";
+			},
+			DoorStatus::Closed => {
+				image_src = "/door.png";
+			}
+		}
+
+		let dst = graphics::Point2::new(x as f32, y as f32);
+		
+        draw_tile(ctx, &image_src, dst, Some(self.face))
 	}
 }
 
@@ -58,35 +100,12 @@ pub struct Terminal {
 
 impl Terminal {
     pub fn draw(&self, pos: i32, ctx: &mut Context) -> GameResult<()> {
-	    let x = pos % LEVEL_SIZE;
-	    let y = pos / LEVEL_SIZE;
-	    graphics::set_color(ctx, graphics::BLACK)?;
-	    graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0))?;
-	    graphics::set_color(ctx, graphics::Color{r: 0.5, g: 0.8, b: 0.5, a: 1.0,})?;
-	    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 21.0))?;
-	    match self.front {
-	        Direction::Up => {
-	            let front = graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 21.0, 3.0);
-	            graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
-	        },
-	        Direction::Down => {
-	            let front = graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32 + (self.front.value().y as f32 * 17.0), 21.0, 4.0);
-	            graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
-	            
-	        },
-	        Direction::Right => {
-	            let front = graphics::Rect::new((x * GRID_SIZE) as f32 + (self.front.value().x as f32 * 17.0), (y * GRID_SIZE) as f32 + (self.front.value().y as f32), 4.0, 21.0);
-	            graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
-	            
-	        },
-	        Direction::Left => {
-	            let front = graphics::Rect::new((x * GRID_SIZE) as f32 + (self.front.value().x as f32), (y * GRID_SIZE) as f32 + (self.front.value().y as f32), 4.0, 21.0);
-	            graphics::rectangle(ctx, graphics::DrawMode::Fill, front)?;
-	            
-	        },
-	    }
+	    let x = pos % LEVEL_SIZE * GRID_SIZE;
+	    let y = pos / LEVEL_SIZE * GRID_SIZE;
 
-	    Ok(())
+		let dst = graphics::Point2::new(x as f32, y as f32);
+		
+        draw_tile(ctx, "/terminal.png", dst, Some(self.front))
 	}
 }
 
@@ -101,30 +120,29 @@ impl Circuitry {
 	    let x = pos % LEVEL_SIZE;
 	    let y = pos / LEVEL_SIZE;
 	    graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 0.1,})?;
-	    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 3.0, (y * GRID_SIZE) as f32 + 3.0, 15.0, 15.0))?;
+	    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 3.0, (y * GRID_SIZE) as f32 + 3.0, 19.0, 19.0))?;
 	    if self.powered {
 	        graphics::set_color(ctx, graphics::Color{r: 0.5, g: 0.8, b: 0.5, a: 0.8,})?;
 	    }
-	    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 5.0, (y * GRID_SIZE) as f32 + 5.0, 11.0, 11.0))?;
+	    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 5.0, (y * GRID_SIZE) as f32 + 5.0, 15.0, 15.0))?;
 
 	    Ok(())
 	}
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct Generator { }
+pub struct Generator {
+	pub face: Direction
+}
 
 impl Generator {
-    pub fn draw(pos: i32, ctx: &mut Context) -> GameResult<()> {
-	    let x = pos % LEVEL_SIZE;
-	    let y = pos / LEVEL_SIZE;
-	    graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 0.1,})?;
-	    graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32 + 3.0, (y * GRID_SIZE) as f32 + 3.0, 15.0, 15.0))?;
-
-	    graphics::set_color(ctx, graphics::Color{r: 0.8, g: 1.0, b: 0.8, a: 1.0,})?;
-	    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 5.0, (y * GRID_SIZE) as f32 + 5.0, 11.0, 11.0))?;
-
-	    Ok(())
+    pub fn draw(&self, pos: i32, ctx: &mut Context) -> GameResult<()> {
+	    let x = pos % LEVEL_SIZE * GRID_SIZE;
+	    let y = pos / LEVEL_SIZE * GRID_SIZE;
+		
+		let dst = graphics::Point2::new(x as f32, y as f32);
+		
+        draw_tile(ctx, "/generator.png", dst, Some(self.face))
 	}
 }
 
@@ -195,19 +213,58 @@ impl Npc {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Storage {
-	pub content: SelectionStorage<Item>
+	pub content: SelectionStorage<Item>,
+	pub face:Direction
 }
 
 impl Storage {
     pub fn draw(&self, pos: i32, ctx: &mut Context) -> GameResult<()> {
-	    let x = pos % LEVEL_SIZE;
-	    let y = pos / LEVEL_SIZE;
-	    graphics::set_color(ctx, graphics::Color{r: 0.05, g: 0.05, b: 0.05, a: 1.0,})?;
-	    graphics::rectangle(ctx, graphics::DrawMode::Fill, graphics::Rect::new((x * GRID_SIZE) as f32 + 2.0, (y * GRID_SIZE) as f32 + 2.0, 17.0, 17.0))?;
+	    let x = pos % LEVEL_SIZE * GRID_SIZE;
+	    let y = pos / LEVEL_SIZE * GRID_SIZE;
+		
+		let dst = graphics::Point2::new(x as f32, y as f32);
 
-	    graphics::set_color(ctx, graphics::Color{r: 0.3, g: 0.3, b: 0.3, a: 1.0,})?;
-	    graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 4.0, (y * GRID_SIZE) as f32 + 4.0, 13.0, 13.0))?;
+        draw_tile(ctx, "/storage.png", dst, Some(self.face))
+	}
+}
+
+pub fn draw_tile(ctx: &mut Context, tile_src: &str, tile_dst: graphics::Point2, direction: Option<Direction>) -> GameResult<()> {
+		graphics::set_color(ctx, graphics::WHITE)?;
+		let mut storage_image = graphics::Image::new(ctx, tile_src)?;
+		storage_image.set_filter(graphics::FilterMode::Nearest);
+		let mut tile_dst = tile_dst;
+		let rotation;
+		match direction {
+			Some(Direction::Up) => {
+                rotation = PI;
+				tile_dst = graphics::Point2::new(tile_dst.x + 24.0, tile_dst.y + 24.0);
+			},
+			Some(Direction::Down) => {
+                rotation = 0.0;
+			},
+			Some(Direction::Left) => {
+                rotation = FRAC_PI_2;
+				tile_dst = graphics::Point2::new(tile_dst.x + 24.0, tile_dst.y);
+			},
+			Some(Direction::Right) => {
+                rotation = 3.0 * FRAC_PI_2;
+				tile_dst = graphics::Point2::new(tile_dst.x, tile_dst.y + 24.0);
+			},
+			_ => {
+                rotation = 0.0;
+			}
+		}
+		
+		graphics::draw_ex(
+			ctx,
+			&storage_image,
+			graphics::DrawParam {
+				dest: tile_dst,
+				rotation: rotation,
+				scale: graphics::Point2::new(3.0, 3.0),
+				..Default::default()
+			},
+		)?;
 
 	    Ok(())
-	}
 }

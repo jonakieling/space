@@ -77,19 +77,19 @@ pub fn static_station_outpost(scene_data: &mut SceneData) {
     scene_data.backdrop = String::from("");
 
     super::insert_walls(scene_data, vec![
-        (6, 8), (7, 8), (8, 8), (9, 8), (10, 8), (11, 8),
-        (6, 9),                                  (11, 9),
-        (6, 10),                                 (11, 10),
-        (6, 11),                                 (11, 11),
-        (6, 12),                                 (11, 12),(12, 12),(13, 12), (14, 12),
-        (6, 13),                                 (11, 13),                   (14, 13),
-        (6, 14),                                                    
-        (6, 15),                                 (11, 15),                   (14, 15),
-        (6, 16),(7, 16),(8, 16),(9, 16),(10, 16),(11, 16),(12, 16),(13, 16), (14, 16)       
+        (6, 8, WallType::Corner, Direction::Down), (7, 8, WallType::Wall, Direction::Down), (8, 8, WallType::Wall, Direction::Down), (9, 8, WallType::Wall, Direction::Down), (10, 8, WallType::Wall, Direction::Down), (11, 8, WallType::Corner, Direction::Down),
+        (6, 9, WallType::Wall, Direction::Left),                                  (11, 9, WallType::Wall, Direction::Right),
+        (6, 10, WallType::Wall, Direction::Left),                                 (11, 10, WallType::Wall, Direction::Right),
+        (6, 11, WallType::Wall, Direction::Left),                                 (11, 11, WallType::Wall, Direction::Right),
+        (6, 12, WallType::Wall, Direction::Left),                                 (11, 12, WallType::T, Direction::Left),(12, 12, WallType::Wall, Direction::Down),(13, 12, WallType::Wall, Direction::Down), (14, 12, WallType::Corner, Direction::Down),
+        (6, 13, WallType::Wall, Direction::Left),                                 (11, 13, WallType::Wall, Direction::Right),                   (14, 13, WallType::Wall, Direction::Right),
+        (6, 14, WallType::Wall, Direction::Left),                                                    
+        (6, 15, WallType::Wall, Direction::Left),                                 (11, 15, WallType::Wall, Direction::Right),                   (14, 15, WallType::Wall, Direction::Right),
+        (6, 16, WallType::Corner, Direction::Left),(7, 16, WallType::Wall, Direction::Up),(8, 16, WallType::Wall, Direction::Up),(9, 16, WallType::Wall, Direction::Up),(10, 16, WallType::Wall, Direction::Up),(11, 16, WallType::T, Direction::Up),(12, 16, WallType::Wall, Direction::Up),(13, 16, WallType::Wall, Direction::Up), (14, 16, WallType::Corner, Direction::Up)       
     ]);
 
     super::insert_doors(scene_data, vec![
-        (11, 14, DoorStatus::Closed)
+        (11, 14, DoorStatus::Closed, Direction::Left)
     ]);
 
     scene_data.terminals.insert(Position::new(14, 14), Terminal {
@@ -98,8 +98,8 @@ pub fn static_station_outpost(scene_data: &mut SceneData) {
     });
 
     super::insert_storage(scene_data, vec![
-        (7, 9),
-        (7, 10)
+        (7, 9, Direction::Right),
+        (7, 10, Direction::Right)
     ]);
 
     super::insert_player(scene_data, (9, 11), Direction::Down, vec![]);
@@ -111,25 +111,25 @@ pub fn static_ship_tech(scene_data: &mut SceneData) {
     scene_data.backdrop = String::from("/realm_of_sol__0000s_0001_2.1.png");
 
     super::insert_walls(scene_data, vec![
-        (6, 8), (7, 8), (8, 8), (9, 8), (10, 8),
-        (6, 9),                         (10, 9),
-        (6, 10),                        (10, 10),
-                (7, 11),        (9, 11),
-        (6, 12),                        (10, 12),
-        (6, 13),
-        (6, 14),                        (10, 14),
-        (6, 15),                        (10, 15),
-        (6, 16),                        (10, 16),
-        (6, 17),(7, 17),(8, 17),(9, 17),(10, 17)
+        (6, 8, WallType::Corner, Direction::Down), (7, 8, WallType::Wall, Direction::Down), (8, 8, WallType::Wall, Direction::Down), (9, 8, WallType::Wall, Direction::Down), (10, 8, WallType::Corner, Direction::Left),
+        (6, 9, WallType::Wall, Direction::Right),                         (10, 9, WallType::Wall, Direction::Left),
+        (6, 10, WallType::Wall, Direction::Right),                        (10, 10, WallType::Wall, Direction::Left),
+                (7, 11, WallType::Wall, Direction::Right),        (9, 11, WallType::Wall, Direction::Left),
+        (6, 12, WallType::Wall, Direction::Right),                        (10, 12, WallType::Wall, Direction::Left),
+        (6, 13, WallType::Wall, Direction::Right),
+        (6, 14, WallType::Wall, Direction::Right),                        (10, 14, WallType::Wall, Direction::Left),
+        (6, 15, WallType::Wall, Direction::Right),                        (10, 15, WallType::Wall, Direction::Left),
+        (6, 16, WallType::Wall, Direction::Right),                        (10, 16, WallType::Wall, Direction::Left),
+        (6, 17, WallType::Corner, Direction::Right),(7, 17, WallType::Wall, Direction::Up),(8, 17, WallType::Wall, Direction::Up),(9, 17, WallType::Wall, Direction::Up),(10, 17, WallType::Corner, Direction::Up)
     ]);
 
     super::insert_doors(scene_data, vec![
-        (8, 11, DoorStatus::Open),
-        (10, 13, DoorStatus::Closed)
+        (8, 11, DoorStatus::Open, Direction::Down),
+        (10, 13, DoorStatus::Closed, Direction::Left)
     ]);
 
     super::insert_generator(scene_data, vec![
-        (8, 15)
+        (8, 15, Direction::Down)
     ]);
 
     super::insert_circuitry(scene_data, vec![
@@ -152,8 +152,8 @@ pub fn static_ship_tech(scene_data: &mut SceneData) {
     scene_data.update_power();
 
     super::insert_storage(scene_data, vec![
-        (7, 12),
-        (7, 13)
+        (7, 12, Direction::Right),
+        (7, 13, Direction::Right)
     ]);
 
     scene_data.terminals.insert(Position::new(8, 9), Terminal {

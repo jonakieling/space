@@ -340,13 +340,14 @@ impl event::EventHandler for Scene {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx);
+        graphics::set_background_color(ctx, graphics::BLACK);
 
         if self.data.backdrop != "" {
-            graphics::set_color(ctx, graphics::WHITE)?;
+            graphics::set_color(ctx, graphics::Color{r: 1.0, g: 1.0, b: 1.0, a: 0.25})?;
             let mut backdrop = graphics::Image::new(ctx, &self.data.backdrop)?;
             backdrop.set_filter(graphics::FilterMode::Nearest);
 
-            let dst = graphics::Point2::new(20.0, 20.0);
+            let dst = graphics::Point2::new(24.0, 24.0);
             graphics::draw_ex(
                 ctx,
                 &backdrop,
@@ -364,9 +365,9 @@ impl event::EventHandler for Scene {
 
         graphics::set_color(ctx, graphics::BLACK)?;
 
-        for (pos, wall) in self.data.walls.iter().enumerate() {
-            if let &Some(_) = wall {
-                Wall::draw(pos as i32, ctx)?;
+        for (pos, item) in self.data.walls.iter().enumerate() {
+            if let &Some(wall) = item {
+                wall.draw(pos as i32, ctx)?;
             }
         }
 
@@ -382,9 +383,9 @@ impl event::EventHandler for Scene {
             }
         }
 
-        for (pos, generator) in self.data.generators.iter().enumerate() {
-            if let &Some(_) = generator {
-                Generator::draw(pos as i32, ctx)?;
+        for (pos, item) in self.data.generators.iter().enumerate() {
+            if let Some(generator) = item {
+                generator.draw(pos as i32, ctx)?;
             }
         }
 

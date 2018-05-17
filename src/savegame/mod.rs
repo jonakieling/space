@@ -201,20 +201,20 @@ pub fn load_scene(scene_data: &mut SceneData, filename: &str) {
     
 }
 
-pub fn insert_walls(scene_data: &mut SceneData, walls: Vec<(i32, i32)>) {
+pub fn insert_walls(scene_data: &mut SceneData, walls: Vec<(i32, i32, WallType, Direction)>) {
     for wall in walls {
         scene_data.walls.insert(
             Position { x: wall.0, y: wall.1 },
-            Wall { }
+            Wall { wall_type: wall.2, face: wall.3 }
         );
     }
 }
 
-pub fn insert_generator(scene_data: &mut SceneData, generators: Vec<(i32, i32)>) {
+pub fn insert_generator(scene_data: &mut SceneData, generators: Vec<(i32, i32, Direction)>) {
     for generator in generators {
         scene_data.generators.insert(
             Position { x: generator.0, y: generator.1 },
-            Generator { }
+            Generator { face: generator.2 }
         );
     }
 }
@@ -230,20 +230,20 @@ pub fn insert_circuitry(scene_data: &mut SceneData, circuitry: Vec<(i32, i32)>) 
     }
 }
 
-pub fn insert_storage(scene_data: &mut SceneData, storages: Vec<(i32, i32)>) {
+pub fn insert_storage(scene_data: &mut SceneData, storages: Vec<(i32, i32, Direction)>) {
     for storage in storages {
         scene_data.storages.insert(
             Position { x: storage.0, y: storage.1 },
-            Storage { content: SelectionStorage::new() }
+            Storage { content: SelectionStorage::new(), face: storage.2 }
         );
     }
 }
 
-pub fn insert_doors(scene_data: &mut SceneData, doors: Vec<(i32, i32, DoorStatus)>) {
+pub fn insert_doors(scene_data: &mut SceneData, doors: Vec<(i32, i32, DoorStatus, Direction)>) {
     for door in doors {
         scene_data.doors.insert(
             Position { x: door.0, y: door.1 },
-            Door { status: door.2 }
+            Door { status: door.2, face: door.3 }
         );
     }
 }

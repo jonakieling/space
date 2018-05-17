@@ -3,7 +3,7 @@ use ggez::Context;
 use ggez::graphics;
 
 use misc::{Position, Direction};
-use objects::{Item, Terminal};
+use objects::{Item, Terminal, draw_tile};
 use storage::SelectionStorage;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -65,13 +65,23 @@ impl Player {
     }
 
     pub fn draw(&self, ctx: &mut Context) -> GameResult<()> {
-        graphics::set_color(ctx, graphics::BLACK)?;
-        let player = graphics::Rect::new(self.position.viewport_x(), self.position.viewport_y(), 20.0, 20.0);
-        graphics::rectangle(ctx, graphics::DrawMode::Fill, player)?;
+		let image_src;
+		match self.direction {
+			Direction::Up => {
+				image_src = "/char-back.png";
+			},
+			Direction::Down => {
+				image_src = "/char-front.png";
+			},
+			Direction::Left => {
+				image_src = "/char-left.png";
+			},
+			Direction::Right => {
+				image_src = "/char-right.png";
+			}
+		}
 
-        graphics::set_color(ctx, graphics::WHITE)?;
-        let face = graphics::Rect::new(self.position.viewport_x() + 5.0 + (self.direction.value().viewport_x() * 0.2), self.position.viewport_y() + 5.0 + (self.direction.value().viewport_y() * 0.2), 10.0, 10.0);
-        graphics::rectangle(ctx, graphics::DrawMode::Fill, face)?;
-        Ok(())
+		let dst = graphics::Point2::new(self.position.viewport_x(), self.position.viewport_y());
+        draw_tile(ctx, image_src, dst, None)
     }
 }

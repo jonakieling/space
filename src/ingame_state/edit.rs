@@ -107,21 +107,21 @@ impl GameState for State {
                 scene_data.update_power();
             },
             Keycode::W => {
-                scene_data.walls.insert(self.edit_cursor, Wall {});
+                scene_data.walls.insert(self.edit_cursor, Wall { wall_type: WallType::Wall, face: Direction::Right});
             },
             Keycode::C => {
                 scene_data.circuitry.insert(self.edit_cursor, Circuitry {parts: SelectionStorage::new(), powered: false});
                 scene_data.update_power();
             },
             Keycode::G => {
-                scene_data.generators.insert(self.edit_cursor, Generator {});
+                scene_data.generators.insert(self.edit_cursor, Generator { face: Direction::Down });
                 scene_data.update_power();
             },
             Keycode::S => {
-                scene_data.storages.insert(self.edit_cursor, Storage { content: SelectionStorage::new() });
+                scene_data.storages.insert(self.edit_cursor, Storage { content: SelectionStorage::new(), face: Direction::Down });
             },
             Keycode::D => {
-                scene_data.doors.insert(self.edit_cursor, Door { status: DoorStatus::Closed});
+                scene_data.doors.insert(self.edit_cursor, Door { status: DoorStatus::Closed, face: Direction::Down});
             },
             Keycode::T => {
                 scene_data.terminals.insert(self.edit_cursor, Terminal { text: Box::new(String::new()), front: Direction::Down});
