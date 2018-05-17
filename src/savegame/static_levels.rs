@@ -77,15 +77,39 @@ pub fn static_station_outpost(scene_data: &mut SceneData) {
     scene_data.backdrop = String::from("");
 
     super::insert_walls(scene_data, vec![
-        (6, 8, WallType::Corner, Direction::Down), (7, 8, WallType::Wall, Direction::Down), (8, 8, WallType::Wall, Direction::Down), (9, 8, WallType::Wall, Direction::Down), (10, 8, WallType::Wall, Direction::Down), (11, 8, WallType::Corner, Direction::Down),
-        (6, 9, WallType::Wall, Direction::Left),                                  (11, 9, WallType::Wall, Direction::Right),
-        (6, 10, WallType::Wall, Direction::Left),                                 (11, 10, WallType::Wall, Direction::Right),
-        (6, 11, WallType::Wall, Direction::Left),                                 (11, 11, WallType::Wall, Direction::Right),
-        (6, 12, WallType::Wall, Direction::Left),                                 (11, 12, WallType::T, Direction::Left),(12, 12, WallType::Wall, Direction::Down),(13, 12, WallType::Wall, Direction::Down), (14, 12, WallType::Corner, Direction::Down),
-        (6, 13, WallType::Wall, Direction::Left),                                 (11, 13, WallType::Wall, Direction::Right),                   (14, 13, WallType::Wall, Direction::Right),
+        (6, 8, WallType::Corner, Direction::Down),
+        (7, 8, WallType::Wall, Direction::Down),
+        (8, 8, WallType::Wall, Direction::Down),
+        (9, 8, WallType::Wall, Direction::Down),
+        (10, 8, WallType::Wall, Direction::Down),
+        (11, 8, WallType::Corner, Direction::Down),
+        (6, 9, WallType::Wall, Direction::Left),
+        (11, 9, WallType::Wall, Direction::Right),
+        (6, 10, WallType::Wall, Direction::Left),
+        (11, 10, WallType::Wall, Direction::Right),
+        (6, 11, WallType::Wall, Direction::Left),
+        (11, 11, WallType::Wall, Direction::Right),
+        (6, 12, WallType::Wall, Direction::Left),
+        (11, 12, WallType::T, Direction::Left),
+        (12, 12, WallType::Wall, Direction::Down),
+        (13, 12, WallType::Wall, Direction::Down),
+        (14, 12, WallType::Corner, Direction::Down),
+        (6, 13, WallType::Wall, Direction::Left),
+        (11, 13, WallType::Wall, Direction::Right),
+        (14, 13, WallType::Wall, Direction::Right),
         (6, 14, WallType::Wall, Direction::Left),                                                    
-        (6, 15, WallType::Wall, Direction::Left),                                 (11, 15, WallType::Wall, Direction::Right),                   (14, 15, WallType::Wall, Direction::Right),
-        (6, 16, WallType::Corner, Direction::Left),(7, 16, WallType::Wall, Direction::Up),(8, 16, WallType::Wall, Direction::Up),(9, 16, WallType::Wall, Direction::Up),(10, 16, WallType::Wall, Direction::Up),(11, 16, WallType::T, Direction::Up),(12, 16, WallType::Wall, Direction::Up),(13, 16, WallType::Wall, Direction::Up), (14, 16, WallType::Corner, Direction::Up)       
+        (6, 15, WallType::Wall, Direction::Left),
+        (11, 15, WallType::Wall, Direction::Right),
+        (14, 15, WallType::Wall, Direction::Right),
+        (6, 16, WallType::Corner, Direction::Left),
+        (7, 16, WallType::Wall, Direction::Up),
+        (8, 16, WallType::Wall, Direction::Up),
+        (9, 16, WallType::Wall, Direction::Up),
+        (10, 16, WallType::Wall, Direction::Up),
+        (11, 16, WallType::T, Direction::Up),
+        (12, 16, WallType::Wall, Direction::Up),
+        (13, 16, WallType::Wall, Direction::Up),
+        (14, 16, WallType::Corner, Direction::Up)       
     ]);
 
     super::insert_doors(scene_data, vec![
@@ -111,16 +135,31 @@ pub fn static_ship_tech(scene_data: &mut SceneData) {
     scene_data.backdrop = String::from("/realm_of_sol__0000s_0001_2.1.png");
 
     super::insert_walls(scene_data, vec![
-        (6, 8, WallType::Corner, Direction::Down), (7, 8, WallType::Wall, Direction::Down), (8, 8, WallType::Wall, Direction::Down), (9, 8, WallType::Wall, Direction::Down), (10, 8, WallType::Corner, Direction::Left),
-        (6, 9, WallType::Wall, Direction::Right),                         (10, 9, WallType::Wall, Direction::Left),
-        (6, 10, WallType::Wall, Direction::Right),                        (10, 10, WallType::Wall, Direction::Left),
-                (7, 11, WallType::Wall, Direction::Right),        (9, 11, WallType::Wall, Direction::Left),
-        (6, 12, WallType::Wall, Direction::Right),                        (10, 12, WallType::Wall, Direction::Left),
+        (6, 8, WallType::Corner, Direction::Down),
+        (7, 8, WallType::Wall, Direction::Down),
+        (8, 8, WallType::Wall, Direction::Down),
+        (9, 8, WallType::Wall, Direction::Down),
+        (10, 8, WallType::Corner, Direction::Left),
+        (6, 9, WallType::Wall, Direction::Right),
+        (10, 9, WallType::Wall, Direction::Left),
+        (6, 10, WallType::Wall, Direction::Right),
+        (10, 10, WallType::Wall, Direction::Left),
+        (7, 11, WallType::Wall, Direction::Right),
+        (9, 11, WallType::Wall, Direction::Left),
+        (6, 12, WallType::Wall, Direction::Right),
+        (10, 12, WallType::Wall, Direction::Left),
         (6, 13, WallType::Wall, Direction::Right),
-        (6, 14, WallType::Wall, Direction::Right),                        (10, 14, WallType::Wall, Direction::Left),
-        (6, 15, WallType::Wall, Direction::Right),                        (10, 15, WallType::Wall, Direction::Left),
-        (6, 16, WallType::Wall, Direction::Right),                        (10, 16, WallType::Wall, Direction::Left),
-        (6, 17, WallType::Corner, Direction::Right),(7, 17, WallType::Wall, Direction::Up),(8, 17, WallType::Wall, Direction::Up),(9, 17, WallType::Wall, Direction::Up),(10, 17, WallType::Corner, Direction::Up)
+        (6, 14, WallType::Wall, Direction::Right),
+        (10, 14, WallType::Wall, Direction::Left),
+        (6, 15, WallType::Wall, Direction::Right),
+        (10, 15, WallType::Wall, Direction::Left),
+        (6, 16, WallType::Wall, Direction::Right),
+        (10, 16, WallType::Wall, Direction::Left),
+        (6, 17, WallType::Corner, Direction::Right),
+        (7, 17, WallType::Wall, Direction::Up),
+        (8, 17, WallType::Wall, Direction::Up),
+        (9, 17, WallType::Wall, Direction::Up),
+        (10, 17, WallType::Corner, Direction::Up)
     ]);
 
     super::insert_doors(scene_data, vec![

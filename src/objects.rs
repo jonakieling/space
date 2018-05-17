@@ -110,6 +110,22 @@ impl Terminal {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct PilotSeat {
+    pub front: Direction,
+}
+
+impl PilotSeat {
+    pub fn draw(&self, pos: i32, ctx: &mut Context) -> GameResult<()> {
+	    let x = pos % LEVEL_SIZE * GRID_SIZE;
+	    let y = pos / LEVEL_SIZE * GRID_SIZE;
+
+		let dst = graphics::Point2::new(x as f32, y as f32);
+		
+        draw_tile(ctx, "/pilot-seat.png", dst, Some(self.front))
+	}
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Circuitry {
     pub parts: SelectionStorage<Item>,
     pub powered: bool
