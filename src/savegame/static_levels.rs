@@ -134,6 +134,30 @@ pub fn static_station_outpost(scene_data: &mut SceneData) {
 pub fn static_ship_tech(scene_data: &mut SceneData) {
     scene_data.backdrop = String::from("/realm_of_sol__0000s_0001_2.1.png");
 
+    super::insert_floor(scene_data, vec![
+        (7, 9),
+        (8, 9),
+        (9, 9),
+        (7, 10),
+        (8, 10),
+        (9, 10),
+        (7, 12),
+        (8, 12),
+        (9, 12),
+        (7, 13),
+        (8, 13),
+        (9, 13),
+        (7, 14),
+        (8, 14),
+        (9, 14),
+        (7, 15),
+        (8, 15),
+        (9, 15),
+        (7, 16),
+        (8, 16),
+        (9, 16),
+    ]);
+
     super::insert_walls(scene_data, vec![
         (6, 8, WallType::Corner, Direction::Down),
         (7, 8, WallType::Wall, Direction::Down),
@@ -142,10 +166,14 @@ pub fn static_ship_tech(scene_data: &mut SceneData) {
         (10, 8, WallType::Corner, Direction::Left),
         (6, 9, WallType::Wall, Direction::Right),
         (10, 9, WallType::Wall, Direction::Left),
-        (6, 10, WallType::Wall, Direction::Right),
-        (10, 10, WallType::Wall, Direction::Left),
-        (7, 11, WallType::Wall, Direction::Right),
-        (9, 11, WallType::Wall, Direction::Left),
+        (6, 10, WallType::Corner, Direction::Right),
+        (7, 10, WallType::Wall, Direction::Up),
+        (9, 10, WallType::Wall, Direction::Up),
+        (10, 10, WallType::Corner, Direction::Up),
+        (6, 11, WallType::Corner, Direction::Down),
+        (7, 11, WallType::Wall, Direction::Down),
+        (9, 11, WallType::Wall, Direction::Down),
+        (10, 11, WallType::Corner, Direction::Left),
         (6, 12, WallType::Wall, Direction::Right),
         (10, 12, WallType::Wall, Direction::Left),
         (6, 13, WallType::Wall, Direction::Right),
@@ -169,6 +197,10 @@ pub fn static_ship_tech(scene_data: &mut SceneData) {
 
     super::insert_generator(scene_data, vec![
         (8, 15, Direction::Down)
+    ]);
+
+    super::insert_pilot_seat(scene_data, vec![
+        (8, 9, Direction::Down)
     ]);
 
     super::insert_circuitry(scene_data, vec![
@@ -195,7 +227,7 @@ pub fn static_ship_tech(scene_data: &mut SceneData) {
         (7, 13, Direction::Right)
     ]);
 
-    scene_data.terminals.insert(Position::new(8, 9), Terminal {
+    scene_data.terminals.insert(Position::new(8, 8), Terminal {
         text: Box::new(String::new()),
         front: Direction::Down
     });

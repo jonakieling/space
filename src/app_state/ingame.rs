@@ -38,10 +38,12 @@ pub struct SceneData {
     pub backdrop: String,
     pub player: Player,
     pub walls: PositionLevelStorage<Wall>,
+    pub floor: PositionLevelStorage<Floor>,
     pub doors: PositionLevelStorage<Door>,
     pub terminals: PositionLevelStorage<Terminal>,
     pub circuitry: PositionLevelStorage<Circuitry>,
     pub generators: PositionLevelStorage<Generator>,
+    pub pilot_seats: PositionLevelStorage<PilotSeat>,
     pub npc: PositionLevelStorage<Npc>,
     pub storages: PositionLevelStorage<Storage>,
     pub receipes: Vec<Receipe>,
@@ -91,10 +93,12 @@ impl Scene {
         };
 
         let walls = <PositionLevelStorage<Wall>>::new();
+        let floor = <PositionLevelStorage<Floor>>::new();
         let doors = <PositionLevelStorage<Door>>::new();
         let terminals = <PositionLevelStorage<Terminal>>::new();
         let circuitry = <PositionLevelStorage<Circuitry>>::new();
         let generators = <PositionLevelStorage<Generator>>::new();
+        let pilot_seats = <PositionLevelStorage<PilotSeat>>::new();
         let npc = <PositionLevelStorage<Npc>>::new();
         let storages = <PositionLevelStorage<Storage>>::new();
         
@@ -111,10 +115,12 @@ impl Scene {
             backdrop: String::from(""),
             player,
             walls,
+            floor,
             doors,
             terminals,
             circuitry,
             generators,
+            pilot_seats,
             npc,
             storages,
             receipes,
@@ -365,20 +371,32 @@ impl event::EventHandler for Scene {
 
         graphics::set_color(ctx, graphics::BLACK)?;
 
+        for (pos, item) in self.data.floor.iter().enumerate() {
+            if let Some(floor) = item {
+                floor.draw(pos as i32, ctx)?;
+            }
+        }
+
         for (pos, item) in self.data.walls.iter().enumerate() {
-            if let &Some(wall) = item {
+            if let Some(wall) = item {
                 wall.draw(pos as i32, ctx)?;
             }
         }
 
         for (pos, terminal) in self.data.terminals.iter().enumerate() {
-            if let &Some(ref current_terminal) = terminal {
+            if let Some(current_terminal) = terminal {
                 current_terminal.draw(pos as i32, ctx)?;
             }
         }
 
+        for (pos, item) in self.data.pilot_seats.iter().enumerate() {
+            if let Some(pilot_seat) = item {
+                pilot_seat.draw(pos as i32, ctx)?;
+            }
+        }
+
         for (pos, item) in self.data.doors.iter().enumerate() {
-            if let &Some(ref door) = item {
+            if let Some(door) = item {
                 door.draw(pos as i32, ctx)?;
             }
         }
@@ -390,21 +408,21 @@ impl event::EventHandler for Scene {
         }
 
         for (pos, item) in self.data.storages.iter().enumerate() {
-            if let &Some(ref storage) = item {
+            if let Some(storage) = item {
                 storage.draw(pos as i32, ctx)?;
             }
         }
 
         if self.data.insight_view {
             for (pos, circuitry) in self.data.circuitry.iter().enumerate() {
-                if let &Some(ref circuitry) = circuitry {
+                if let Some(circuitry) = circuitry {
                     circuitry.draw(pos as i32, ctx)?;
                 }
             }
         }
 
         for (pos, npc) in self.data.npc.iter().enumerate() {
-            if let &Some(ref npc) = npc {
+            if let Some(npc) = npc {
                 npc.draw(pos as i32, ctx)?;
             }
         }

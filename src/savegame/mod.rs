@@ -210,11 +210,29 @@ pub fn insert_walls(scene_data: &mut SceneData, walls: Vec<(i32, i32, WallType, 
     }
 }
 
+pub fn insert_floor(scene_data: &mut SceneData, floor: Vec<(i32, i32)>) {
+    for tile in floor {
+        scene_data.floor.insert(
+            Position { x: tile.0, y: tile.1 },
+            Floor { }
+        );
+    }
+}
+
 pub fn insert_generator(scene_data: &mut SceneData, generators: Vec<(i32, i32, Direction)>) {
     for generator in generators {
         scene_data.generators.insert(
             Position { x: generator.0, y: generator.1 },
             Generator { face: generator.2 }
+        );
+    }
+}
+
+pub fn insert_pilot_seat(scene_data: &mut SceneData, pilot_seats: Vec<(i32, i32, Direction)>) {
+    for pilot_seat in pilot_seats {
+        scene_data.pilot_seats.insert(
+            Position { x: pilot_seat.0, y: pilot_seat.1 },
+            PilotSeat { front: pilot_seat.2 }
         );
     }
 }

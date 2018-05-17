@@ -48,7 +48,7 @@ impl Wall {
 pub struct Floor { }
 
 impl Floor {
-	pub fn draw(pos: i32, ctx: &mut Context) -> GameResult<()> {
+	pub fn draw(&self, pos: i32, ctx: &mut Context) -> GameResult<()> {
 	    let x = pos % LEVEL_SIZE * GRID_SIZE;
 	    let y = pos / LEVEL_SIZE * GRID_SIZE;
 
