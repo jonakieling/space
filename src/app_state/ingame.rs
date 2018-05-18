@@ -2,7 +2,7 @@ use std::time::Duration;
 use std::collections::VecDeque;
 use std::collections::BTreeSet;
 
-use ggez::timer;
+use ggez::timer::get_delta;
 use ggez::GameResult;
 use ggez::Context;
 use ggez::graphics;
@@ -158,30 +158,31 @@ impl SceneData {
         self.storages.clear();
     }
 
-    pub fn check_player_collision(&self) -> bool {
+    pub fn check_player_collision(&self, direction: &Direction) -> bool {
         let mut found_collision = false;
+        let collision_tile = &self.player.position + &direction.value();
 
-        if let Some(_) = self.walls.get(self.player.front_tile) {
+        if let Some(_) = self.walls.get(collision_tile) {
             found_collision = true;
         }
 
-        if let Some(_) = self.terminals.get(self.player.front_tile) {
+        if let Some(_) = self.terminals.get(collision_tile) {
             found_collision = true;
         }
 
-        if let Some(_) = self.generators.get(self.player.front_tile) {
+        if let Some(_) = self.generators.get(collision_tile) {
             found_collision = true;
         }
 
-        if let Some(_) = self.storages.get(self.player.front_tile) {
+        if let Some(_) = self.storages.get(collision_tile) {
             found_collision = true;
         }
 
-        if let Some(_) = self.npc.get(self.player.front_tile) {
+        if let Some(_) = self.npc.get(collision_tile) {
             found_collision = true;
         }
 
-        if let Some(door) = self.doors.get(self.player.front_tile) {
+        if let Some(door) = self.doors.get(collision_tile) {
             if let DoorStatus::Closed = door.status {
                 found_collision = true;
             }
@@ -294,12 +295,12 @@ impl event::EventHandler for Scene {
             self.current_ingame_state = state;
         }
 
-        self.data.movement_timer += timer::get_delta(ctx);
+        self.data.movement_timer += get_delta(ctx);
 
         if self.data.movement_timer > Duration::from_millis(MOVEMENT_SPEED) {
-            self.data.movement_timer = Duration::from_millis(0);
             if let Some(&current_movement) = self.data.player.movement.last() {
-                if !self.data.check_player_collision() {
+                if !self.data.check_player_collision(&current_movement) {
+                    self.data.movement_timer = Duration::from_millis(0);
                     self.data.player.position = &self.data.player.position + &current_movement.value();
                 }
             };

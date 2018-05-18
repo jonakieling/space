@@ -1,9 +1,6 @@
-use std::time::Duration;
-
 use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
-use constants::MOVEMENT_SPEED;
 use app_state::{ingame::SceneData, draw_input_state, ingame::InputState};
 use misc::*;
 use ingame_state::GameState;
@@ -96,8 +93,6 @@ impl GameState for State {
     
     fn key_down_event(&mut self, scene_data: &mut SceneData, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, repeat: bool) {
         if !repeat {
-            scene_data.movement_timer = Duration::from_millis(MOVEMENT_SPEED);
-
             match keycode {
                 Keycode::Left => {
                     scene_data.player.movement(Direction::Left, Direction::Right);
