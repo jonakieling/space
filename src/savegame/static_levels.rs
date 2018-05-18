@@ -90,7 +90,7 @@ pub fn static_station_outpost(scene_data: &mut SceneData) {
         (6, 11, WallType::Wall, Direction::Left),
         (11, 11, WallType::Wall, Direction::Right),
         (6, 12, WallType::Wall, Direction::Left),
-        (11, 12, WallType::T, Direction::Left),
+        (11, 12, WallType::Wall, Direction::Left),
         (12, 12, WallType::Wall, Direction::Down),
         (13, 12, WallType::Wall, Direction::Down),
         (14, 12, WallType::Corner, Direction::Down),
@@ -106,7 +106,7 @@ pub fn static_station_outpost(scene_data: &mut SceneData) {
         (8, 16, WallType::Wall, Direction::Up),
         (9, 16, WallType::Wall, Direction::Up),
         (10, 16, WallType::Wall, Direction::Up),
-        (11, 16, WallType::T, Direction::Up),
+        (11, 16, WallType::Wall, Direction::Up),
         (12, 16, WallType::Wall, Direction::Up),
         (13, 16, WallType::Wall, Direction::Up),
         (14, 16, WallType::Corner, Direction::Up)       

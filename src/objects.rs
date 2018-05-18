@@ -13,8 +13,7 @@ use dialog::DialogItem;
 pub enum WallType {
 	Wall,
 	Corner,
-	T,
-	Cross
+	Edge
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
@@ -32,6 +31,9 @@ impl Wall {
 		match self.wall_type {
 			WallType::Corner => {
 				image_src = "/corner.png";
+			},
+			WallType::Edge => {
+				image_src = "/edge.png";
 			},
 			_ => {
 				image_src = "/wall.png";
@@ -79,7 +81,7 @@ impl Door {
 		let image_src;
 		match self.status {
 			DoorStatus::Open => {
-				image_src = "/floor.png";
+				image_src = "/door-open.png";
 			},
 			DoorStatus::Closed => {
 				image_src = "/door.png";
@@ -133,16 +135,12 @@ pub struct Circuitry {
 
 impl Circuitry {
     pub fn draw(&self, pos: i32, ctx: &mut Context) -> GameResult<()> {
-	    let x = pos % LEVEL_SIZE;
-	    let y = pos / LEVEL_SIZE;
-	    graphics::set_color(ctx, graphics::Color{r: 0.8, g: 0.8, b: 0.8, a: 0.1,})?;
-	    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 3.0, (y * GRID_SIZE) as f32 + 3.0, GRID_SIZE as f32 - 5.0, GRID_SIZE as f32 - 5.0))?;
-	    if self.powered {
-	        graphics::set_color(ctx, graphics::Color{r: 0.5, g: 0.8, b: 0.5, a: 0.8,})?;
-	    }
-	    graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), graphics::Rect::new((x * GRID_SIZE) as f32 + 5.0, (y * GRID_SIZE) as f32 + 5.0, GRID_SIZE as f32 - 9.0, GRID_SIZE as f32 - 9.0))?;
+	    let x = pos % LEVEL_SIZE * GRID_SIZE;
+	    let y = pos / LEVEL_SIZE * GRID_SIZE;
 
-	    Ok(())
+		let dst = graphics::Point2::new(x as f32, y as f32);
+		
+        draw_tile(ctx, "/circuitry.png", dst, None)
 	}
 }
 
@@ -158,7 +156,7 @@ impl Generator {
 		
 		let dst = graphics::Point2::new(x as f32, y as f32);
 		
-        draw_tile(ctx, "/generator.png", dst, Some(self.face))
+        draw_tile(ctx, "/generator.png", dst, None)
 	}
 }
 
@@ -214,16 +212,26 @@ pub struct Npc {
 
 impl Npc {
     pub fn draw(&self, pos: i32, ctx: &mut Context) -> GameResult<()> {
-	    let x = pos % LEVEL_SIZE;
-	    let y = pos / LEVEL_SIZE;
-        graphics::set_color(ctx, graphics::BLACK)?;
-        let npc = graphics::Rect::new((x * GRID_SIZE) as f32, (y * GRID_SIZE) as f32, 20.0, 20.0);
-        graphics::rectangle(ctx, graphics::DrawMode::Fill, npc)?;
+	    let x = pos % LEVEL_SIZE * GRID_SIZE;
+	    let y = pos / LEVEL_SIZE * GRID_SIZE;
+		let image_src;
+		match self.direction {
+			Direction::Up => {
+				image_src = "/gnoerf-back.png";
+			},
+			Direction::Down => {
+				image_src = "/gnoerf-front.png";
+			},
+			Direction::Left => {
+				image_src = "/gnoerf-left.png";
+			},
+			Direction::Right => {
+				image_src = "/gnoerf-right.png";
+			}
+		}
 
-        graphics::set_color(ctx, graphics::WHITE)?;
-        let face = graphics::Rect::new((x * GRID_SIZE) as f32 + 5.0 + (self.direction.value().viewport_x() * 0.2), (y * GRID_SIZE) as f32 + 5.0 + (self.direction.value().viewport_y() * 0.2), 10.0, 10.0);
-        graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), face)?;
-        Ok(())
+		let dst = graphics::Point2::new(x as f32, y as f32);
+        draw_tile(ctx, image_src, dst, None)
 	}
 }
 
@@ -237,10 +245,26 @@ impl Storage {
     pub fn draw(&self, pos: i32, ctx: &mut Context) -> GameResult<()> {
 	    let x = pos % LEVEL_SIZE * GRID_SIZE;
 	    let y = pos / LEVEL_SIZE * GRID_SIZE;
+
+		let image_src;
+		match self.face {
+			Direction::Up => {
+				image_src = "/storage.png";
+			},
+			Direction::Down => {
+				image_src = "/storage-front.png";
+			},
+			Direction::Left => {
+				image_src = "/storage.png";
+			},
+			Direction::Right => {
+				image_src = "/storage.png";
+			}
+		}
 		
 		let dst = graphics::Point2::new(x as f32, y as f32);
 
-        draw_tile(ctx, "/storage.png", dst, Some(self.face))
+        draw_tile(ctx, image_src, dst, None)
 	}
 }
 
