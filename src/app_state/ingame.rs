@@ -369,7 +369,7 @@ impl event::EventHandler for Scene {
 
         self.data.movement_timer += get_delta(ctx);
 
-        if self.data.movement_timer > Duration::from_millis(MOVEMENT_SPEED) {
+        if self.data.movement_timer > Duration::from_millis(MOVEMENT_DURATION) {
             if let Some(&current_movement) = self.data.player.movement.last() {
                 if !self.data.check_player_collision(&current_movement) {
                     self.data.movement_timer = Duration::from_millis(0);
