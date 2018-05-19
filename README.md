@@ -75,6 +75,6 @@ thoughts after implmentation start.
 engine tech
 -----------
 
-* next up: spritebatch, camera (✓), ui
+* next up: spritebatch (✓), camera (✓), ui
 * gui for selections and lists (✓)
 * ~~scene/storage management (how to deal with space, ship, level, objects)~~ kiss

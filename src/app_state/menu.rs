@@ -59,31 +59,31 @@ impl Scene {
 }
 
 impl AppState for Scene {
-    fn change_state(&self) -> Option<Box<AppState>> {
+    fn change_state(&self, ctx: &mut Context) -> Option<Box<AppState>> {
         if let Some(ref savegame) = self.loading {
             match savegame {
                 SaveType::Empty => {
-                    let mut world = ingame::Scene::new().unwrap();
+                    let mut world = ingame::Scene::new(ctx).unwrap();
                     savegame::static_levels::empty(&mut world.data);
                     Some(Box::new(world))
                 },
                 SaveType::DevNpc => {
-                    let mut world = ingame::Scene::new().unwrap();
+                    let mut world = ingame::Scene::new(ctx).unwrap();
                     savegame::static_levels::static_empty_npc(&mut world.data);
                     Some(Box::new(world))
                 },
                 SaveType::DevShip => {
-                    let mut world = ingame::Scene::new().unwrap();
+                    let mut world = ingame::Scene::new(ctx).unwrap();
                     savegame::static_levels::static_ship_tech(&mut world.data);
                     Some(Box::new(world))
                 },
                 SaveType::DevStation => {
-                    let mut world = ingame::Scene::new().unwrap();
+                    let mut world = ingame::Scene::new(ctx).unwrap();
                     savegame::static_levels::static_station_outpost(&mut world.data);
                     Some(Box::new(world))
                 },
                 SaveType::File(savefile) => {
-                    let mut world = ingame::Scene::new().unwrap();
+                    let mut world = ingame::Scene::new(ctx).unwrap();
                     savegame::load_scene(&mut world.data, savefile);
                     Some(Box::new(world))
                 },

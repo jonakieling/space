@@ -61,6 +61,7 @@ pub struct Sprites {
     pub floor: SpriteBatch,
     pub circuitry: SpriteBatch,
     pub doors: SpriteBatch,
+    pub doors_open: SpriteBatch,
     pub terminals: SpriteBatch,
     pub pilot_seats: SpriteBatch,
     pub storages: SpriteBatch,
@@ -70,11 +71,12 @@ pub struct Sprites {
 pub struct Scene {
     pub current_ingame_state: Box<GameState>,
     pub data: SceneData,
+    pub sprites: Sprites,
     pub camera: Position
 }
 
 impl AppState for Scene {
-    fn change_state(&self) -> Option<Box<AppState>> {
+    fn change_state(&self, _ctx: &mut Context) -> Option<Box<AppState>> {
         if self.data.main_menu {
             save_scene(&self.data, "saves/auto-save.tar");
             let menu = super::menu::Scene::new().unwrap();
@@ -86,7 +88,7 @@ impl AppState for Scene {
 }
 
 impl Scene {
-    pub fn new() -> GameResult<Scene> {
+    pub fn new(ctx: &mut Context) -> GameResult<Scene> {
         
         // initialize player and level object storages
         // state and object are loaded seperatly
@@ -154,9 +156,46 @@ impl Scene {
 
         data.update_power();
 
+        let mut wall_img = graphics::Image::new(ctx, "/wall.png").unwrap();
+            wall_img.set_filter(graphics::FilterMode::Nearest);
+        let mut corner_img = graphics::Image::new(ctx, "/corner.png").unwrap();
+            corner_img.set_filter(graphics::FilterMode::Nearest);
+        let mut edge_img = graphics::Image::new(ctx, "/edge.png").unwrap();
+            edge_img.set_filter(graphics::FilterMode::Nearest);
+        let mut floor_img = graphics::Image::new(ctx, "/floor.png").unwrap();
+            floor_img.set_filter(graphics::FilterMode::Nearest);
+        let mut circuitry_img = graphics::Image::new(ctx, "/circuitry.png").unwrap();
+            circuitry_img.set_filter(graphics::FilterMode::Nearest);
+        let mut door_img = graphics::Image::new(ctx, "/door.png").unwrap();
+            door_img.set_filter(graphics::FilterMode::Nearest);
+        let mut door_open_img = graphics::Image::new(ctx, "/door-open.png").unwrap();
+            door_open_img.set_filter(graphics::FilterMode::Nearest);
+        let mut terminal_img = graphics::Image::new(ctx, "/terminal.png").unwrap();
+            terminal_img.set_filter(graphics::FilterMode::Nearest);
+        let mut pilot_seat_img = graphics::Image::new(ctx, "/pilot-seat.png").unwrap();
+            pilot_seat_img.set_filter(graphics::FilterMode::Nearest);
+        let mut storage_img = graphics::Image::new(ctx, "/storage.png").unwrap();
+            storage_img.set_filter(graphics::FilterMode::Nearest);
+        let mut generator_img = graphics::Image::new(ctx, "/generator.png").unwrap();
+            generator_img.set_filter(graphics::FilterMode::Nearest);
+        let sprites = Sprites {
+            walls: SpriteBatch::new(wall_img),
+            corners: SpriteBatch::new(corner_img),
+            edges: SpriteBatch::new(edge_img),
+            floor: SpriteBatch::new(floor_img),
+            circuitry: SpriteBatch::new(circuitry_img),
+            doors: SpriteBatch::new(door_img),
+            doors_open: SpriteBatch::new(door_open_img),
+            terminals: SpriteBatch::new(terminal_img),
+            pilot_seats: SpriteBatch::new(pilot_seat_img),
+            storages: SpriteBatch::new(storage_img),
+            generators: SpriteBatch::new(generator_img),
+        };
+
         let scene = Scene {
             current_ingame_state: Box::new(world::State::new()),
             data,
+            sprites,
             camera: Position { x: 0, y: 0}
         };
 
@@ -373,77 +412,97 @@ impl event::EventHandler for Scene {
             let mut backdrop = graphics::Image::new(ctx, &self.data.backdrop)?;
             backdrop.set_filter(graphics::FilterMode::Nearest);
 
+            // this is a convention for levels now (got stuck when setting up static levels via functions)
             let backdrop_pos = Position {
                 x: 1,
                 y: 1
             };
-            let sceen_horizontal_center = get_screen_coordinates(ctx).w / 2.0;
-            let sceen_vertical_center = get_screen_coordinates(ctx).h / 2.0;
-            let dst = graphics::Point2::new(
-                backdrop_pos.viewport_x(self.camera) as f32 + sceen_horizontal_center,
-                backdrop_pos.viewport_y(self.camera) as f32 + sceen_vertical_center
-            );
+            let mut p = get_tile_params(ctx, backdrop_pos.to_int(), self.camera, None);
+            // override with grid size scaling since backdrops are smaller scale (1 pixel = 1 tile)
+            p.scale = graphics::Point2::new(GRID_SIZE as f32, GRID_SIZE as f32);
             graphics::draw_ex(
                 ctx,
                 &backdrop,
-                graphics::DrawParam {
-                    dest: dst,
-                    scale: graphics::Point2::new(GRID_SIZE as f32, GRID_SIZE as f32),
-                    ..Default::default()
-                },
+                p,
             )?;
         }
 
         graphics::set_color(ctx, graphics::BLACK)?;
 
         for (pos, item) in self.data.floor.iter().enumerate() {
-            if let Some(floor) = item {
-                draw_tile(ctx, floor.tile(), pos as i32, self.camera, None)?;
+            if item.is_some() {
+                let p = get_tile_params(ctx, pos as i32, self.camera, None);
+                self.sprites.floor.add(p);
             }
         }
+        draw_spritebatch(ctx, &mut self.sprites.floor)?;
 
         for (pos, item) in self.data.walls.iter().enumerate() {
             if let Some(wall) = item {
-                draw_tile(ctx, wall.tile(), pos as i32, self.camera, Some(wall.face))?;
+                let p = get_tile_params(ctx, pos as i32, self.camera, Some(wall.face));
+                match wall.wall_type {
+                    WallType::Wall => self.sprites.walls.add(p),
+                    WallType::Corner => self.sprites.corners.add(p),
+                    WallType::Edge => self.sprites.edges.add(p),
+                };
             }
         }
+        draw_spritebatch(ctx, &mut self.sprites.walls)?;
+        draw_spritebatch(ctx, &mut self.sprites.corners)?;
+        draw_spritebatch(ctx, &mut self.sprites.edges)?;
 
         for (pos, terminal) in self.data.terminals.iter().enumerate() {
             if let Some(current_terminal) = terminal {
-                draw_tile(ctx, current_terminal.tile(), pos as i32, self.camera, Some(current_terminal.front))?;
+                let p = get_tile_params(ctx, pos as i32, self.camera, Some(current_terminal.front));
+                self.sprites.terminals.add(p);
             }
         }
+        draw_spritebatch(ctx, &mut self.sprites.terminals)?;
 
         for (pos, item) in self.data.pilot_seats.iter().enumerate() {
             if let Some(pilot_seat) = item {
-                draw_tile(ctx, pilot_seat.tile(), pos as i32, self.camera, Some(pilot_seat.front))?;
+                let p = get_tile_params(ctx, pos as i32, self.camera, Some(pilot_seat.front));
+                self.sprites.pilot_seats.add(p);
             }
         }
+        draw_spritebatch(ctx, &mut self.sprites.pilot_seats)?;
 
         for (pos, item) in self.data.doors.iter().enumerate() {
             if let Some(door) = item {
-                draw_tile(ctx, door.tile(), pos as i32, self.camera, Some(door.face))?;
+                let p = get_tile_params(ctx, pos as i32, self.camera, Some(door.face));
+                match door.status {
+                    DoorStatus::Open => self.sprites.doors_open.add(p),
+                    DoorStatus::Closed => self.sprites.doors.add(p)
+                };
             }
         }
+        draw_spritebatch(ctx, &mut self.sprites.doors)?;
+        draw_spritebatch(ctx, &mut self.sprites.doors_open)?;
 
         for (pos, item) in self.data.generators.iter().enumerate() {
-            if let Some(generator) = item {
-                draw_tile(ctx, generator.tile(), pos as i32, self.camera, None)?;
+            if item.is_some() {
+                let params = get_tile_params(ctx, pos as i32, self.camera, None);
+                self.sprites.generators.add(params);
             }
         }
+        draw_spritebatch(ctx, &mut self.sprites.generators)?;
 
         for (pos, item) in self.data.storages.iter().enumerate() {
-            if let Some(storage) = item {
-                draw_tile(ctx, storage.tile(), pos as i32, self.camera, None)?;
+            if item.is_some() {
+                let params = get_tile_params(ctx, pos as i32, self.camera, None);
+                self.sprites.storages.add(params);
             }
         }
+        draw_spritebatch(ctx, &mut self.sprites.storages)?;
 
         if self.data.insight_view {
-            for (pos, circuitry) in self.data.circuitry.iter().enumerate() {
-                if let Some(circuitry) = circuitry {
-                    draw_tile(ctx, circuitry.tile(), pos as i32, self.camera, None)?;
+            for (pos, item) in self.data.circuitry.iter().enumerate() {
+                if item.is_some() {
+                    let params = get_tile_params(ctx, pos as i32, self.camera, None);
+                    self.sprites.circuitry.add(params);
                 }
             }
+            draw_spritebatch(ctx, &mut self.sprites.circuitry)?;
         }
 
         for (pos, npc) in self.data.npc.iter().enumerate() {
@@ -460,6 +519,18 @@ impl event::EventHandler for Scene {
 
         Ok(())
     }
+}
+
+pub fn draw_spritebatch(ctx: &mut Context, spritebatch: &mut SpriteBatch) -> GameResult<()> {
+    graphics::set_color(ctx, graphics::WHITE)?;
+    let params = graphics::DrawParam {
+        dest: graphics::Point2::new(0.0, 0.0),
+        ..Default::default()
+    };
+    graphics::draw_ex(ctx, spritebatch, params)?;
+    spritebatch.clear();
+
+    Ok(())
 }
 
 pub fn get_tile_params(ctx: &mut Context, pos: i32, camera: Position, direction: Option<Direction>) -> graphics::DrawParam {

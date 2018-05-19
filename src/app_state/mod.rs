@@ -11,7 +11,7 @@ pub mod ingame;
 pub mod menu;
 
 pub trait AppState: EventHandler {
-    fn change_state(&self) -> Option<Box<AppState>> { None }
+    fn change_state(&self, _ctx: &mut Context) -> Option<Box<AppState>> { None }
 }
 
 pub struct App {
@@ -20,7 +20,7 @@ pub struct App {
 
 impl EventHandler for App {
     fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
-        if let Some(scene) = self.state.change_state() {
+        if let Some(scene) = self.state.change_state(ctx) {
             self.state = scene;
         }
         self.state.update(ctx)
