@@ -462,55 +462,62 @@ impl event::EventHandler for Scene {
     }
 }
 
+pub fn get_tile_params(ctx: &mut Context, pos: i32, camera: Position, direction: Option<Direction>) -> graphics::DrawParam {
+    let pos = Position {
+        x: pos % LEVEL_SIZE,
+        y: pos / LEVEL_SIZE
+    };
+
+    let viewport_pos = pos.viewport(camera);
+
+    let sceen_horizontal_center = get_screen_coordinates(ctx).w / 2.0;
+    let sceen_vertical_center = get_screen_coordinates(ctx).h / 2.0;
+    let dst = graphics::Point2::new(viewport_pos.x as f32 + sceen_horizontal_center, viewport_pos.y as f32 + sceen_vertical_center);
+
+    let mut tile_dst = dst;
+    let rotation;
+    match direction {
+        Some(Direction::Up) => {
+            rotation = PI;
+            tile_dst = graphics::Point2::new(dst.x + GRID_SIZE as f32, dst.y + GRID_SIZE as f32);
+        },
+        Some(Direction::Down) => {
+            rotation = 0.0;
+        },
+        Some(Direction::Left) => {
+            rotation = FRAC_PI_2;
+            tile_dst = graphics::Point2::new(tile_dst.x + GRID_SIZE as f32, tile_dst.y);
+        },
+        Some(Direction::Right) => {
+            rotation = 3.0 * FRAC_PI_2;
+            tile_dst = graphics::Point2::new(tile_dst.x, tile_dst.y + GRID_SIZE as f32);
+        },
+        _ => {
+            rotation = 0.0;
+        }
+    }
+
+    graphics::DrawParam {
+        dest: tile_dst,
+        rotation: rotation,
+        scale: graphics::Point2::new(PIXEL_SCALE as f32, PIXEL_SCALE as f32),
+        ..Default::default()
+    }
+}
+
 pub fn draw_tile(ctx: &mut Context, tile_src: &str, pos: i32, camera: Position, direction: Option<Direction>) -> GameResult<()> {
 		
-	    let pos = Position {
-            x: pos % LEVEL_SIZE,
-            y: pos / LEVEL_SIZE
-        };
+    graphics::set_color(ctx, graphics::WHITE)?;
+    let mut storage_image = graphics::Image::new(ctx, tile_src)?;
+    storage_image.set_filter(graphics::FilterMode::Nearest);
 
-        let viewport_pos = pos.viewport(camera);
+    let params = get_tile_params(ctx, pos, camera, direction);
+    
+    graphics::draw_ex(
+        ctx,
+        &storage_image,
+        params,
+    )?;
 
-        let sceen_horizontal_center = get_screen_coordinates(ctx).w / 2.0;
-        let sceen_vertical_center = get_screen_coordinates(ctx).h / 2.0;
-		let dst = graphics::Point2::new(viewport_pos.x as f32 + sceen_horizontal_center, viewport_pos.y as f32 + sceen_vertical_center);
-
-        graphics::set_color(ctx, graphics::WHITE)?;
-		let mut storage_image = graphics::Image::new(ctx, tile_src)?;
-		storage_image.set_filter(graphics::FilterMode::Nearest);
-		let mut tile_dst = dst;
-		let rotation;
-		match direction {
-			Some(Direction::Up) => {
-                rotation = PI;
-				tile_dst = graphics::Point2::new(dst.x + GRID_SIZE as f32, dst.y + GRID_SIZE as f32);
-			},
-			Some(Direction::Down) => {
-                rotation = 0.0;
-			},
-			Some(Direction::Left) => {
-                rotation = FRAC_PI_2;
-				tile_dst = graphics::Point2::new(tile_dst.x + GRID_SIZE as f32, tile_dst.y);
-			},
-			Some(Direction::Right) => {
-                rotation = 3.0 * FRAC_PI_2;
-				tile_dst = graphics::Point2::new(tile_dst.x, tile_dst.y + GRID_SIZE as f32);
-			},
-			_ => {
-                rotation = 0.0;
-			}
-		}
-		
-		graphics::draw_ex(
-			ctx,
-			&storage_image,
-			graphics::DrawParam {
-				dest: tile_dst,
-				rotation: rotation,
-				scale: graphics::Point2::new(PIXEL_SCALE as f32, PIXEL_SCALE as f32),
-				..Default::default()
-			},
-		)?;
-
-	    Ok(())
-    }
+    Ok(())
+}
