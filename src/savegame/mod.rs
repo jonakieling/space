@@ -44,6 +44,17 @@ pub fn save_scene(scene_data: &SceneData, filename: &str) {
     let bytes: Vec<u8> = bincode::serialize(&level_walls).unwrap();
     File::create("temp-save/walls.bin").unwrap().write_all(&bytes).unwrap();
 
+    let mut level_floor: Vec<(i32, i32, Floor)> = vec![];
+    for (pos, item) in scene_data.floor.iter().enumerate() {
+        if let Some(ref floor) = *item {
+            let x = pos as i32 % LEVEL_SIZE;
+            let y = pos as i32 / LEVEL_SIZE;
+            level_floor.push((x, y, floor.clone()));
+        }
+    }
+    let bytes: Vec<u8> = bincode::serialize(&level_floor).unwrap();
+    File::create("temp-save/floor.bin").unwrap().write_all(&bytes).unwrap();
+
     let mut level_doors: Vec<(i32, i32, Door)> = vec![];
     for (pos, item) in scene_data.doors.iter().enumerate() {
         if let Some(ref door) = *item {
@@ -143,6 +154,12 @@ pub fn load_scene(scene_data: &mut SceneData, filename: &str) {
                     let level_walls: Vec<(i32, i32, Wall)> = bincode::deserialize_from(file).unwrap();
                     for wall in level_walls {
                         scene_data.walls.insert(Position {x: wall.0, y: wall.1}, wall.2);
+                    }
+                },
+                "floor" => {
+                    let level_floor: Vec<(i32, i32, Floor)> = bincode::deserialize_from(file).unwrap();
+                    for floor in level_floor {
+                        scene_data.floor.insert(Position {x: floor.0, y: floor.1}, floor.2);
                     }
                 },
                 "doors" => {
