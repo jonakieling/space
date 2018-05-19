@@ -6,41 +6,37 @@ use dialog::DialogItem;
 pub enum WallType {
 	Wall,
 	Corner,
-	Edge
+	Edge,
+	Window
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 pub struct Wall {
-	pub wall_type: WallType,
+	pub variant: WallType,
 	pub face: Direction
 }
 
-impl Wall {
-    pub fn tile(&self) -> &'static str {
-		let image_src;
-		match self.wall_type {
-			WallType::Corner => {
-				image_src = "/corner.png";
-			},
-			WallType::Edge => {
-				image_src = "/edge.png";
-			},
-			_ => {
-				image_src = "/wall.png";
-			}
-		}
-
-		image_src
-	}
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
+pub enum DecorationType {
+	Display,
+	Panel
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
-pub struct Floor { }
+pub struct Decoration {
+	pub variant: DecorationType,
+	pub face: Direction
+}
 
-impl Floor {
-    pub fn tile(&self) -> &'static str {
-        "/floor.png"
-	}
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
+pub enum FloorType {
+	Regular,
+	Light
+}
+
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
+pub struct Floor {
+	pub variant: FloorType
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
@@ -55,43 +51,23 @@ pub struct Door {
 	pub face: Direction
 }
 
-impl Door {
-    pub fn tile(&self) -> &'static str {
-		let image_src;
-		match self.status {
-			DoorStatus::Open => {
-				image_src = "/door-open.png";
-			},
-			DoorStatus::Closed => {
-				image_src = "/door.png";
-			}
-		}
-
-        image_src
-	}
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum TerminalType {
+	ShipConsole,
+	Intercomm,
+	Hud
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Terminal {
+	pub variant: TerminalType,
     pub text: Box<String>,
     pub front: Direction,
-}
-
-impl Terminal {
-    pub fn tile(&self) -> &'static str {
-        "/terminal.png"
-	}
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct PilotSeat {
     pub front: Direction,
-}
-
-impl PilotSeat {
-    pub fn tile(&self) -> &'static str {
-		"/pilot-seat.png"
-	}
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -109,12 +85,6 @@ impl Circuitry {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Generator {
 	pub face: Direction
-}
-
-impl Generator {
-    pub fn tile(&self) -> &'static str {
-	    "/generator.png"
-	}
 }
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
@@ -195,24 +165,3 @@ pub struct Storage {
 	pub face:Direction
 }
 
-impl Storage {
-    pub fn tile(&self) -> &'static str {
-		let image_src;
-		match self.face {
-			Direction::Up => {
-				image_src = "/storage.png";
-			},
-			Direction::Down => {
-				image_src = "/storage-front.png";
-			},
-			Direction::Left => {
-				image_src = "/storage.png";
-			},
-			Direction::Right => {
-				image_src = "/storage.png";
-			}
-		}
-		
-		image_src
-	}
-}

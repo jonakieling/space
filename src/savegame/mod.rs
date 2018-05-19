@@ -205,16 +205,16 @@ pub fn insert_walls(scene_data: &mut SceneData, walls: Vec<(i32, i32, WallType, 
     for wall in walls {
         scene_data.walls.insert(
             Position { x: wall.0, y: wall.1 },
-            Wall { wall_type: wall.2, face: wall.3 }
+            Wall { variant: wall.2, face: wall.3 }
         );
     }
 }
 
-pub fn insert_floor(scene_data: &mut SceneData, floor: Vec<(i32, i32)>) {
+pub fn insert_floor(scene_data: &mut SceneData, floor: Vec<(i32, i32, FloorType)>) {
     for tile in floor {
         scene_data.floor.insert(
             Position { x: tile.0, y: tile.1 },
-            Floor { }
+            Floor { variant: tile.2 }
         );
     }
 }
@@ -280,6 +280,7 @@ pub fn insert_player(scene_data: &mut SceneData, pos: (i32, i32), dir: Direction
         front_tile: player_front_tile,
         inventory,
         terminal: Box::new(Terminal {
+            variant: TerminalType::Hud,
             text: Box::new(String::new()),
             front: Direction::Down
         }),

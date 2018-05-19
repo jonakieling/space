@@ -43,6 +43,7 @@ pub struct SceneData {
     pub floor: PositionLevelStorage<Floor>,
     pub doors: PositionLevelStorage<Door>,
     pub terminals: PositionLevelStorage<Terminal>,
+    pub decorations: PositionLevelStorage<Decoration>,
     pub circuitry: PositionLevelStorage<Circuitry>,
     pub generators: PositionLevelStorage<Generator>,
     pub pilot_seats: PositionLevelStorage<PilotSeat>,
@@ -58,11 +59,14 @@ pub struct Sprites {
     pub walls: SpriteBatch,
     pub corners: SpriteBatch,
     pub edges: SpriteBatch,
+    pub windows: SpriteBatch,
     pub floor: SpriteBatch,
+    pub floor_light: SpriteBatch,
     pub circuitry: SpriteBatch,
     pub doors: SpriteBatch,
     pub doors_open: SpriteBatch,
     pub terminals: SpriteBatch,
+    pub ship_consoles: SpriteBatch,
     pub pilot_seats: SpriteBatch,
     pub storages: SpriteBatch,
     pub generators: SpriteBatch,
@@ -104,6 +108,7 @@ impl Scene {
             front_tile: player_front_tile,
             inventory,
             terminal: Box::new(Terminal {
+                variant: TerminalType::Intercomm,
                 text: Box::new(String::new()),
                 front: Direction::Down
             }),
@@ -114,6 +119,7 @@ impl Scene {
         let floor = <PositionLevelStorage<Floor>>::new();
         let doors = <PositionLevelStorage<Door>>::new();
         let terminals = <PositionLevelStorage<Terminal>>::new();
+        let decorations = <PositionLevelStorage<Decoration>>::new();
         let circuitry = <PositionLevelStorage<Circuitry>>::new();
         let generators = <PositionLevelStorage<Generator>>::new();
         let pilot_seats = <PositionLevelStorage<PilotSeat>>::new();
@@ -136,6 +142,7 @@ impl Scene {
             floor,
             doors,
             terminals,
+            decorations,
             circuitry,
             generators,
             pilot_seats,
@@ -162,8 +169,12 @@ impl Scene {
             corner_img.set_filter(graphics::FilterMode::Nearest);
         let mut edge_img = graphics::Image::new(ctx, "/edge.png").unwrap();
             edge_img.set_filter(graphics::FilterMode::Nearest);
+        let mut window_img = graphics::Image::new(ctx, "/window.png").unwrap();
+            window_img.set_filter(graphics::FilterMode::Nearest);
         let mut floor_img = graphics::Image::new(ctx, "/floor.png").unwrap();
             floor_img.set_filter(graphics::FilterMode::Nearest);
+        let mut floor_light_img = graphics::Image::new(ctx, "/floor-light.png").unwrap();
+            floor_light_img.set_filter(graphics::FilterMode::Nearest);
         let mut circuitry_img = graphics::Image::new(ctx, "/circuitry.png").unwrap();
             circuitry_img.set_filter(graphics::FilterMode::Nearest);
         let mut door_img = graphics::Image::new(ctx, "/door.png").unwrap();
@@ -172,6 +183,8 @@ impl Scene {
             door_open_img.set_filter(graphics::FilterMode::Nearest);
         let mut terminal_img = graphics::Image::new(ctx, "/terminal.png").unwrap();
             terminal_img.set_filter(graphics::FilterMode::Nearest);
+        let mut ship_console_img = graphics::Image::new(ctx, "/ship-console.png").unwrap();
+            ship_console_img.set_filter(graphics::FilterMode::Nearest);
         let mut pilot_seat_img = graphics::Image::new(ctx, "/pilot-seat.png").unwrap();
             pilot_seat_img.set_filter(graphics::FilterMode::Nearest);
         let mut storage_img = graphics::Image::new(ctx, "/storage.png").unwrap();
@@ -182,11 +195,14 @@ impl Scene {
             walls: SpriteBatch::new(wall_img),
             corners: SpriteBatch::new(corner_img),
             edges: SpriteBatch::new(edge_img),
+            windows: SpriteBatch::new(window_img),
             floor: SpriteBatch::new(floor_img),
+            floor_light: SpriteBatch::new(floor_light_img),
             circuitry: SpriteBatch::new(circuitry_img),
             doors: SpriteBatch::new(door_img),
             doors_open: SpriteBatch::new(door_open_img),
             terminals: SpriteBatch::new(terminal_img),
+            ship_consoles: SpriteBatch::new(ship_console_img),
             pilot_seats: SpriteBatch::new(pilot_seat_img),
             storages: SpriteBatch::new(storage_img),
             generators: SpriteBatch::new(generator_img),
@@ -430,34 +446,49 @@ impl event::EventHandler for Scene {
         graphics::set_color(ctx, graphics::BLACK)?;
 
         for (pos, item) in self.data.floor.iter().enumerate() {
-            if item.is_some() {
+            if let Some(floor) = item {
                 let p = get_tile_params(ctx, pos as i32, self.camera, None);
-                self.sprites.floor.add(p);
+                match floor.variant {
+                    FloorType::Regular => self.sprites.floor.add(p),
+                    FloorType::Light => self.sprites.floor_light.add(p)
+                };
             }
         }
         draw_spritebatch(ctx, &mut self.sprites.floor)?;
+        draw_spritebatch(ctx, &mut self.sprites.floor_light)?;
 
         for (pos, item) in self.data.walls.iter().enumerate() {
             if let Some(wall) = item {
                 let p = get_tile_params(ctx, pos as i32, self.camera, Some(wall.face));
-                match wall.wall_type {
+                match wall.variant {
                     WallType::Wall => self.sprites.walls.add(p),
                     WallType::Corner => self.sprites.corners.add(p),
                     WallType::Edge => self.sprites.edges.add(p),
+                    WallType::Window => self.sprites.windows.add(p),
                 };
             }
         }
         draw_spritebatch(ctx, &mut self.sprites.walls)?;
         draw_spritebatch(ctx, &mut self.sprites.corners)?;
         draw_spritebatch(ctx, &mut self.sprites.edges)?;
+        draw_spritebatch(ctx, &mut self.sprites.windows)?;
 
         for (pos, terminal) in self.data.terminals.iter().enumerate() {
             if let Some(current_terminal) = terminal {
                 let p = get_tile_params(ctx, pos as i32, self.camera, Some(current_terminal.front));
-                self.sprites.terminals.add(p);
+                match current_terminal.variant {
+                    TerminalType::Intercomm => {
+                        self.sprites.terminals.add(p);
+                    },
+                    TerminalType::ShipConsole => {
+                        self.sprites.ship_consoles.add(p);
+                    },
+                    TerminalType::Hud => ()
+                };
             }
         }
         draw_spritebatch(ctx, &mut self.sprites.terminals)?;
+        draw_spritebatch(ctx, &mut self.sprites.ship_consoles)?;
 
         for (pos, item) in self.data.pilot_seats.iter().enumerate() {
             if let Some(pilot_seat) = item {

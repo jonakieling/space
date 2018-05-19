@@ -107,7 +107,7 @@ impl GameState for State {
                 scene_data.update_power();
             },
             Keycode::W => {
-                scene_data.walls.insert(self.edit_cursor, Wall { wall_type: WallType::Wall, face: Direction::Right});
+                scene_data.walls.insert(self.edit_cursor, Wall { variant: WallType::Wall, face: Direction::Right});
             },
             Keycode::C => {
                 scene_data.circuitry.insert(self.edit_cursor, Circuitry {parts: SelectionStorage::new(), powered: false});
@@ -124,7 +124,7 @@ impl GameState for State {
                 scene_data.doors.insert(self.edit_cursor, Door { status: DoorStatus::Closed, face: Direction::Down});
             },
             Keycode::T => {
-                scene_data.terminals.insert(self.edit_cursor, Terminal { text: Box::new(String::new()), front: Direction::Down});
+                scene_data.terminals.insert(self.edit_cursor, Terminal { variant: TerminalType::Intercomm, text: Box::new(String::new()), front: Direction::Down});
             },
             Keycode::Tab => {
                 if let Some(ref mut door) = scene_data.doors.get_mut(self.edit_cursor) {

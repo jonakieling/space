@@ -77,38 +77,38 @@ pub fn static_station_outpost(scene_data: &mut SceneData) {
     scene_data.backdrop = String::from("");
 
     super::insert_floor(scene_data, vec![
-        (7, 9),
-        (8, 9),
-        (9, 9),
-        (10, 9),
-        (7, 10),
-        (8, 10),
-        (9, 10),
-        (10, 10),
-        (7, 11),
-        (8, 11),
-        (9, 11),
-        (10, 11),
-        (7, 12),
-        (8, 12),
-        (9, 12),
-        (10, 12),
-        (7, 13),
-        (8, 13),
-        (9, 13),
-        (10, 13),
-        (7, 14),
-        (8, 14),
-        (9, 14),
-        (10, 14),
-        (7, 15),
-        (8, 15),
-        (9, 15),
-        (10, 15),
-        (12, 14),
-        (13, 13),
-        (13, 14),
-        (13, 15),
+        (7, 9, FloorType::Regular),
+        (8, 9, FloorType::Regular),
+        (9, 9, FloorType::Regular),
+        (10, 9, FloorType::Regular),
+        (7, 10, FloorType::Regular),
+        (8, 10, FloorType::Regular),
+        (9, 10, FloorType::Regular),
+        (10, 10, FloorType::Regular),
+        (7, 11, FloorType::Regular),
+        (8, 11, FloorType::Regular),
+        (9, 11, FloorType::Regular),
+        (10, 11, FloorType::Regular),
+        (7, 12, FloorType::Regular),
+        (8, 12, FloorType::Regular),
+        (9, 12, FloorType::Regular),
+        (10, 12, FloorType::Regular),
+        (7, 13, FloorType::Regular),
+        (8, 13, FloorType::Regular),
+        (9, 13, FloorType::Regular),
+        (10, 13, FloorType::Regular),
+        (7, 14, FloorType::Regular),
+        (8, 14, FloorType::Regular),
+        (9, 14, FloorType::Regular),
+        (10, 14, FloorType::Regular),
+        (7, 15, FloorType::Regular),
+        (8, 15, FloorType::Regular),
+        (9, 15, FloorType::Regular),
+        (10, 15, FloorType::Regular),
+        (12, 14, FloorType::Regular),
+        (13, 13, FloorType::Regular),
+        (13, 14, FloorType::Regular),
+        (13, 15, FloorType::Regular),
     ]);
 
     super::insert_walls(scene_data, vec![
@@ -155,6 +155,7 @@ pub fn static_station_outpost(scene_data: &mut SceneData) {
     ]);
 
     scene_data.terminals.insert(Position::new(14, 14), Terminal {
+        variant: TerminalType::Intercomm,
         text: Box::new(String::new()),
         front: Direction::Left
     });
@@ -173,37 +174,37 @@ pub fn static_ship_tech(scene_data: &mut SceneData) {
     scene_data.backdrop = String::from("/realm_of_sol__0000s_0001_2.1.png");
 
     super::insert_floor(scene_data, vec![
-        (7, 9),
-        (8, 9),
-        (9, 9),
-        (7, 10),
-        (8, 10),
-        (9, 10),
-        (7, 12),
-        (8, 12),
-        (9, 12),
-        (7, 13),
-        (8, 13),
-        (9, 13),
-        (7, 14),
-        (8, 14),
-        (9, 14),
-        (7, 15),
-        (8, 15),
-        (9, 15),
-        (7, 16),
-        (8, 16),
-        (9, 16),
+        (7, 9, FloorType::Light),
+        (8, 9, FloorType::Light),
+        (9, 9, FloorType::Light),
+        (7, 10, FloorType::Regular),
+        (8, 10, FloorType::Regular),
+        (9, 10, FloorType::Regular),
+        (7, 12, FloorType::Regular),
+        (8, 12, FloorType::Regular),
+        (9, 12, FloorType::Regular),
+        (7, 13, FloorType::Regular),
+        (8, 13, FloorType::Regular),
+        (9, 13, FloorType::Regular),
+        (7, 14, FloorType::Regular),
+        (8, 14, FloorType::Regular),
+        (9, 14, FloorType::Regular),
+        (7, 15, FloorType::Light),
+        (8, 15, FloorType::Light),
+        (9, 15, FloorType::Light),
+        (7, 16, FloorType::Regular),
+        (8, 16, FloorType::Regular),
+        (9, 16, FloorType::Regular),
     ]);
 
     super::insert_walls(scene_data, vec![
         (6, 8, WallType::Corner, Direction::Down),
-        (7, 8, WallType::Wall, Direction::Down),
+        (7, 8, WallType::Window, Direction::Down),
         (8, 8, WallType::Wall, Direction::Down),
-        (9, 8, WallType::Wall, Direction::Down),
+        (9, 8, WallType::Window, Direction::Down),
         (10, 8, WallType::Corner, Direction::Left),
-        (6, 9, WallType::Wall, Direction::Right),
-        (10, 9, WallType::Wall, Direction::Left),
+        (6, 9, WallType::Window, Direction::Right),
+        (10, 9, WallType::Window, Direction::Left),
         (6, 10, WallType::Corner, Direction::Right),
         (7, 10, WallType::Wall, Direction::Up),
         (9, 10, WallType::Wall, Direction::Up),
@@ -217,7 +218,7 @@ pub fn static_ship_tech(scene_data: &mut SceneData) {
         (6, 13, WallType::Wall, Direction::Right),
         (6, 14, WallType::Wall, Direction::Right),
         (10, 14, WallType::Wall, Direction::Left),
-        (6, 15, WallType::Wall, Direction::Right),
+        (6, 15, WallType::Window, Direction::Right),
         (10, 15, WallType::Wall, Direction::Left),
         (6, 16, WallType::Wall, Direction::Right),
         (10, 16, WallType::Wall, Direction::Left),
@@ -266,8 +267,15 @@ pub fn static_ship_tech(scene_data: &mut SceneData) {
     ]);
 
     scene_data.terminals.insert(Position::new(8, 8), Terminal {
+        variant: TerminalType::ShipConsole,
         text: Box::new(String::new()),
         front: Direction::Down
+    });
+
+    scene_data.terminals.insert(Position::new(10, 15), Terminal {
+        variant: TerminalType::Intercomm,
+        text: Box::new(String::new()),
+        front: Direction::Left
     });
 
     super::insert_player(scene_data, (8, 10), Direction::Up, vec![]);
