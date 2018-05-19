@@ -52,7 +52,7 @@ impl GameState for State {
     fn draw(&mut self, scene_data: &mut SceneData, camera: Position, ctx: &mut Context) -> GameResult<()> {
 
         draw_input_state("Circuitry", ctx)?;
-        draw_selection(&scene_data.current_circuitry().unwrap().parts, ctx, true)?;
+        draw_selection(&scene_data.current_circuitry().unwrap().parts, ctx, true, false)?;
 
         if !scene_data.insight_view {
             let front_index = scene_data.player.front_tile.to_int();

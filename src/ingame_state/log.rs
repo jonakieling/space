@@ -133,7 +133,7 @@ impl GameState for State {
 
     fn draw(&mut self, scene_data: &mut SceneData, _camera: Position, ctx: &mut Context) -> GameResult<()> {
 
-        draw_selection_with_parameters(&scene_data.player.log, ctx, Position {x: 770, y: 45}, TextAlign::Left, true)?;
+        draw_selection_with_parameters(&scene_data.player.log, ctx, Position {x: 770, y: 45}, TextAlign::Left, true, false)?;
 
         let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
 

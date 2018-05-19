@@ -68,13 +68,13 @@ pub fn draw_dialog(dialog: &Node<DialogItem>, ctx: &mut Context) -> GameResult<(
     graphics::set_color(ctx, graphics::WHITE)?;
     graphics::draw(ctx, &text, graphics::Point2::new(310.0, 400.0), 0.0)?;
     
-    draw_selection_with_parameters(&dialog.children, ctx, Position { x: 300, y: 430 }, TextAlign::Right, true)?;
+    draw_selection_with_parameters(&dialog.children, ctx, Position { x: 300, y: 430 }, TextAlign::Right, true, false)?;
 
     Ok(())
 }
 
-pub fn draw_selection<T: Clone + ToString>(selection: &SelectionStorage<T>, ctx: &mut Context, cursor: bool) -> GameResult<()> {
-    draw_selection_with_parameters(&selection, ctx, Position { x: 760, y: 20 }, TextAlign::Left, cursor)?;
+pub fn draw_selection<T: Clone + ToString>(selection: &SelectionStorage<T>, ctx: &mut Context, cursor: bool, draw_empty: bool) -> GameResult<()> {
+    draw_selection_with_parameters(&selection, ctx, Position { x: 760, y: 20 }, TextAlign::Left, cursor, draw_empty)?;
 
     Ok(())
 }
@@ -93,12 +93,12 @@ pub fn draw_input_state(state: &str, ctx: &mut Context) -> GameResult<()> {
     Ok(())
 }
 
-pub fn draw_selection_with_parameters<T: Clone + ToString>(selection: &SelectionStorage<T>, ctx: &mut Context, position: Position, orientation: TextAlign, cursor: bool) -> GameResult<()> {
+pub fn draw_selection_with_parameters<T: Clone + ToString>(selection: &SelectionStorage<T>, ctx: &mut Context, position: Position, orientation: TextAlign, cursor: bool, draw_empty: bool) -> GameResult<()> {
     let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
     let mut inventory_item_position = 0.0;
     let current_item = selection.current_index();
 
-    if selection.iter().len() == 0 {
+    if draw_empty && selection.iter().len() == 0 {
         let empty_text = graphics::Text::new(ctx, "empty", &font).unwrap();
         let offset;
         match orientation {

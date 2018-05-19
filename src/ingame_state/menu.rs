@@ -70,7 +70,7 @@ impl GameState for State {
     }
 
     fn draw(&mut self, _scene_data: &mut SceneData, _camera: Position, ctx: &mut Context) -> GameResult<()> {
-        draw_selection(&self.menu, ctx, true)?;
+        draw_selection(&self.menu, ctx, true, false)?;
 
         Ok(())
     }

@@ -116,7 +116,7 @@ impl EventHandler for Scene {
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx);
 
-        super::draw_selection(&self.saves, ctx, true)?;
+        super::draw_selection(&self.saves, ctx, true, false)?;
 
         graphics::present(ctx);
 

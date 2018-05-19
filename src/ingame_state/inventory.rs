@@ -1,7 +1,7 @@
 use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
-use app_state::draw_selection_with_parameters;
+use app_state::{draw_selection_with_parameters, draw_input_state};
 use app_state::ingame::{SceneData, InputState};
 use objects::{Receipe, Item};
 use ingame_state::GameState;
@@ -134,8 +134,10 @@ impl GameState for State {
 
     fn draw(&mut self, scene_data: &mut SceneData, _camera: Position, ctx: &mut Context) -> GameResult<()> {
         let cursor = self.mode == Mode::Inventory;
-        draw_selection_with_parameters(&scene_data.player.inventory, ctx, Position {x: 770, y: 20}, TextAlign::Left, cursor)?;
-        draw_selection_with_parameters(&self.craft_area, ctx, Position {x: 580, y: 20}, TextAlign::Left, !cursor)?;
+        draw_selection_with_parameters(&scene_data.player.inventory, ctx, Position {x: 770, y: 20}, TextAlign::Left, cursor, true)?;
+        draw_selection_with_parameters(&self.craft_area, ctx, Position {x: 580, y: 20}, TextAlign::Left, !cursor, false)?;
+
+        draw_input_state("Inventory", ctx)?;
 
         Ok(())
     }
