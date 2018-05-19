@@ -190,7 +190,7 @@ impl GameState for State {
         }
     }
 
-    fn draw(&mut self, scene_data: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, scene_data: &mut SceneData, _camera: Position, ctx: &mut Context) -> GameResult<()> {
         let npc_inventory = scene_data.current_npc().unwrap().inventory.clone();
         self.draw_trade_area(&npc_inventory, ctx, TradeArea::NpcInventory)?;
         self.draw_trade_area(&self.npc_trade_area, ctx, TradeArea::NpcStaging)?;

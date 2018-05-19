@@ -1,9 +1,5 @@
-use ggez::GameResult;
-use ggez::Context;
-use ggez::graphics;
-
 use misc::{Position, Direction};
-use objects::{Item, Terminal, draw_tile};
+use objects::{Item, Terminal};
 use storage::SelectionStorage;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -64,7 +60,7 @@ impl Player {
         }
     }
 
-    pub fn draw(&self, ctx: &mut Context) -> GameResult<()> {
+    pub fn tile(&self) -> &'static str {
 		let image_src;
 		match self.direction {
 			Direction::Up => {
@@ -80,8 +76,7 @@ impl Player {
 				image_src = "/char-right.png";
 			}
 		}
-
-		let dst = graphics::Point2::new(self.position.viewport_x(), self.position.viewport_y());
-        draw_tile(ctx, image_src, dst, None)
+        
+		image_src
     }
 }

@@ -1,5 +1,6 @@
 use ggez::{GameResult, Context, event::Keycode, event::Mod};
 use app_state::ingame::SceneData;
+use misc::Position;
 
 pub mod edit;
 pub mod terminal;
@@ -19,7 +20,7 @@ pub trait GameState {
         Ok(())
     }
 
-    fn draw(&mut self, _scene_data: &mut SceneData, _ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, _scene_data: &mut SceneData, _camera: Position, _ctx: &mut Context) -> GameResult<()> {
         Ok(())
     }
 

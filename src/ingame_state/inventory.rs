@@ -132,7 +132,7 @@ impl GameState for State {
         false
     }
 
-    fn draw(&mut self, scene_data: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, scene_data: &mut SceneData, _camera: Position, ctx: &mut Context) -> GameResult<()> {
         let cursor = self.mode == Mode::Inventory;
         draw_selection_with_parameters(&scene_data.player.inventory, ctx, Position {x: 770, y: 20}, TextAlign::Left, cursor)?;
         draw_selection_with_parameters(&self.craft_area, ctx, Position {x: 580, y: 20}, TextAlign::Left, !cursor)?;

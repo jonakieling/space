@@ -158,11 +158,11 @@ impl GameState for State {
         }
     }
 
-    fn draw(&mut self, _scene_data: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, _scene_data: &mut SceneData, camera: Position, ctx: &mut Context) -> GameResult<()> {
         draw_selection(&self.edit_selection, ctx, false)?;
 
         graphics::set_color(ctx, graphics::Color{r: 0.2, g: 0.8, b: 0.2, a: 1.0,})?;
-        let edit_cursor = graphics::Rect::new(self.edit_cursor.viewport_x(), self.edit_cursor.viewport_y(), 21.0, 21.0);
+        let edit_cursor = graphics::Rect::new(self.edit_cursor.viewport_x(camera), self.edit_cursor.viewport_y(camera), 21.0, 21.0);
         graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), edit_cursor)?;
 
         Ok(())

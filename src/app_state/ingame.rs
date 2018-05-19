@@ -1,11 +1,13 @@
 use std::time::Duration;
 use std::collections::VecDeque;
 use std::collections::BTreeSet;
+use std::f32::consts::{PI, FRAC_PI_2};
 
 use ggez::timer::get_delta;
 use ggez::GameResult;
 use ggez::Context;
 use ggez::graphics;
+use ggez::graphics::{spritebatch::SpriteBatch, get_screen_coordinates};
 use ggez::event;
 use ggez::event::*;
 
@@ -52,9 +54,23 @@ pub struct SceneData {
     pub main_menu: bool
 }
 
+pub struct Sprites {
+    pub walls: SpriteBatch,
+    pub corners: SpriteBatch,
+    pub edges: SpriteBatch,
+    pub floor: SpriteBatch,
+    pub circuitry: SpriteBatch,
+    pub doors: SpriteBatch,
+    pub terminals: SpriteBatch,
+    pub pilot_seats: SpriteBatch,
+    pub storages: SpriteBatch,
+    pub generators: SpriteBatch,
+}
+
 pub struct Scene {
     pub current_ingame_state: Box<GameState>,
-    pub data: SceneData
+    pub data: SceneData,
+    pub camera: Position
 }
 
 impl AppState for Scene {
@@ -140,7 +156,8 @@ impl Scene {
 
         let scene = Scene {
             current_ingame_state: Box::new(world::State::new()),
-            data
+            data,
+            camera: Position { x: 0, y: 0}
         };
 
 
@@ -346,6 +363,8 @@ impl event::EventHandler for Scene {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
+        self.camera = self.data.player.position;
+
         graphics::clear(ctx);
         graphics::set_background_color(ctx, graphics::BLACK);
 
@@ -354,13 +373,21 @@ impl event::EventHandler for Scene {
             let mut backdrop = graphics::Image::new(ctx, &self.data.backdrop)?;
             backdrop.set_filter(graphics::FilterMode::Nearest);
 
-            let dst = graphics::Point2::new(GRID_SIZE as f32, GRID_SIZE as f32);
+            let backdrop_pos = Position {
+                x: 1,
+                y: 1
+            };
+            let sceen_horizontal_center = get_screen_coordinates(ctx).w / 2.0;
+            let sceen_vertical_center = get_screen_coordinates(ctx).h / 2.0;
+            let dst = graphics::Point2::new(
+                backdrop_pos.viewport_x(self.camera) as f32 + sceen_horizontal_center,
+                backdrop_pos.viewport_y(self.camera) as f32 + sceen_vertical_center
+            );
             graphics::draw_ex(
                 ctx,
                 &backdrop,
                 graphics::DrawParam {
                     dest: dst,
-                    rotation: 0.0,
                     scale: graphics::Point2::new(GRID_SIZE as f32, GRID_SIZE as f32),
                     ..Default::default()
                 },
@@ -371,66 +398,119 @@ impl event::EventHandler for Scene {
 
         for (pos, item) in self.data.floor.iter().enumerate() {
             if let Some(floor) = item {
-                floor.draw(pos as i32, ctx)?;
+                draw_tile(ctx, floor.tile(), pos as i32, self.camera, None)?;
             }
         }
 
         for (pos, item) in self.data.walls.iter().enumerate() {
             if let Some(wall) = item {
-                wall.draw(pos as i32, ctx)?;
+                draw_tile(ctx, wall.tile(), pos as i32, self.camera, Some(wall.face))?;
             }
         }
 
         for (pos, terminal) in self.data.terminals.iter().enumerate() {
             if let Some(current_terminal) = terminal {
-                current_terminal.draw(pos as i32, ctx)?;
+                draw_tile(ctx, current_terminal.tile(), pos as i32, self.camera, Some(current_terminal.front))?;
             }
         }
 
         for (pos, item) in self.data.pilot_seats.iter().enumerate() {
             if let Some(pilot_seat) = item {
-                pilot_seat.draw(pos as i32, ctx)?;
+                draw_tile(ctx, pilot_seat.tile(), pos as i32, self.camera, Some(pilot_seat.front))?;
             }
         }
 
         for (pos, item) in self.data.doors.iter().enumerate() {
             if let Some(door) = item {
-                door.draw(pos as i32, ctx)?;
+                draw_tile(ctx, door.tile(), pos as i32, self.camera, Some(door.face))?;
             }
         }
 
         for (pos, item) in self.data.generators.iter().enumerate() {
             if let Some(generator) = item {
-                generator.draw(pos as i32, ctx)?;
+                draw_tile(ctx, generator.tile(), pos as i32, self.camera, None)?;
             }
         }
 
         for (pos, item) in self.data.storages.iter().enumerate() {
             if let Some(storage) = item {
-                storage.draw(pos as i32, ctx)?;
+                draw_tile(ctx, storage.tile(), pos as i32, self.camera, None)?;
             }
         }
 
         if self.data.insight_view {
             for (pos, circuitry) in self.data.circuitry.iter().enumerate() {
                 if let Some(circuitry) = circuitry {
-                    circuitry.draw(pos as i32, ctx)?;
+                    draw_tile(ctx, circuitry.tile(), pos as i32, self.camera, None)?;
                 }
             }
         }
 
         for (pos, npc) in self.data.npc.iter().enumerate() {
             if let Some(npc) = npc {
-                npc.draw(pos as i32, ctx)?;
+                draw_tile(ctx, npc.tile(), pos as i32, self.camera, None)?;
             }
         }
 
-        self.data.player.draw(ctx)?;
+        draw_tile(ctx, self.data.player.tile(), self.data.player.position.to_int(), self.camera, None)?;
 
-        self.current_ingame_state.draw(&mut self.data, ctx)?;
+        self.current_ingame_state.draw(&mut self.data, self.camera, ctx)?;
 
         graphics::present(ctx);
 
         Ok(())
     }
 }
+
+pub fn draw_tile(ctx: &mut Context, tile_src: &str, pos: i32, camera: Position, direction: Option<Direction>) -> GameResult<()> {
+		
+	    let pos = Position {
+            x: pos % LEVEL_SIZE,
+            y: pos / LEVEL_SIZE
+        };
+
+        let viewport_pos = pos.viewport(camera);
+
+        let sceen_horizontal_center = get_screen_coordinates(ctx).w / 2.0;
+        let sceen_vertical_center = get_screen_coordinates(ctx).h / 2.0;
+		let dst = graphics::Point2::new(viewport_pos.x as f32 + sceen_horizontal_center, viewport_pos.y as f32 + sceen_vertical_center);
+
+        graphics::set_color(ctx, graphics::WHITE)?;
+		let mut storage_image = graphics::Image::new(ctx, tile_src)?;
+		storage_image.set_filter(graphics::FilterMode::Nearest);
+		let mut tile_dst = dst;
+		let rotation;
+		match direction {
+			Some(Direction::Up) => {
+                rotation = PI;
+				tile_dst = graphics::Point2::new(dst.x + GRID_SIZE as f32, dst.y + GRID_SIZE as f32);
+			},
+			Some(Direction::Down) => {
+                rotation = 0.0;
+			},
+			Some(Direction::Left) => {
+                rotation = FRAC_PI_2;
+				tile_dst = graphics::Point2::new(tile_dst.x + GRID_SIZE as f32, tile_dst.y);
+			},
+			Some(Direction::Right) => {
+                rotation = 3.0 * FRAC_PI_2;
+				tile_dst = graphics::Point2::new(tile_dst.x, tile_dst.y + GRID_SIZE as f32);
+			},
+			_ => {
+                rotation = 0.0;
+			}
+		}
+		
+		graphics::draw_ex(
+			ctx,
+			&storage_image,
+			graphics::DrawParam {
+				dest: tile_dst,
+				rotation: rotation,
+				scale: graphics::Point2::new(PIXEL_SCALE as f32, PIXEL_SCALE as f32),
+				..Default::default()
+			},
+		)?;
+
+	    Ok(())
+    }

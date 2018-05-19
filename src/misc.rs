@@ -1,4 +1,4 @@
-use std::ops::Add;
+use std::ops::{Add, Sub};
 use constants::{GRID_SIZE, LEVEL_SIZE};
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
@@ -15,13 +15,20 @@ impl Position {
             y
         }
     }
-
-    pub fn viewport_x(self) -> f32 {
-        (self.x * GRID_SIZE) as f32
+    
+    pub fn viewport(self, camera: Position) -> Position {
+        Position {
+            x: (self.x - camera.x) * GRID_SIZE,
+            y: (self.y - camera.y) * GRID_SIZE
+        }
     }
 
-    pub fn viewport_y(self) -> f32 {
-        (self.y * GRID_SIZE) as f32
+    pub fn viewport_x(self, camera: Position) -> f32 {
+        ((self.x - camera.x) * GRID_SIZE) as f32
+    }
+
+    pub fn viewport_y(self, camera: Position) -> f32 {
+        ((self.y - camera.y) * GRID_SIZE) as f32
     }
 
     pub fn dist(self, other: &Position) -> f32 {
@@ -75,6 +82,17 @@ impl<'a> Add for &'a Position {
         Position {
             x: self.x + other.x,
             y: self.y + other.y
+        }
+    }
+}
+
+impl<'a> Sub for &'a Position {
+    type Output = Position;
+
+    fn sub(self, other: &Position) -> Position {
+        Position {
+            x: self.x - other.x,
+            y: self.y - other.y
         }
     }
 }
