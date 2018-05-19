@@ -111,10 +111,9 @@ pub fn draw_selection_with_parameters<T: Clone + ToString>(selection: &Selection
         }
         let empty_text_box = graphics::Rect::new(position.x as f32 - offset, position.y as f32, empty_text.width() as f32 + 20.0, 20.0);
 
-        graphics::set_color(ctx, graphics::BLACK)?;
+        graphics::set_color(ctx, graphics::WHITE)?;
         graphics::draw(ctx, &empty_text, graphics::Point2::new(position.x as f32 + 11.0 - offset, position.y as f32), 0.0)?;
         if cursor {
-            graphics::set_color(ctx, graphics::WHITE)?;
             graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), empty_text_box)?;
         }
     }

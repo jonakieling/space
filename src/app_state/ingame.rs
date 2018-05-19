@@ -572,8 +572,8 @@ pub fn get_tile_params(ctx: &mut Context, pos: i32, camera: Position, direction:
 
     let viewport_pos = pos.viewport(camera);
 
-    let sceen_horizontal_center = get_screen_coordinates(ctx).w / 2.0;
-    let sceen_vertical_center = get_screen_coordinates(ctx).h / 2.0;
+    let sceen_horizontal_center = get_screen_coordinates(ctx).w / 2.0 - (GRID_SIZE / 2) as f32;
+    let sceen_vertical_center = get_screen_coordinates(ctx).h / 2.0 - (GRID_SIZE / 2) as f32;
     let dst = graphics::Point2::new(viewport_pos.x as f32 + sceen_horizontal_center, viewport_pos.y as f32 + sceen_vertical_center);
 
     let mut tile_dst = dst;
