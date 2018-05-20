@@ -5,7 +5,7 @@ use app_state::{draw_input_state, draw_selection_with_parameters, ingame::SceneD
 use ingame_state::GameState;
 use storage::SelectionStorage;
 use objects::Item;
-use misc::{Position, TextAlign};
+use misc::{TextAlign, Position};
 
 #[derive(PartialEq, Clone)]
 pub enum TradeArea {
@@ -190,7 +190,7 @@ impl GameState for State {
         }
     }
 
-    fn draw(&mut self, scene_data: &mut SceneData, _camera: Position, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, scene_data: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
         draw_input_state("Trade", ctx)?;
         let npc_inventory = scene_data.current_npc().unwrap().inventory.clone();
         self.draw_trade_area(&npc_inventory, ctx, TradeArea::NpcInventory)?;

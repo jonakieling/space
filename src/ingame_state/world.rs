@@ -1,4 +1,4 @@
-use ggez::{Context, GameResult};
+use ggez::Context;
 use ggez::event::{Keycode, Mod};
 
 use app_state::{ingame::SceneData, ingame::InputState};
@@ -164,9 +164,5 @@ impl GameState for State {
             },
             _ => ()
         }
-    }
-
-    fn draw(&mut self, _scene_data: &mut SceneData, _camera: Position, _ctx: &mut Context) -> GameResult<()> {
-        Ok(())
     }
 }

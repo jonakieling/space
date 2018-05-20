@@ -4,7 +4,6 @@ use ggez::event::{Keycode, Mod};
 
 use app_state::{ingame::SceneData, draw_input_state, draw_dialog, ingame::InputState};
 use ingame_state::GameState;
-use misc::Position;
 
 pub struct State {
     change_state: Option<InputState>
@@ -71,7 +70,7 @@ impl GameState for State {
         }
     }
 
-    fn draw(&mut self, scene_data: &mut SceneData, _camera: Position, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, scene_data: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
         {
             let current_npc = scene_data.current_npc().unwrap();
             draw_input_state(&current_npc.name, ctx)?;

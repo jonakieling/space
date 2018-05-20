@@ -4,7 +4,6 @@ use ggez::event::{Keycode, Mod};
 use app_state::{draw_text, draw_input_state};
 use app_state::ingame::{SceneData, InputState};
 use ingame_state::GameState;
-use misc::Position;
 
 const TERMINAL_LIMIT: usize = 20;
 
@@ -77,7 +76,7 @@ impl GameState for State {
         self.terminal_add_character(scene_data, text);
     }
 
-    fn draw(&mut self, scene_data: &mut SceneData, _camera: Position, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, scene_data: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
         draw_input_state("Terminal", ctx)?;
         if let Some(ref text) = self.terminal_text {
             let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();

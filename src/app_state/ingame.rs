@@ -52,7 +52,9 @@ pub struct SceneData {
     pub receipes: Vec<Receipe>,
     pub dialog: Node<DialogItem>,
     pub insight_view: bool,
-    pub main_menu: bool
+    pub main_menu: bool,
+    pub sprites: Sprites,
+    pub camera: Position
 }
 
 pub struct Sprites {
@@ -74,9 +76,7 @@ pub struct Sprites {
 
 pub struct Scene {
     pub current_ingame_state: Box<GameState>,
-    pub data: SceneData,
-    pub sprites: Sprites,
-    pub camera: Position
+    pub data: SceneData
 }
 
 impl AppState for Scene {
@@ -134,35 +134,6 @@ impl Scene {
             }
         );
 
-        let mut data = SceneData {
-            movement_timer: Duration::from_millis(0),
-            backdrop: String::from(""),
-            player,
-            walls,
-            floor,
-            doors,
-            terminals,
-            decorations,
-            circuitry,
-            generators,
-            pilot_seats,
-            npc,
-            storages,
-            receipes,
-            dialog: Node {
-                value: DialogItem {
-                    text: "".to_string(),
-                    response: "".to_string(),
-                    action: None
-                },
-                children: SelectionStorage::new()
-            },
-            insight_view: false,
-            main_menu: false
-        };
-
-        data.update_power();
-
         let mut wall_img = graphics::Image::new(ctx, "/wall.png").unwrap();
             wall_img.set_filter(graphics::FilterMode::Nearest);
         let mut corner_img = graphics::Image::new(ctx, "/corner.png").unwrap();
@@ -208,11 +179,40 @@ impl Scene {
             generators: SpriteBatch::new(generator_img),
         };
 
-        let scene = Scene {
-            current_ingame_state: Box::new(world::State::new()),
-            data,
+        let mut data = SceneData {
+            movement_timer: Duration::from_millis(0),
+            backdrop: String::from(""),
+            player,
+            walls,
+            floor,
+            doors,
+            terminals,
+            decorations,
+            circuitry,
+            generators,
+            pilot_seats,
+            npc,
+            storages,
+            receipes,
+            dialog: Node {
+                value: DialogItem {
+                    text: "".to_string(),
+                    response: "".to_string(),
+                    action: None
+                },
+                children: SelectionStorage::new()
+            },
+            insight_view: false,
+            main_menu: false,
             sprites,
             camera: Position { x: 0, y: 0}
+        };
+
+        data.update_power();
+
+        let scene = Scene {
+            current_ingame_state: Box::new(world::State::new()),
+            data
         };
 
 
@@ -418,7 +418,7 @@ impl event::EventHandler for Scene {
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        self.camera = self.data.player.position;
+        self.data.camera = self.data.player.position;
 
         graphics::clear(ctx);
         graphics::set_background_color(ctx, graphics::BLACK);
@@ -433,7 +433,7 @@ impl event::EventHandler for Scene {
                 x: 1,
                 y: 1
             };
-            let mut p = get_tile_params(ctx, backdrop_pos.to_int(), self.camera, None);
+            let mut p = get_tile_params(ctx, backdrop_pos.to_int(), self.data.camera, None);
             // override with grid size scaling since backdrops are smaller scale (1 pixel = 1 tile)
             p.scale = graphics::Point2::new(GRID_SIZE as f32, GRID_SIZE as f32);
             graphics::draw_ex(
@@ -447,104 +447,104 @@ impl event::EventHandler for Scene {
 
         for (pos, item) in self.data.floor.iter().enumerate() {
             if let Some(floor) = item {
-                let p = get_tile_params(ctx, pos as i32, self.camera, None);
+                let p = get_tile_params(ctx, pos as i32, self.data.camera, None);
                 match floor.variant {
-                    FloorType::Regular => self.sprites.floor.add(p),
-                    FloorType::Light => self.sprites.floor_light.add(p)
+                    FloorType::Regular => self.data.sprites.floor.add(p),
+                    FloorType::Light => self.data.sprites.floor_light.add(p)
                 };
             }
         }
-        draw_spritebatch(ctx, &mut self.sprites.floor)?;
-        draw_spritebatch(ctx, &mut self.sprites.floor_light)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.floor)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.floor_light)?;
 
         for (pos, item) in self.data.walls.iter().enumerate() {
             if let Some(wall) = item {
-                let p = get_tile_params(ctx, pos as i32, self.camera, Some(wall.face));
+                let p = get_tile_params(ctx, pos as i32, self.data.camera, Some(wall.face));
                 match wall.variant {
-                    WallType::Wall => self.sprites.walls.add(p),
-                    WallType::Corner => self.sprites.corners.add(p),
-                    WallType::Edge => self.sprites.edges.add(p),
-                    WallType::Window => self.sprites.windows.add(p),
+                    WallType::Wall => self.data.sprites.walls.add(p),
+                    WallType::Corner => self.data.sprites.corners.add(p),
+                    WallType::Edge => self.data.sprites.edges.add(p),
+                    WallType::Window => self.data.sprites.windows.add(p),
                 };
             }
         }
-        draw_spritebatch(ctx, &mut self.sprites.walls)?;
-        draw_spritebatch(ctx, &mut self.sprites.corners)?;
-        draw_spritebatch(ctx, &mut self.sprites.edges)?;
-        draw_spritebatch(ctx, &mut self.sprites.windows)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.walls)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.corners)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.edges)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.windows)?;
 
         for (pos, terminal) in self.data.terminals.iter().enumerate() {
             if let Some(current_terminal) = terminal {
-                let p = get_tile_params(ctx, pos as i32, self.camera, Some(current_terminal.front));
+                let p = get_tile_params(ctx, pos as i32, self.data.camera, Some(current_terminal.front));
                 match current_terminal.variant {
                     TerminalType::Intercomm => {
-                        self.sprites.terminals.add(p);
+                        self.data.sprites.terminals.add(p);
                     },
                     TerminalType::ShipConsole => {
-                        self.sprites.ship_consoles.add(p);
+                        self.data.sprites.ship_consoles.add(p);
                     },
                     TerminalType::Hud => ()
                 };
             }
         }
-        draw_spritebatch(ctx, &mut self.sprites.terminals)?;
-        draw_spritebatch(ctx, &mut self.sprites.ship_consoles)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.terminals)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.ship_consoles)?;
 
         for (pos, item) in self.data.pilot_seats.iter().enumerate() {
             if let Some(pilot_seat) = item {
-                let p = get_tile_params(ctx, pos as i32, self.camera, Some(pilot_seat.front));
-                self.sprites.pilot_seats.add(p);
+                let p = get_tile_params(ctx, pos as i32, self.data.camera, Some(pilot_seat.front));
+                self.data.sprites.pilot_seats.add(p);
             }
         }
-        draw_spritebatch(ctx, &mut self.sprites.pilot_seats)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.pilot_seats)?;
 
         for (pos, item) in self.data.doors.iter().enumerate() {
             if let Some(door) = item {
-                let p = get_tile_params(ctx, pos as i32, self.camera, Some(door.face));
+                let p = get_tile_params(ctx, pos as i32, self.data.camera, Some(door.face));
                 match door.status {
-                    DoorStatus::Open => self.sprites.doors_open.add(p),
-                    DoorStatus::Closed => self.sprites.doors.add(p)
+                    DoorStatus::Open => self.data.sprites.doors_open.add(p),
+                    DoorStatus::Closed => self.data.sprites.doors.add(p)
                 };
             }
         }
-        draw_spritebatch(ctx, &mut self.sprites.doors)?;
-        draw_spritebatch(ctx, &mut self.sprites.doors_open)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.doors)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.doors_open)?;
 
         for (pos, item) in self.data.generators.iter().enumerate() {
             if item.is_some() {
-                let params = get_tile_params(ctx, pos as i32, self.camera, None);
-                self.sprites.generators.add(params);
+                let params = get_tile_params(ctx, pos as i32, self.data.camera, None);
+                self.data.sprites.generators.add(params);
             }
         }
-        draw_spritebatch(ctx, &mut self.sprites.generators)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.generators)?;
 
         for (pos, item) in self.data.storages.iter().enumerate() {
             if item.is_some() {
-                let params = get_tile_params(ctx, pos as i32, self.camera, None);
-                self.sprites.storages.add(params);
+                let params = get_tile_params(ctx, pos as i32, self.data.camera, None);
+                self.data.sprites.storages.add(params);
             }
         }
-        draw_spritebatch(ctx, &mut self.sprites.storages)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.storages)?;
 
         if self.data.insight_view {
             for (pos, item) in self.data.circuitry.iter().enumerate() {
                 if item.is_some() {
-                    let params = get_tile_params(ctx, pos as i32, self.camera, None);
-                    self.sprites.circuitry.add(params);
+                    let params = get_tile_params(ctx, pos as i32, self.data.camera, None);
+                    self.data.sprites.circuitry.add(params);
                 }
             }
-            draw_spritebatch(ctx, &mut self.sprites.circuitry)?;
+            draw_spritebatch(ctx, &mut self.data.sprites.circuitry)?;
         }
 
         for (pos, npc) in self.data.npc.iter().enumerate() {
             if let Some(npc) = npc {
-                draw_tile(ctx, npc.tile(), pos as i32, self.camera, None)?;
+                draw_tile(ctx, npc.tile(), pos as i32, self.data.camera, None)?;
             }
         }
 
-        draw_tile(ctx, self.data.player.tile(), self.data.player.position.to_int(), self.camera, None)?;
+        draw_tile(ctx, self.data.player.tile(), self.data.player.position.to_int(), self.data.camera, None)?;
 
-        self.current_ingame_state.draw(&mut self.data, self.camera, ctx)?;
+        self.current_ingame_state.draw(&mut self.data, ctx)?;
 
         graphics::present(ctx);
 

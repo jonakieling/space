@@ -161,12 +161,12 @@ impl GameState for State {
         }
     }
 
-    fn draw(&mut self, _scene_data: &mut SceneData, camera: Position, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, scene_data: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
         draw_selection(&self.edit_selection, ctx, false, false)?;
 
         graphics::set_color(ctx, graphics::Color{r: 0.2, g: 0.8, b: 0.2, a: 1.0,})?;
 
-        let viewport_pos = self.edit_cursor.viewport(camera);
+        let viewport_pos = self.edit_cursor.viewport(scene_data.camera);
 
         let sceen_horizontal_center = get_screen_coordinates(ctx).w / 2.0 - (GRID_SIZE / 2) as f32;
         let sceen_vertical_center = get_screen_coordinates(ctx).h / 2.0 - (GRID_SIZE / 2) as f32;

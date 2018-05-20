@@ -4,7 +4,6 @@ use ggez::event::{Keycode, Mod};
 use app_state::{ingame::SceneData, ingame::InputState, draw_selection};
 use ingame_state::GameState;
 use storage::SelectionStorage;
-use misc::Position;
 
 #[derive(Debug, Clone)]
 pub enum MenuOption {
@@ -69,7 +68,7 @@ impl GameState for State {
         }
     }
 
-    fn draw(&mut self, _scene_data: &mut SceneData, _camera: Position, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, _scene_data: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
         draw_selection(&self.menu, ctx, true, false)?;
 
         Ok(())
