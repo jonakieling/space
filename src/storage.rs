@@ -168,9 +168,17 @@ impl<T: Clone> SelectionStorage<T> {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-pub struct Tree<T: Clone> {
-    pub root: Node<T>
+impl Node<DialogItem> {
+    pub fn new() -> Node<DialogItem> {
+        Node {
+            value: DialogItem {
+                text: "".to_string(),
+                response: "[ ]".to_string(),
+                action: None
+            },
+            children: SelectionStorage::new()
+        }
+    }    
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

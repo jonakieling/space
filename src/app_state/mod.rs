@@ -47,17 +47,6 @@ impl EventHandler for App {
     }
 }
 
-pub fn draw_text(ctx: &mut Context, text: &graphics::Text) -> GameResult<()> {
-    graphics::set_color(ctx, graphics::BLACK)?;
-    let textbox = graphics::Rect::new(270.0, 450.0, text.width() as f32 + 20.0, 20.0);
-    graphics::rectangle(ctx, graphics::DrawMode::Fill, textbox)?;
-    graphics::set_color(ctx, graphics::WHITE)?;
-    graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), textbox)?;
-    graphics::draw(ctx, text, graphics::Point2::new(280.0, 450.0), 0.0)?;
-
-    Ok(())
-}
-
 pub fn draw_dialog(dialog: &Node<DialogItem>, ctx: &mut Context) -> GameResult<()> {
     let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
     let text = graphics::Text::new(ctx, &dialog.value.response, &font)?;

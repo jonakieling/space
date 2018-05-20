@@ -31,7 +31,6 @@ pub enum InputState {
     Menu,
     Npc,
     NpcTrade,
-    Log,
     Storage
 }
 
@@ -109,7 +108,7 @@ impl Scene {
             inventory,
             terminal: Box::new(Terminal {
                 variant: TerminalType::Intercomm,
-                text: Box::new(String::new()),
+                dialog: Node::new(),
                 front: Direction::Down
             }),
             log: SelectionStorage::new()
@@ -126,13 +125,7 @@ impl Scene {
         let npc = <PositionLevelStorage<Npc>>::new();
         let storages = <PositionLevelStorage<Storage>>::new();
         
-        let mut receipes = Vec::new();
-        receipes.push(
-            Receipe {
-                result: Item::Log,
-                incredients: vec![Item::MicroController, Item::DataChip]
-            }
-        );
+        let receipes = Vec::new();
 
         let mut wall_img = graphics::Image::new(ctx, "/wall.png").unwrap();
             wall_img.set_filter(graphics::FilterMode::Nearest);

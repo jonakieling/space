@@ -11,10 +11,11 @@ use app_state::ingame::*;
 use player::Player;
 use objects::*;
 use misc::{Position, Direction};
-use storage::{Tree, SelectionStorage};
+use storage::{Node, SelectionStorage};
 use dialog::*;
 
 pub mod static_levels;
+pub mod static_npc;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Save {
@@ -121,7 +122,7 @@ pub fn save_scene(scene_data: &SceneData, filename: &str) {
     let bytes: Vec<u8> = bincode::serialize(&level_npc).unwrap();
     File::create("temp-save/npc.bin").unwrap().write_all(&bytes).unwrap();
 
-    let mut level_npc_dialog: Vec<Tree<DialogItem>> = vec![];
+    let mut level_npc_dialog: Vec<Node<DialogItem>> = vec![];
     for item in scene_data.npc.iter() {
         if let Some(ref npc) = *item {
             level_npc_dialog.push(npc.dialog.clone());
@@ -298,10 +299,17 @@ pub fn insert_player(scene_data: &mut SceneData, pos: (i32, i32), dir: Direction
         inventory,
         terminal: Box::new(Terminal {
             variant: TerminalType::Hud,
-            text: Box::new(String::new()),
+            dialog: Node::new(),
             front: Direction::Down
         }),
         log: SelectionStorage::new()
     };
     scene_data.player = player;
+}
+
+pub fn insert_npc(scene_data: &mut SceneData, x: i32, y: i32, npc: Npc) {
+    scene_data.npc.insert(
+        Position { x, y },
+        npc
+    );
 }

@@ -1,76 +1,15 @@
 use app_state::ingame::*;
 use objects::*;
-use storage::{SelectionStorage, Tree, Node};
 use misc::*;
-use dialog::*;
+use savegame::static_npc::*;
+use storage::Node;
 
 pub fn empty(scene_data: &mut SceneData) {
     scene_data.backdrop = String::from("");
 
-    super::insert_player(scene_data, (8, 10), Direction::Up, vec![]);
+    super::insert_player(scene_data, (1, 1), Direction::Down, vec![]);
     
     println!("game loaded: static empty");
-}
-
-pub fn static_empty_npc(scene_data: &mut SceneData) {
-    scene_data.backdrop = String::from("");
-
-    let mut inventory = SelectionStorage::new();
-    inventory.insert(Item::DataChip);
-    inventory.insert(Item::Communicator);
-    inventory.insert(Item::Terminal);
-
-    let mut dialog = SelectionStorage::new();
-    let mut dialog2 = SelectionStorage::new();
-    dialog2.insert(Node {
-        value: DialogItem {
-            text: "Trade".to_string(),
-            response: "Here are my goods".to_string(),
-            action: Some(DialogAction::Trade)
-        },
-        children: SelectionStorage::new()
-    });
-    dialog.insert(Node {
-        value: DialogItem {
-            text: "Hi".to_string(),
-            response: "Hello".to_string(),
-            action: None
-        },
-        children: dialog2
-    });
-    dialog.insert(Node {
-        value: DialogItem {
-            text: "Bye".to_string(),
-            response: "Goodbye".to_string(),
-            action: None
-        },
-        children: SelectionStorage::new()
-    });
-    
-    let npc_gnoerf = Npc {
-        name: "Gnoerf".to_string(),
-        direction: Direction::Left,
-        look_at: Direction::Left,
-        dialog: Tree {
-            root: Node {
-                value: DialogItem {
-                    text: "".to_string(),
-                    response: "...".to_string(),
-                    action: None
-                },
-                children: dialog
-            }
-        },
-        inventory
-    };
-    scene_data.npc.insert(Position::new(12, 12), npc_gnoerf);
-    
-    let mut inventory = <SelectionStorage<Item>>::new();
-    inventory.insert(Item::MicroController);
-    inventory.insert(Item::DataChip);
-    scene_data.player.inventory = inventory;
-    
-    println!("game loaded: static empty npc");
 }
 
 pub fn static_station_outpost(scene_data: &mut SceneData) {
@@ -156,7 +95,7 @@ pub fn static_station_outpost(scene_data: &mut SceneData) {
 
     scene_data.terminals.insert(Position::new(14, 14), Terminal {
         variant: TerminalType::Intercomm,
-        text: Box::new(String::new()),
+        dialog: Node::new(),
         front: Direction::Left
     });
 
@@ -165,7 +104,11 @@ pub fn static_station_outpost(scene_data: &mut SceneData) {
         (7, 10, Direction::Right)
     ]);
 
-    super::insert_player(scene_data, (9, 11), Direction::Down, vec![]);
+    super::insert_npc(scene_data, 10 ,13, guard(Direction::Left));
+
+    super::insert_npc(scene_data, 9 ,9, gnoerf(Direction::Down));
+
+    super::insert_player(scene_data, (9, 11), Direction::Up, vec![]);
 
     println!("game loaded: static station outpost");
 }
@@ -268,13 +211,13 @@ pub fn static_ship_tech(scene_data: &mut SceneData) {
 
     scene_data.terminals.insert(Position::new(8, 8), Terminal {
         variant: TerminalType::ShipConsole,
-        text: Box::new(String::new()),
+        dialog: Node::new(),
         front: Direction::Down
     });
 
     scene_data.terminals.insert(Position::new(10, 15), Terminal {
         variant: TerminalType::Intercomm,
-        text: Box::new(String::new()),
+        dialog: Node::new(),
         front: Direction::Left
     });
 

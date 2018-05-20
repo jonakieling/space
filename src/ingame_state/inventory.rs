@@ -44,10 +44,6 @@ impl GameState for State {
                 self.change_state = None;
                 Some(Box::new(super::world::State::new()))
             },
-            Some(InputState::Log) => {
-                self.change_state = None;
-                Some(Box::new(super::log::State::new()))
-            },
             _ => None,
         }
     }
@@ -106,9 +102,6 @@ impl GameState for State {
                 match self.mode {
                     Mode::Inventory => {
                         match scene_data.player.inventory.current() {
-                            Some(Item::Log) => {
-                                self.change_state = Some(InputState::Log);
-                            },
                             _ => (),
                         }
                     },

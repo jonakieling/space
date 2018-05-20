@@ -7,7 +7,7 @@ use app_state::{ingame::InputState, ingame::SceneData, draw_selection};
 use ingame_state::GameState;
 use misc::Direction;
 use objects::*;
-use storage::SelectionStorage;
+use storage::{SelectionStorage, Node};
 use misc::Position;
 use constants::GRID_SIZE;
 
@@ -127,7 +127,7 @@ impl GameState for State {
                 scene_data.doors.insert(self.edit_cursor, Door { status: DoorStatus::Closed, face: Direction::Down});
             },
             Keycode::T => {
-                scene_data.terminals.insert(self.edit_cursor, Terminal { variant: TerminalType::Intercomm, text: Box::new(String::new()), front: Direction::Down});
+                scene_data.terminals.insert(self.edit_cursor, Terminal { variant: TerminalType::Intercomm, dialog: Node::new(), front: Direction::Down});
             },
             Keycode::Tab => {
                 if let Some(ref mut door) = scene_data.doors.get_mut(self.edit_cursor) {

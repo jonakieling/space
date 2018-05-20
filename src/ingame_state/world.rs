@@ -24,7 +24,7 @@ impl State {
                 Direction::Up => npc.direction = Direction::Down,
                 Direction::Right => npc.direction = Direction::Left,
             }
-            scene_data.dialog = npc.dialog.root.clone();
+            scene_data.dialog = npc.dialog.clone();
             self.change_state = Some(InputState::Npc);
         }
     }
@@ -46,6 +46,7 @@ impl State {
             let terminal_front_tile = &terminal.front.value() + &scene_data.player.front_tile;
             if terminal_front_tile == scene_data.player.position {
                 self.change_state = Some(InputState::Terminal);
+                scene_data.dialog = terminal.dialog.clone();
             }
         }
     }

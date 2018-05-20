@@ -1,5 +1,5 @@
 use misc::{Direction};
-use storage::{SelectionStorage, Tree};
+use storage::{SelectionStorage, Node};
 use dialog::DialogItem;
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
@@ -61,7 +61,7 @@ pub enum TerminalType {
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Terminal {
 	pub variant: TerminalType,
-    pub text: Box<String>,
+    pub dialog: Node<DialogItem>,
     pub front: Direction,
 }
 
@@ -89,13 +89,8 @@ pub struct Generator {
 
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 pub enum Item {
-    Log,
-    Terminal,
-    Communicator,
-    Scanner,
-    PowerConductor,
-	DataChip,
-	MicroController
+	PowerConductor,
+	Hud
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -129,30 +124,41 @@ impl ToString for Item {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub enum NpcType {
+	Gnoerf,
+	Guard
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Npc {
 	pub name: String,
+	pub variant: NpcType,
     pub direction: Direction,
     pub look_at: Direction,
-    pub dialog: Tree<DialogItem>,
+    pub dialog: Node<DialogItem>,
     pub inventory: SelectionStorage<Item>,
 }
 
 impl Npc {
     pub fn tile(&self) -> &'static str {
 		let image_src;
-		match self.direction {
-			Direction::Up => {
-				image_src = "/gnoerf-back.png";
+		match self.variant {
+			NpcType::Gnoerf => {
+				match self.direction {
+					Direction::Up => image_src = "/gnoerf-back.png",
+					Direction::Down => image_src = "/gnoerf-front.png",
+					Direction::Left => image_src = "/gnoerf-left.png",
+					Direction::Right => image_src = "/gnoerf-right.png"
+				}
 			},
-			Direction::Down => {
-				image_src = "/gnoerf-front.png";
+			NpcType::Guard => {
+				match self.direction {
+					Direction::Up => image_src = "/guard-back.png",
+					Direction::Down => image_src = "/guard-front.png",
+					Direction::Left => image_src = "/guard-left.png",
+					Direction::Right => image_src = "/guard-right.png"
+				}
 			},
-			Direction::Left => {
-				image_src = "/gnoerf-left.png";
-			},
-			Direction::Right => {
-				image_src = "/gnoerf-right.png";
-			}
 		}
 
 		image_src
