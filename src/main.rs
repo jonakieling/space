@@ -20,13 +20,14 @@ use std::env;
 use std::path;
 use std::io::Write;
 
-use ggez::{Context, conf, event::*};
+use ggez::{graphics, Context, conf, event::*};
 
 use app_state::*;
 
 fn main() {
     let c = conf::Conf::new();
     let ctx = &mut Context::load_from_conf("Space", "Jonathan Kieling", c).unwrap();
+    graphics::set_background_color(ctx, graphics::BLACK);
 
     if let Ok(ref manifest_dir) = env::var("CARGO_MANIFEST_DIR") {
         let mut path = path::PathBuf::from(manifest_dir);

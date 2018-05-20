@@ -421,7 +421,6 @@ impl event::EventHandler for Scene {
         self.data.camera = self.data.player.position;
 
         graphics::clear(ctx);
-        graphics::set_background_color(ctx, graphics::BLACK);
 
         if self.data.backdrop != "" {
             graphics::set_color(ctx, graphics::Color{r: 1.0, g: 1.0, b: 1.0, a: 0.25})?;
