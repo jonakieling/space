@@ -363,7 +363,7 @@ impl SceneData {
 impl event::EventHandler for Scene {
     fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
 
-        if let Some(state) = self.current_ingame_state.change_state() {
+        if let Some(state) = self.current_ingame_state.change_state(&mut self.data) {
             self.current_ingame_state = state;
         }
 

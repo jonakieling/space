@@ -43,7 +43,7 @@ impl State {
 
 impl GameState for State {
 
-    fn change_state(&mut self) -> Option<Box<GameState>> {
+    fn change_state(&mut self, _scene_data: &mut SceneData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;

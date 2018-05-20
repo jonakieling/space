@@ -53,7 +53,7 @@ impl State {
 
 impl GameState for State {
 
-    fn change_state(&mut self) -> Option<Box<GameState>> {
+    fn change_state(&mut self, scene_data: &mut SceneData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
@@ -61,7 +61,7 @@ impl GameState for State {
             },
             Some(InputState::Edit) => {
                 self.change_state = None;
-                Some(Box::new(super::edit::State::new()))
+                Some(Box::new(super::edit::State::new(scene_data.player.position)))
             },
             Some(InputState::Menu) => {
                 self.change_state = None;

@@ -1,3 +1,5 @@
+use ggez::graphics::get_screen_coordinates;
+
 use ggez::{Context, GameResult, graphics};
 use ggez::event::{Keycode, Mod};
 
@@ -7,6 +9,7 @@ use misc::Direction;
 use objects::*;
 use storage::SelectionStorage;
 use misc::Position;
+use constants::GRID_SIZE;
 
 pub struct State {
     edit_cursor: Position,
@@ -15,9 +18,9 @@ pub struct State {
 }
 
 impl State {
-    pub fn new() -> State {
+    pub fn new(init: Position) -> State {
     	State {
-            edit_cursor: Position {x: 0, y: 0},
+            edit_cursor: init,
             edit_selection: SelectionStorage::new(),
             change_state: None
         }
@@ -63,7 +66,7 @@ impl State {
 
 impl GameState for State {
 
-    fn change_state(&mut self) -> Option<Box<GameState>> {
+    fn change_state(&mut self, _scene_data: &mut SceneData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
@@ -162,7 +165,17 @@ impl GameState for State {
         draw_selection(&self.edit_selection, ctx, false, false)?;
 
         graphics::set_color(ctx, graphics::Color{r: 0.2, g: 0.8, b: 0.2, a: 1.0,})?;
-        let edit_cursor = graphics::Rect::new(self.edit_cursor.viewport_x(camera), self.edit_cursor.viewport_y(camera), 21.0, 21.0);
+
+        let viewport_pos = self.edit_cursor.viewport(camera);
+
+        let sceen_horizontal_center = get_screen_coordinates(ctx).w / 2.0 - (GRID_SIZE / 2) as f32;
+        let sceen_vertical_center = get_screen_coordinates(ctx).h / 2.0 - (GRID_SIZE / 2) as f32;
+        let edit_cursor = graphics::Rect::new(
+            viewport_pos.x as f32 + sceen_horizontal_center,
+            viewport_pos.y as f32 + sceen_vertical_center,
+            GRID_SIZE as f32,
+            GRID_SIZE as f32
+        );
         graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), edit_cursor)?;
 
         Ok(())

@@ -14,7 +14,7 @@ pub mod log;
 pub mod storage;
 
 pub trait GameState {
-    fn change_state(&mut self) -> Option<Box<GameState>> { None }
+    fn change_state(&mut self, _scene_data: &mut SceneData) -> Option<Box<GameState>> { None }
     
     fn update(&mut self, _scene_data: &mut SceneData) -> GameResult<()> {
         Ok(())
