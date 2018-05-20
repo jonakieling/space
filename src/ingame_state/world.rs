@@ -1,7 +1,7 @@
 use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
-use app_state::{ingame::SceneData, draw_input_state, ingame::InputState};
+use app_state::{ingame::SceneData, ingame::InputState};
 use misc::*;
 use ingame_state::GameState;
 
@@ -166,14 +166,7 @@ impl GameState for State {
         }
     }
 
-    fn draw(&mut self, scene_data: &mut SceneData, _camera: Position, ctx: &mut Context) -> GameResult<()> {
-
-        if scene_data.insight_view {
-            draw_input_state("World insight", ctx)?;
-        } else {
-            draw_input_state("World", ctx)?;
-        }
-
+    fn draw(&mut self, _scene_data: &mut SceneData, _camera: Position, _ctx: &mut Context) -> GameResult<()> {
         Ok(())
     }
 }

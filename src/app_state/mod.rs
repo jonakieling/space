@@ -87,7 +87,6 @@ pub fn draw_input_state(state: &str, ctx: &mut Context) -> GameResult<()> {
     let input_state_box = graphics::Rect::new(20.0, 20.0, input_state_graphics.width() as f32 + 20.0, 20.0);
     graphics::rectangle(ctx, graphics::DrawMode::Fill, input_state_box)?;
     graphics::set_color(ctx, graphics::WHITE)?;
-    graphics::rectangle(ctx, graphics::DrawMode::Line(2.0), input_state_box)?;
     graphics::draw(ctx, &input_state_graphics, graphics::Point2::new(30.0, 20.0), 0.0)?;
 
     Ok(())

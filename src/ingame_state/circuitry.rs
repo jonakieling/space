@@ -1,7 +1,7 @@
 use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
-use app_state::{ingame::InputState, ingame::SceneData, draw_selection, draw_input_state};
+use app_state::{ingame::InputState, ingame::SceneData, draw_selection};
 use ingame_state::GameState;
 use app_state::ingame::draw_tile;
 use misc::Position;
@@ -50,8 +50,6 @@ impl GameState for State {
     }
 
     fn draw(&mut self, scene_data: &mut SceneData, camera: Position, ctx: &mut Context) -> GameResult<()> {
-
-        draw_input_state("Circuitry", ctx)?;
         draw_selection(&scene_data.current_circuitry().unwrap().parts, ctx, true, false)?;
 
         if !scene_data.insight_view {

@@ -1,7 +1,7 @@
 use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
-use app_state::{draw_selection_with_parameters, ingame::SceneData, ingame::InputState};
+use app_state::{draw_input_state, draw_selection_with_parameters, ingame::SceneData, ingame::InputState};
 use ingame_state::GameState;
 use storage::SelectionStorage;
 use objects::Item;
@@ -191,6 +191,7 @@ impl GameState for State {
     }
 
     fn draw(&mut self, scene_data: &mut SceneData, _camera: Position, ctx: &mut Context) -> GameResult<()> {
+        draw_input_state("Trade", ctx)?;
         let npc_inventory = scene_data.current_npc().unwrap().inventory.clone();
         self.draw_trade_area(&npc_inventory, ctx, TradeArea::NpcInventory)?;
         self.draw_trade_area(&self.npc_trade_area, ctx, TradeArea::NpcStaging)?;
