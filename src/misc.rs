@@ -75,6 +75,12 @@ impl Position {
     }
 }
 
+impl ToString for Position {
+    fn to_string(&self) -> String {
+        format!("{}:{}", self.x, self.y)
+    }
+}
+
 impl<'a> Add for &'a Position {
     type Output = Position;
 

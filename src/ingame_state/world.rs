@@ -89,6 +89,10 @@ impl GameState for Handler {
                 self.change_state = None;
                 Some(Box::new(super::storage::Handler::new()))
             },
+            Some(InputState::Map) => {
+                self.change_state = None;
+                Some(Box::new(super::map::Handler::new()))
+            },
             _ => None,
         }
     }
@@ -157,6 +161,10 @@ impl GameState for Handler {
             },
             Keycode::I => {
                 self.change_state = Some(InputState::Inventory);
+            },
+            Keycode::M => {
+                scene_data.overlay = true;
+                self.change_state = Some(InputState::Map);
             },
             Keycode::Escape => {
                 self.change_state = Some(InputState::Menu);

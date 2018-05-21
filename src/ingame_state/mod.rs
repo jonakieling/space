@@ -7,3 +7,4 @@ pub mod menu;
 pub mod npc;
 pub mod npc_trade;
 pub mod storage;
+pub mod map;

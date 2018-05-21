@@ -1,5 +1,4 @@
 use ggez::graphics::get_screen_coordinates;
-
 use ggez::{Context, GameResult, graphics};
 use ggez::event::{Keycode, Mod};
 

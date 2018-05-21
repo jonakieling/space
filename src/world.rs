@@ -9,21 +9,13 @@ use storage::*;
 use objects::*;
 use misc::*;
 use dialog::*;
+use app::SpriteId;
 
-#[derive(Hash, PartialEq, Eq)]
-pub enum SpriteId {
-    Wall,
-    Corner,
-    Edge,
-    Window,
-    Floor(FloorType),
-    Circuitry,
-    Door(DoorStatus),
-    Terminal(TerminalType),
-    PilotSeat,
-    Storage,
-    Generator,
-    Decoration(DecorationType)
+pub struct Station { }
+
+pub struct Sector {
+    pub position: Position,
+    pub stations: Vec<Station>
 }
 
 pub struct WorldData {
@@ -40,10 +32,12 @@ pub struct WorldData {
     pub pilot_seats: PositionLevelStorage<PilotSeat>,
     pub npc: PositionLevelStorage<Npc>,
     pub storages: PositionLevelStorage<Storage>,
+    pub sectors: Vec<Sector>,
     pub receipes: Vec<Receipe>,
     pub dialog: Node<DialogItem>,
     pub insight_view: bool,
     pub main_menu: bool,
+    pub overlay: bool,
     pub sprites: HashMap<SpriteId, SpriteBatch>,
     pub camera: Position
 }
@@ -96,6 +90,8 @@ impl WorldData {
         sprites.insert(SpriteId::PilotSeat, SpriteBatch::new(Image::new(ctx, "/pilot-seat.png").unwrap()));
         sprites.insert(SpriteId::Storage, SpriteBatch::new(Image::new(ctx, "/storage.png").unwrap()));
         sprites.insert(SpriteId::Generator, SpriteBatch::new(Image::new(ctx, "/generator.png").unwrap()));
+        sprites.insert(SpriteId::MapSector, SpriteBatch::new(Image::new(ctx, "/map-sector.png").unwrap()));
+        sprites.insert(SpriteId::MapStation, SpriteBatch::new(Image::new(ctx, "/map-station.png").unwrap()));
 
         WorldData {
             movement_timer: Duration::from_millis(0),
@@ -111,6 +107,29 @@ impl WorldData {
             pilot_seats,
             npc,
             storages,
+            sectors: vec![
+                Sector {
+                    position: Position {
+                        x: -3,
+                        y: -2
+                    },
+                    stations: vec![]
+                },
+                Sector {
+                    position: Position {
+                        x: 4,
+                        y: 4
+                    },
+                    stations: vec![ Station {} ]
+                },
+                Sector {
+                    position: Position {
+                        x: 11,
+                        y: 6
+                    },
+                    stations: vec![]
+                }
+            ],
             receipes,
             dialog: Node {
                 value: DialogItem {
@@ -122,6 +141,7 @@ impl WorldData {
             },
             insight_view: false,
             main_menu: false,
+            overlay: false,
             sprites,
             camera: Position { x: 0, y: 0}
         }

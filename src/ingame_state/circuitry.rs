@@ -2,10 +2,9 @@ use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
 use world::WorldData;
-use app::draw_selection;
+use app::{draw_selection, draw_tile};
 use app_state::ingame::InputState;
 use GameState;
-use app_state::ingame::draw_tile;
 
 pub struct Handler {
     change_state: Option<InputState>
