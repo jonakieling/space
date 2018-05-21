@@ -1,7 +1,7 @@
 use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
-use app_state::{draw_selection_with_parameters, draw_input_state};
+use app::{draw_selection_with_parameters, draw_input_state};
 use app_state::ingame::InputState;
 use world::WorldData;
 use objects::{Receipe, Item};
@@ -15,15 +15,15 @@ enum Mode {
     Crafting
 }
 
-pub struct State {
+pub struct Handler {
     craft_area: SelectionStorage<Item>,
     change_state: Option<InputState>,
     mode: Mode
 }
 
-impl State {
-    pub fn new() -> State {
-    	State {
+impl Handler {
+    pub fn new() -> Handler {
+    	Handler {
             craft_area:  SelectionStorage::new(),
             change_state: None,
             mode: Mode::Inventory
@@ -37,13 +37,13 @@ impl State {
     }
 }
 
-impl GameState for State {
+impl GameState for Handler {
 
     fn change_state(&mut self, _ctx: &mut Context, _scene_data: &mut WorldData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
-                Some(Box::new(super::world::State::new()))
+                Some(Box::new(super::world::Handler::new()))
             },
             _ => None,
         }

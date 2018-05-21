@@ -2,7 +2,8 @@ use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
 use world::WorldData;
-use app_state::{ingame::InputState, draw_input_state, draw_selection_with_parameters};
+use app::{draw_input_state, draw_selection_with_parameters};
+use app_state::ingame::InputState;
 use GameState;
 use misc::{TextAlign, Position};
 use objects::Item;
@@ -14,14 +15,14 @@ pub enum StorageArea {
     Storage
 }
 
-pub struct State {
+pub struct Handler {
     change_state: Option<InputState>,
     active_storage_area: StorageArea
 }
 
-impl State {
-    pub fn new() -> State {
-    	State {
+impl Handler {
+    pub fn new() -> Handler {
+    	Handler {
             change_state: None,
             active_storage_area: StorageArea::Inventory
         }
@@ -42,13 +43,13 @@ impl State {
     }
 }
 
-impl GameState for State {
+impl GameState for Handler {
 
     fn change_state(&mut self, _ctx: &mut Context, _scene_data: &mut WorldData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
-                Some(Box::new(super::world::State::new()))
+                Some(Box::new(super::world::Handler::new()))
             },
             _ => None,
         }

@@ -16,7 +16,7 @@ use world::WorldData;
 use world::SpriteId;
 use savegame::save_scene;
 use ingame_state::*;
-use super::GameState;
+use GameState;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum InputState {
@@ -31,24 +31,24 @@ pub enum InputState {
     Storage
 }
 
-pub struct Scene {
+pub struct Handler {
     pub current_ingame_state: Box<GameState>
 }
 
-impl Scene {
-    pub fn new() -> Scene {
-        Scene {
-            current_ingame_state: Box::new(world::State::new())
+impl Handler {
+    pub fn new() -> Handler {
+        Handler {
+            current_ingame_state: Box::new(world::Handler::new())
         }
     }
 }
 
-impl GameState for Scene {
+impl GameState for Handler {
     fn change_state(&mut self, _ctx: &mut Context, data: &mut WorldData) -> Option<Box<GameState>> {
         if data.main_menu {
             data.main_menu = false;
             save_scene(&data, "saves/auto-save.tar");
-            let menu = super::menu::Scene::new().unwrap();
+            let menu = super::menu::Handler::new().unwrap();
             Some(Box::new(menu))
         } else {
             None

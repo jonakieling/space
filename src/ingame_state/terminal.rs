@@ -1,29 +1,30 @@
 use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
-use app_state::{draw_input_state, draw_dialog, ingame::InputState};
+use app::{draw_input_state, draw_dialog};
+use app_state::ingame::InputState;
 use world::WorldData;
 use GameState;
 
-pub struct State {
+pub struct Handler {
     change_state: Option<InputState>
 }
 
-impl State {
-    pub fn new() -> State {
-    	State {
+impl Handler {
+    pub fn new() -> Handler {
+    	Handler {
             change_state: None
         }
     }
 }
 
-impl GameState for State {
+impl GameState for Handler {
 
     fn change_state(&mut self, _ctx: &mut Context, _scene_data: &mut WorldData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
-                Some(Box::new(super::world::State::new()))
+                Some(Box::new(super::world::Handler::new()))
             },
             _ => None,
         }

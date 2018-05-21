@@ -6,13 +6,13 @@ use app_state::ingame::InputState;
 use misc::*;
 use GameState;
 
-pub struct State {
+pub struct Handler {
     change_state: Option<InputState>
 }
 
-impl State {
-    pub fn new() -> State {
-    	State {
+impl Handler {
+    pub fn new() -> Handler {
+    	Handler {
             change_state: None
         }
     }
@@ -53,41 +53,41 @@ impl State {
     }
 }
 
-impl GameState for State {
+impl GameState for Handler {
 
     fn change_state(&mut self, _ctx: &mut Context, scene_data: &mut WorldData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
-                Some(Box::new(super::world::State::new()))
+                Some(Box::new(super::world::Handler::new()))
             },
             Some(InputState::Edit) => {
                 self.change_state = None;
-                Some(Box::new(super::edit::State::new(scene_data.player.position)))
+                Some(Box::new(super::edit::Handler::new(scene_data.player.position)))
             },
             Some(InputState::Menu) => {
                 self.change_state = None;
-                Some(Box::new(super::menu::State::new()))
+                Some(Box::new(super::menu::Handler::new()))
             },
             Some(InputState::Npc) => {
                 self.change_state = None;
-                Some(Box::new(super::npc::State::new()))
+                Some(Box::new(super::npc::Handler::new()))
             },
             Some(InputState::Terminal) => {
                 self.change_state = None;
-                Some(Box::new(super::terminal::State::new()))
+                Some(Box::new(super::terminal::Handler::new()))
             },
             Some(InputState::Inventory) => {
                 self.change_state = None;
-                Some(Box::new(super::inventory::State::new()))
+                Some(Box::new(super::inventory::Handler::new()))
             },
             Some(InputState::Circuitry) => {
                 self.change_state = None;
-                Some(Box::new(super::circuitry::State::new()))
+                Some(Box::new(super::circuitry::Handler::new()))
             },
             Some(InputState::Storage) => {
                 self.change_state = None;
-                Some(Box::new(super::storage::State::new()))
+                Some(Box::new(super::storage::Handler::new()))
             },
             _ => None,
         }

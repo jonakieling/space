@@ -7,8 +7,9 @@ use GameState;
 use savegame;
 use app_state::ingame;
 use world::WorldData;
+use app::draw_selection;
 
-pub struct Scene {
+pub struct Handler {
 	saves: SelectionStorage<SaveType>,
     loading: Option<SaveType>
 }
@@ -32,9 +33,9 @@ impl ToString for SaveType {
     }
 }
 
-impl Scene {
-    pub fn new() -> GameResult<Scene> {
-    	let mut menu = Scene {
+impl Handler {
+    pub fn new() -> GameResult<Handler> {
+    	let mut menu = Handler {
     		saves: SelectionStorage::new(),
             loading: None
     	};
@@ -56,30 +57,30 @@ impl Scene {
     }
 }
 
-impl GameState for Scene {
+impl GameState for Handler {
     fn change_state(&mut self, _ctx: &mut Context, data: &mut WorldData) -> Option<Box<GameState>> {
         if let Some(ref savegame) = self.loading {
             match savegame {
                 SaveType::Empty => {
-                    let mut world = ingame::Scene::new();
+                    let mut world = ingame::Handler::new();
                     data.clear();
                     savegame::static_levels::empty(data);
                     Some(Box::new(world))
                 },
                 SaveType::DevShip => {
-                    let mut world = ingame::Scene::new();
+                    let mut world = ingame::Handler::new();
                     data.clear();
                     savegame::static_levels::static_ship_tech(data);
                     Some(Box::new(world))
                 },
                 SaveType::DevStation => {
-                    let mut world = ingame::Scene::new();
+                    let mut world = ingame::Handler::new();
                     data.clear();
                     savegame::static_levels::static_station_outpost(data);
                     Some(Box::new(world))
                 },
                 SaveType::File(savefile) => {
-                    let mut world = ingame::Scene::new();
+                    let mut world = ingame::Handler::new();
                     data.clear();
                     savegame::load_scene(data, savefile);
                     Some(Box::new(world))
@@ -111,7 +112,7 @@ impl GameState for Scene {
     fn draw(&mut self, ctx: &mut Context, _world_data: &mut WorldData) -> GameResult<()> {
         graphics::clear(ctx);
 
-        super::draw_selection(&self.saves, ctx, true, false)?;
+        draw_selection(&self.saves, ctx, true, false)?;
 
         graphics::present(ctx);
 

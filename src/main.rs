@@ -15,6 +15,7 @@ mod misc;
 mod constants;
 mod ingame_state;
 mod dialog;
+mod app;
 mod world;
 
 use std::env;
@@ -29,13 +30,9 @@ use world::WorldData;
 pub trait GameState {
     fn change_state(&mut self, _ctx: &mut Context, _world: &mut WorldData) -> Option<Box<GameState>> { None }
     
-    fn update(&mut self, _ctx: &mut Context, _world: &mut WorldData) -> GameResult<()> {
-        Ok(())
-    }
+    fn update(&mut self, _ctx: &mut Context, _world: &mut WorldData) -> GameResult<()> { Ok(()) }
 
-    fn draw(&mut self, _ctx: &mut Context, _world: &mut WorldData) -> GameResult<()> {
-        Ok(())
-    }
+    fn draw(&mut self, _ctx: &mut Context, _world: &mut WorldData) -> GameResult<()> { Ok(()) }
 
     fn key_down_event(&mut self, _ctx: &mut Context, _world: &mut WorldData, _keycode: Keycode, _keymod: Mod, _repeat: bool) { }
 
@@ -62,8 +59,8 @@ fn main() {
         ctx.filesystem.mount(&path, true);
 	}
 
-    let game = &mut App {
-        state: Box::new(menu::Scene::new().unwrap()),
+    let game = &mut app::AppContainer {
+        state: Box::new(menu::Handler::new().unwrap()),
         world: world::WorldData::new(&mut ctx)
     };
 

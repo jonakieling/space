@@ -2,7 +2,8 @@ use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
 use world::WorldData;
-use app_state::{ingame::InputState, draw_selection};
+use app::draw_selection;
+use app_state::ingame::InputState;
 use GameState;
 use storage::SelectionStorage;
 
@@ -18,27 +19,27 @@ impl ToString for MenuOption {
     }
 }
 
-pub struct State {
+pub struct Handler {
     menu: SelectionStorage<MenuOption>,
     change_state: Option<InputState>
 }
 
-impl State {
-    pub fn new() -> State {
+impl Handler {
+    pub fn new() -> Handler {
         let mut menu = SelectionStorage::new();
         menu.insert(MenuOption::Menu);
         menu.insert(MenuOption::Quit);
-    	State { menu, change_state: None }
+    	Handler { menu, change_state: None }
     }
 }
 
-impl GameState for State {
+impl GameState for Handler {
 
     fn change_state(&mut self, _ctx: &mut Context, _scene_data: &mut WorldData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
-                Some(Box::new(super::world::State::new()))
+                Some(Box::new(super::world::Handler::new()))
             },
             _ => None,
         }

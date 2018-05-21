@@ -4,7 +4,8 @@ use ggez::{Context, GameResult, graphics};
 use ggez::event::{Keycode, Mod};
 
 use world::WorldData;
-use app_state::{ingame::InputState, draw_selection};
+use app::draw_selection;
+use app_state::ingame::InputState;
 use GameState;
 use misc::Direction;
 use objects::*;
@@ -12,15 +13,15 @@ use storage::{SelectionStorage, Node};
 use misc::Position;
 use constants::GRID_SIZE;
 
-pub struct State {
+pub struct Handler {
     edit_cursor: Position,
     edit_selection: SelectionStorage<String>,
     change_state: Option<InputState>
 }
 
-impl State {
-    pub fn new(init: Position) -> State {
-    	State {
+impl Handler {
+    pub fn new(init: Position) -> Handler {
+    	Handler {
             edit_cursor: init,
             edit_selection: SelectionStorage::new(),
             change_state: None
@@ -65,13 +66,13 @@ impl State {
     }
 }
 
-impl GameState for State {
+impl GameState for Handler {
 
     fn change_state(&mut self, _ctx: &mut Context, _scene_data: &mut WorldData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
-                Some(Box::new(super::world::State::new()))
+                Some(Box::new(super::world::Handler::new()))
             },
             _ => None,
         }
