@@ -1,8 +1,9 @@
 use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
-use app_state::{ingame::InputState, ingame::SceneData, draw_input_state, draw_selection_with_parameters};
-use ingame_state::GameState;
+use world::WorldData;
+use app_state::{ingame::InputState, draw_input_state, draw_selection_with_parameters};
+use GameState;
 use misc::{TextAlign, Position};
 use objects::Item;
 use storage::SelectionStorage;
@@ -43,7 +44,7 @@ impl State {
 
 impl GameState for State {
 
-    fn change_state(&mut self, _scene_data: &mut SceneData) -> Option<Box<GameState>> {
+    fn change_state(&mut self, _ctx: &mut Context, _scene_data: &mut WorldData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
@@ -53,7 +54,7 @@ impl GameState for State {
         }
     }
 
-    fn key_up_event(&mut self, scene_data: &mut SceneData, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match keycode {
             Keycode::Escape => {
                 self.change_state = Some(InputState::World);
@@ -122,7 +123,7 @@ impl GameState for State {
         }
     }
 
-    fn draw(&mut self, scene_data: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, ctx: &mut Context, scene_data: &mut WorldData) -> GameResult<()> {
 
         draw_input_state("Storage", ctx)?;
 

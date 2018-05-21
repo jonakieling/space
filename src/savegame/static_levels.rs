@@ -1,10 +1,10 @@
-use app_state::ingame::*;
+use world::WorldData;
 use objects::*;
 use misc::*;
 use savegame::static_npc::*;
 use storage::Node;
 
-pub fn empty(scene_data: &mut SceneData) {
+pub fn empty(scene_data: &mut WorldData) {
     scene_data.backdrop = String::from("");
 
     super::insert_player(scene_data, (1, 1), Direction::Down, vec![]);
@@ -12,7 +12,7 @@ pub fn empty(scene_data: &mut SceneData) {
     println!("game loaded: static empty");
 }
 
-pub fn static_station_outpost(scene_data: &mut SceneData) {
+pub fn static_station_outpost(scene_data: &mut WorldData) {
     scene_data.backdrop = String::from("");
 
     super::insert_floor(scene_data, vec![
@@ -113,7 +113,7 @@ pub fn static_station_outpost(scene_data: &mut SceneData) {
     println!("game loaded: static station outpost");
 }
 
-pub fn static_ship_tech(scene_data: &mut SceneData) {
+pub fn static_ship_tech(scene_data: &mut WorldData) {
     scene_data.backdrop = String::from("/realm_of_sol__0000s_0001_2.1.png");
 
     super::insert_floor(scene_data, vec![

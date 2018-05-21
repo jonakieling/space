@@ -15,18 +15,40 @@ mod misc;
 mod constants;
 mod ingame_state;
 mod dialog;
+mod world;
 
 use std::env;
 use std::path;
 use std::io::Write;
 
-use ggez::{graphics, Context, conf, event::*};
+use ggez::{graphics, Context, conf, event::*, GameResult};
 
 use app_state::*;
+use world::WorldData;
+
+pub trait GameState {
+    fn change_state(&mut self, _ctx: &mut Context, _world: &mut WorldData) -> Option<Box<GameState>> { None }
+    
+    fn update(&mut self, _ctx: &mut Context, _world: &mut WorldData) -> GameResult<()> {
+        Ok(())
+    }
+
+    fn draw(&mut self, _ctx: &mut Context, _world: &mut WorldData) -> GameResult<()> {
+        Ok(())
+    }
+
+    fn key_down_event(&mut self, _ctx: &mut Context, _world: &mut WorldData, _keycode: Keycode, _keymod: Mod, _repeat: bool) { }
+
+    fn key_up_event(&mut self, _ctx: &mut Context, _world: &mut WorldData, _keycode: Keycode, _keymod: Mod, _repeat: bool) { }
+
+    fn text_input_event(&mut self, _ctx: &mut Context, _world: &mut WorldData, _text: String) { }
+
+    fn quit_event(&mut self, _ctx: &mut Context, _world: &mut WorldData) -> bool { false }
+}
 
 fn main() {
     let c = conf::Conf::new();
-    let ctx = &mut Context::load_from_conf("Space", "Jonathan Kieling", c).unwrap();
+    let mut ctx = &mut Context::load_from_conf("Space", "Jonathan Kieling", c).unwrap();
     graphics::set_background_color(ctx, graphics::BLACK);
     graphics::set_default_filter(ctx, graphics::FilterMode::Nearest);
 
@@ -39,11 +61,10 @@ fn main() {
         path.push("saves");
         ctx.filesystem.mount(&path, true);
 	}
-    
-    let menu = menu::Scene::new().unwrap();
 
     let game = &mut App {
-        state: Box::new(menu)
+        state: Box::new(menu::Scene::new().unwrap()),
+        world: world::WorldData::new(&mut ctx)
     };
 
     if let Err(e) = run(ctx, game) {

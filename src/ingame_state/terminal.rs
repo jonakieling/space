@@ -1,9 +1,9 @@
 use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
-use app_state::{draw_input_state, draw_dialog};
-use app_state::ingame::{SceneData, InputState};
-use ingame_state::GameState;
+use app_state::{draw_input_state, draw_dialog, ingame::InputState};
+use world::WorldData;
+use GameState;
 
 pub struct State {
     change_state: Option<InputState>
@@ -19,7 +19,7 @@ impl State {
 
 impl GameState for State {
 
-    fn change_state(&mut self, _scene_data: &mut SceneData) -> Option<Box<GameState>> {
+    fn change_state(&mut self, _ctx: &mut Context, _scene_data: &mut WorldData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
@@ -29,7 +29,7 @@ impl GameState for State {
         }
     }
 
-    fn key_up_event(&mut self, scene_data: &mut SceneData, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match keycode {
             Keycode::Escape => {
                 self.change_state = Some(InputState::World);
@@ -51,7 +51,7 @@ impl GameState for State {
         }
     }
 
-    fn draw(&mut self, scene_data: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, ctx: &mut Context, scene_data: &mut WorldData) -> GameResult<()> {
         draw_input_state("Terminal", ctx)?;
 
         draw_dialog(&scene_data.dialog, ctx)

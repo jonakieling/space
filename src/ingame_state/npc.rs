@@ -2,8 +2,9 @@ use dialog::DialogAction;
 use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
-use app_state::{ingame::SceneData, draw_input_state, draw_dialog, ingame::InputState};
-use ingame_state::GameState;
+use world::WorldData;
+use app_state::{draw_input_state, draw_dialog, ingame::InputState};
+use GameState;
 
 pub struct State {
     change_state: Option<InputState>
@@ -19,7 +20,7 @@ impl State {
 
 impl GameState for State {
 
-    fn change_state(&mut self, _scene_data: &mut SceneData) -> Option<Box<GameState>> {
+    fn change_state(&mut self, _ctx: &mut Context, _scene_data: &mut WorldData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
@@ -33,7 +34,7 @@ impl GameState for State {
         }
     }
     
-    fn key_up_event(&mut self, scene_data: &mut SceneData, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match keycode {
             Keycode::Escape => {
                 if let Some(npc) = scene_data.current_npc() {
@@ -70,7 +71,7 @@ impl GameState for State {
         }
     }
 
-    fn draw(&mut self, scene_data: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, ctx: &mut Context, scene_data: &mut WorldData) -> GameResult<()> {
         {
             let current_npc = scene_data.current_npc().unwrap();
             draw_input_state(&current_npc.name, ctx)?;

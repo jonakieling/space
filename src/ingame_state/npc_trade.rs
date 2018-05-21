@@ -1,8 +1,9 @@
 use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
-use app_state::{draw_input_state, draw_selection_with_parameters, ingame::SceneData, ingame::InputState};
-use ingame_state::GameState;
+use world::WorldData;
+use app_state::{draw_input_state, draw_selection_with_parameters, ingame::InputState};
+use GameState;
 use storage::SelectionStorage;
 use objects::Item;
 use misc::{TextAlign, Position};
@@ -32,7 +33,7 @@ impl State {
         }
     }
 
-    fn reset_trade_areas(&mut self, scene_data: &mut SceneData) {
+    fn reset_trade_areas(&mut self, scene_data: &mut WorldData) {
         while let Some(item) = self.npc_trade_area.extract_current() {
             scene_data.current_npc().unwrap().inventory.insert(item);
         }
@@ -65,7 +66,7 @@ impl State {
 
 impl GameState for State {
 
-    fn change_state(&mut self, _scene_data: &mut SceneData) -> Option<Box<GameState>> {
+    fn change_state(&mut self, _ctx: &mut Context, _scene_data: &mut WorldData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
@@ -75,7 +76,7 @@ impl GameState for State {
         }
     }
 
-    fn key_up_event(&mut self, scene_data: &mut SceneData, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
 
         match keycode {
             Keycode::Escape => {
@@ -190,7 +191,7 @@ impl GameState for State {
         }
     }
 
-    fn draw(&mut self, scene_data: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, ctx: &mut Context, scene_data: &mut WorldData) -> GameResult<()> {
         draw_input_state("Trade", ctx)?;
         let npc_inventory = scene_data.current_npc().unwrap().inventory.clone();
         self.draw_trade_area(&npc_inventory, ctx, TradeArea::NpcInventory)?;
@@ -201,7 +202,7 @@ impl GameState for State {
         Ok(())
     }
 
-    fn quit_event(&mut self, scene_data: &mut SceneData, _ctx: &mut Context) -> bool {
+    fn quit_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData) -> bool {
         self.reset_trade_areas(scene_data);
 
         false

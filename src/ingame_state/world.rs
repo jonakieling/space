@@ -1,9 +1,10 @@
 use ggez::Context;
 use ggez::event::{Keycode, Mod};
 
-use app_state::{ingame::SceneData, ingame::InputState};
+use world::WorldData;
+use app_state::ingame::InputState;
 use misc::*;
-use ingame_state::GameState;
+use GameState;
 
 pub struct State {
     change_state: Option<InputState>
@@ -16,7 +17,7 @@ impl State {
         }
     }
 
-    fn interact_with_npc(&mut self, scene_data: &mut SceneData) {
+    fn interact_with_npc(&mut self, scene_data: &mut WorldData) {
         if let Some(npc) = scene_data.npc.get_mut(scene_data.player.front_tile) {
             match scene_data.player.direction {
                 Direction::Down => npc.direction = Direction::Up,
@@ -29,19 +30,19 @@ impl State {
         }
     }
 
-    fn interact_with_circuitry(&mut self, scene_data: &mut SceneData) {
+    fn interact_with_circuitry(&mut self, scene_data: &mut WorldData) {
         if let Some(_) = scene_data.circuitry.get_mut(scene_data.player.front_tile) {
             self.change_state = Some(InputState::Circuitry);
         }
     }
 
-    fn interact_with_storage(&mut self, scene_data: &mut SceneData) {
+    fn interact_with_storage(&mut self, scene_data: &mut WorldData) {
         if let Some(_) = scene_data.storages.get_mut(scene_data.player.front_tile) {
             self.change_state = Some(InputState::Storage);
         }
     }
 
-    fn interact_with_terminal(&mut self, scene_data: &mut SceneData) {
+    fn interact_with_terminal(&mut self, scene_data: &mut WorldData) {
         if let Some(ref terminal) = scene_data.terminals.get_mut(scene_data.player.front_tile) {
             let terminal_front_tile = &terminal.front.value() + &scene_data.player.front_tile;
             if terminal_front_tile == scene_data.player.position {
@@ -54,7 +55,7 @@ impl State {
 
 impl GameState for State {
 
-    fn change_state(&mut self, scene_data: &mut SceneData) -> Option<Box<GameState>> {
+    fn change_state(&mut self, _ctx: &mut Context, scene_data: &mut WorldData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
@@ -92,7 +93,7 @@ impl GameState for State {
         }
     }
     
-    fn key_down_event(&mut self, scene_data: &mut SceneData, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, repeat: bool) {
+    fn key_down_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData, keycode: Keycode, _keymod: Mod, repeat: bool) {
         if !repeat {
             match keycode {
                 Keycode::Left => {
@@ -130,7 +131,7 @@ impl GameState for State {
         }
     }
 
-    fn key_up_event(&mut self, scene_data: &mut SceneData, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match keycode {
             Keycode::Left => {
                 scene_data.player.remove_movement(Direction::Left);

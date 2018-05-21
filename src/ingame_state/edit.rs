@@ -3,8 +3,9 @@ use ggez::graphics::get_screen_coordinates;
 use ggez::{Context, GameResult, graphics};
 use ggez::event::{Keycode, Mod};
 
-use app_state::{ingame::InputState, ingame::SceneData, draw_selection};
-use ingame_state::GameState;
+use world::WorldData;
+use app_state::{ingame::InputState, draw_selection};
+use GameState;
 use misc::Direction;
 use objects::*;
 use storage::{SelectionStorage, Node};
@@ -26,7 +27,7 @@ impl State {
         }
     }
 
-    fn get_edit_selection(&mut self, scene_data: &mut SceneData) -> SelectionStorage<String> {
+    fn get_edit_selection(&mut self, scene_data: &mut WorldData) -> SelectionStorage<String> {
         let mut selection_storage: SelectionStorage<String> = SelectionStorage::new();
         if let Some(_) = scene_data.walls.get(self.edit_cursor) {
             selection_storage.insert("Wall".to_string());
@@ -66,7 +67,7 @@ impl State {
 
 impl GameState for State {
 
-    fn change_state(&mut self, _scene_data: &mut SceneData) -> Option<Box<GameState>> {
+    fn change_state(&mut self, _ctx: &mut Context, _scene_data: &mut WorldData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
@@ -76,7 +77,7 @@ impl GameState for State {
         }
     }
     
-    fn key_up_event(&mut self, scene_data: &mut SceneData, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
 
         self.edit_selection = self.get_edit_selection(scene_data);
         
@@ -161,7 +162,7 @@ impl GameState for State {
         }
     }
 
-    fn draw(&mut self, scene_data: &mut SceneData, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, ctx: &mut Context, scene_data: &mut WorldData) -> GameResult<()> {
         draw_selection(&self.edit_selection, ctx, false, false)?;
 
         graphics::set_color(ctx, graphics::Color{r: 0.2, g: 0.8, b: 0.2, a: 1.0,})?;

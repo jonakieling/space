@@ -6,44 +6,43 @@ use ggez::event::*;
 use storage::{SelectionStorage, Node};
 use dialog::DialogItem;
 use misc::{TextAlign, Position};
+use world::WorldData;
+use super::GameState;
 
 pub mod ingame;
 pub mod menu;
 
-pub trait AppState: EventHandler {
-    fn change_state(&self, _ctx: &mut Context) -> Option<Box<AppState>> { None }
-}
-
 pub struct App {
-    pub state: Box<AppState>
+    pub state: Box<GameState>,
+    pub world: WorldData
 }
 
 impl EventHandler for App {
     fn update(&mut self, ctx: &mut Context) -> GameResult<()> {
-        if let Some(scene) = self.state.change_state(ctx) {
+        if let Some(scene) = self.state.change_state(ctx, &mut self.world) {
             self.state = scene;
         }
-        self.state.update(ctx)
+        self.state.update(ctx, &mut self.world)
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
-        self.state.draw(ctx)
+        self.state.draw(ctx, &mut self.world)
     }
 
     fn key_down_event(&mut self, ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
-        self.state.key_down_event(ctx, keycode, keymod, repeat)
+        self.state.key_down_event(ctx, &mut self.world, keycode, keymod, repeat)
     }
 
     fn key_up_event(&mut self, ctx: &mut Context, keycode: Keycode, keymod: Mod, repeat: bool) {
-        self.state.key_up_event(ctx, keycode, keymod, repeat)
+        self.state.key_up_event(ctx, &mut self.world, keycode, keymod, repeat)
     }
 
     fn text_input_event(&mut self, ctx: &mut Context, text: String) {
-        self.state.text_input_event(ctx, text)
+        self.state.text_input_event(ctx, &mut self.world, text)
     }
 
     fn quit_event(&mut self, ctx: &mut Context) -> bool {
-        self.state.quit_event(ctx)
+        self.state.quit_event(ctx, &mut self.world)
     }
 }
 

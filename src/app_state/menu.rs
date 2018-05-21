@@ -3,9 +3,10 @@ use std::fs;
 use ggez::{graphics, Context, event::*, GameResult};
 
 use storage::SelectionStorage;
-use AppState;
+use GameState;
 use savegame;
 use app_state::ingame;
+use world::WorldData;
 
 pub struct Scene {
 	saves: SelectionStorage<SaveType>,
@@ -55,28 +56,32 @@ impl Scene {
     }
 }
 
-impl AppState for Scene {
-    fn change_state(&self, ctx: &mut Context) -> Option<Box<AppState>> {
+impl GameState for Scene {
+    fn change_state(&mut self, _ctx: &mut Context, data: &mut WorldData) -> Option<Box<GameState>> {
         if let Some(ref savegame) = self.loading {
             match savegame {
                 SaveType::Empty => {
-                    let mut world = ingame::Scene::new(ctx).unwrap();
-                    savegame::static_levels::empty(&mut world.data);
+                    let mut world = ingame::Scene::new();
+                    data.clear();
+                    savegame::static_levels::empty(data);
                     Some(Box::new(world))
                 },
                 SaveType::DevShip => {
-                    let mut world = ingame::Scene::new(ctx).unwrap();
-                    savegame::static_levels::static_ship_tech(&mut world.data);
+                    let mut world = ingame::Scene::new();
+                    data.clear();
+                    savegame::static_levels::static_ship_tech(data);
                     Some(Box::new(world))
                 },
                 SaveType::DevStation => {
-                    let mut world = ingame::Scene::new(ctx).unwrap();
-                    savegame::static_levels::static_station_outpost(&mut world.data);
+                    let mut world = ingame::Scene::new();
+                    data.clear();
+                    savegame::static_levels::static_station_outpost(data);
                     Some(Box::new(world))
                 },
                 SaveType::File(savefile) => {
-                    let mut world = ingame::Scene::new(ctx).unwrap();
-                    savegame::load_scene(&mut world.data, savefile);
+                    let mut world = ingame::Scene::new();
+                    data.clear();
+                    savegame::load_scene(data, savefile);
                     Some(Box::new(world))
                 },
             }
@@ -84,13 +89,8 @@ impl AppState for Scene {
             None
         }
     }
-}
-
-impl EventHandler for Scene {
-
-    fn update(&mut self, _ctx: &mut Context) -> GameResult<()> { Ok(()) }
-
-    fn key_up_event(&mut self, _ctx: &mut Context, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    
+    fn key_up_event(&mut self, ctx: &mut Context, _world_data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
 	    match keycode {
 	        Keycode::Up => {
 	            self.saves.prev();
@@ -101,11 +101,14 @@ impl EventHandler for Scene {
             Keycode::Return => {
                 self.loading = Some(self.saves.current().unwrap().clone())
             },
+            Keycode::Escape => {
+                ctx.quit().expect("game should have quit");
+            },
 	        _ => ()
 	    }
     }
 
-    fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
+    fn draw(&mut self, ctx: &mut Context, _world_data: &mut WorldData) -> GameResult<()> {
         graphics::clear(ctx);
 
         super::draw_selection(&self.saves, ctx, true, false)?;
