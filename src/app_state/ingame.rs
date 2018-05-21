@@ -1,6 +1,5 @@
 use std::time::Duration;
-use std::collections::VecDeque;
-use std::collections::BTreeSet;
+use std::collections::{VecDeque, BTreeSet, HashMap};
 use std::f32::consts::{PI, FRAC_PI_2};
 
 use ggez::timer::get_delta;
@@ -52,25 +51,8 @@ pub struct SceneData {
     pub dialog: Node<DialogItem>,
     pub insight_view: bool,
     pub main_menu: bool,
-    pub sprites: Sprites,
+    pub sprites: HashMap<SpriteId, SpriteBatch>,
     pub camera: Position
-}
-
-pub struct Sprites {
-    pub walls: SpriteBatch,
-    pub corners: SpriteBatch,
-    pub edges: SpriteBatch,
-    pub windows: SpriteBatch,
-    pub floor: SpriteBatch,
-    pub floor_light: SpriteBatch,
-    pub circuitry: SpriteBatch,
-    pub doors: SpriteBatch,
-    pub doors_open: SpriteBatch,
-    pub terminals: SpriteBatch,
-    pub ship_consoles: SpriteBatch,
-    pub pilot_seats: SpriteBatch,
-    pub storages: SpriteBatch,
-    pub generators: SpriteBatch,
 }
 
 pub struct Scene {
@@ -88,6 +70,22 @@ impl AppState for Scene {
             None
         }
     }
+}
+
+#[derive(Hash, PartialEq, Eq)]
+pub enum SpriteId {
+    Wall,
+    Corner,
+    Edge,
+    Window,
+    Floor(FloorType),
+    Circuitry,
+    Door(DoorStatus),
+    Terminal(TerminalType),
+    PilotSeat,
+    Storage,
+    Generator,
+    Decoration(DecorationType)
 }
 
 impl Scene {
@@ -127,50 +125,21 @@ impl Scene {
         
         let receipes = Vec::new();
 
-        let mut wall_img = graphics::Image::new(ctx, "/wall.png").unwrap();
-            wall_img.set_filter(graphics::FilterMode::Nearest);
-        let mut corner_img = graphics::Image::new(ctx, "/corner.png").unwrap();
-            corner_img.set_filter(graphics::FilterMode::Nearest);
-        let mut edge_img = graphics::Image::new(ctx, "/edge.png").unwrap();
-            edge_img.set_filter(graphics::FilterMode::Nearest);
-        let mut window_img = graphics::Image::new(ctx, "/window.png").unwrap();
-            window_img.set_filter(graphics::FilterMode::Nearest);
-        let mut floor_img = graphics::Image::new(ctx, "/floor.png").unwrap();
-            floor_img.set_filter(graphics::FilterMode::Nearest);
-        let mut floor_light_img = graphics::Image::new(ctx, "/floor-light.png").unwrap();
-            floor_light_img.set_filter(graphics::FilterMode::Nearest);
-        let mut circuitry_img = graphics::Image::new(ctx, "/circuitry.png").unwrap();
-            circuitry_img.set_filter(graphics::FilterMode::Nearest);
-        let mut door_img = graphics::Image::new(ctx, "/door.png").unwrap();
-            door_img.set_filter(graphics::FilterMode::Nearest);
-        let mut door_open_img = graphics::Image::new(ctx, "/door-open.png").unwrap();
-            door_open_img.set_filter(graphics::FilterMode::Nearest);
-        let mut terminal_img = graphics::Image::new(ctx, "/terminal.png").unwrap();
-            terminal_img.set_filter(graphics::FilterMode::Nearest);
-        let mut ship_console_img = graphics::Image::new(ctx, "/ship-console.png").unwrap();
-            ship_console_img.set_filter(graphics::FilterMode::Nearest);
-        let mut pilot_seat_img = graphics::Image::new(ctx, "/pilot-seat.png").unwrap();
-            pilot_seat_img.set_filter(graphics::FilterMode::Nearest);
-        let mut storage_img = graphics::Image::new(ctx, "/storage.png").unwrap();
-            storage_img.set_filter(graphics::FilterMode::Nearest);
-        let mut generator_img = graphics::Image::new(ctx, "/generator.png").unwrap();
-            generator_img.set_filter(graphics::FilterMode::Nearest);
-        let sprites = Sprites {
-            walls: SpriteBatch::new(wall_img),
-            corners: SpriteBatch::new(corner_img),
-            edges: SpriteBatch::new(edge_img),
-            windows: SpriteBatch::new(window_img),
-            floor: SpriteBatch::new(floor_img),
-            floor_light: SpriteBatch::new(floor_light_img),
-            circuitry: SpriteBatch::new(circuitry_img),
-            doors: SpriteBatch::new(door_img),
-            doors_open: SpriteBatch::new(door_open_img),
-            terminals: SpriteBatch::new(terminal_img),
-            ship_consoles: SpriteBatch::new(ship_console_img),
-            pilot_seats: SpriteBatch::new(pilot_seat_img),
-            storages: SpriteBatch::new(storage_img),
-            generators: SpriteBatch::new(generator_img),
-        };
+        let mut sprites = HashMap::new();
+        sprites.insert(SpriteId::Wall, SpriteBatch::new(graphics::Image::new(ctx, "/wall.png").unwrap()));
+        sprites.insert(SpriteId::Corner, SpriteBatch::new(graphics::Image::new(ctx, "/corner.png").unwrap()));
+        sprites.insert(SpriteId::Edge, SpriteBatch::new(graphics::Image::new(ctx, "/edge.png").unwrap()));
+        sprites.insert(SpriteId::Window, SpriteBatch::new(graphics::Image::new(ctx, "/window.png").unwrap()));
+        sprites.insert(SpriteId::Floor(FloorType::Regular), SpriteBatch::new(graphics::Image::new(ctx, "/floor.png").unwrap()));
+        sprites.insert(SpriteId::Floor(FloorType::Light), SpriteBatch::new(graphics::Image::new(ctx, "/floor-light.png").unwrap()));
+        sprites.insert(SpriteId::Circuitry, SpriteBatch::new(graphics::Image::new(ctx, "/circuitry.png").unwrap()));
+        sprites.insert(SpriteId::Door(DoorStatus::Closed), SpriteBatch::new(graphics::Image::new(ctx, "/door.png").unwrap()));
+        sprites.insert(SpriteId::Door(DoorStatus::Open), SpriteBatch::new(graphics::Image::new(ctx, "/door-open.png").unwrap()));
+        sprites.insert(SpriteId::Terminal(TerminalType::Intercomm), SpriteBatch::new(graphics::Image::new(ctx, "/terminal.png").unwrap()));
+        sprites.insert(SpriteId::Terminal(TerminalType::ShipConsole), SpriteBatch::new(graphics::Image::new(ctx, "/ship-console.png").unwrap()));
+        sprites.insert(SpriteId::PilotSeat, SpriteBatch::new(graphics::Image::new(ctx, "/pilot-seat.png").unwrap()));
+        sprites.insert(SpriteId::Storage, SpriteBatch::new(graphics::Image::new(ctx, "/storage.png").unwrap()));
+        sprites.insert(SpriteId::Generator, SpriteBatch::new(graphics::Image::new(ctx, "/generator.png").unwrap()));
 
         let mut data = SceneData {
             movement_timer: Duration::from_millis(0),
@@ -441,91 +410,91 @@ impl event::EventHandler for Scene {
             if let Some(floor) = item {
                 let p = get_tile_params(ctx, pos as i32, self.data.camera, None);
                 match floor.variant {
-                    FloorType::Regular => self.data.sprites.floor.add(p),
-                    FloorType::Light => self.data.sprites.floor_light.add(p)
+                    FloorType::Regular => self.data.sprites.get(&SpriteId::Floor(FloorType::Regular)).unwrap().add(p),
+                    FloorType::Light => self.data.sprites.get(&SpriteId::Floor(FloorType::Light)).unwrap().add(p)
                 };
             }
         }
-        draw_spritebatch(ctx, &mut self.data.sprites.floor)?;
-        draw_spritebatch(ctx, &mut self.data.sprites.floor_light)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Floor(FloorType::Regular)).unwrap())?;
+        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Floor(FloorType::Light)).unwrap())?;
 
         for (pos, item) in self.data.walls.iter().enumerate() {
             if let Some(wall) = item {
                 let p = get_tile_params(ctx, pos as i32, self.data.camera, Some(wall.face));
                 match wall.variant {
-                    WallType::Wall => self.data.sprites.walls.add(p),
-                    WallType::Corner => self.data.sprites.corners.add(p),
-                    WallType::Edge => self.data.sprites.edges.add(p),
-                    WallType::Window => self.data.sprites.windows.add(p),
+                    WallType::Wall => self.data.sprites.get(&SpriteId::Wall).unwrap().add(p),
+                    WallType::Corner => self.data.sprites.get(&SpriteId::Corner).unwrap().add(p),
+                    WallType::Edge => self.data.sprites.get(&SpriteId::Edge).unwrap().add(p),
+                    WallType::Window => self.data.sprites.get(&SpriteId::Window).unwrap().add(p),
                 };
             }
         }
-        draw_spritebatch(ctx, &mut self.data.sprites.walls)?;
-        draw_spritebatch(ctx, &mut self.data.sprites.corners)?;
-        draw_spritebatch(ctx, &mut self.data.sprites.edges)?;
-        draw_spritebatch(ctx, &mut self.data.sprites.windows)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Wall).unwrap())?;
+        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Corner).unwrap())?;
+        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Edge).unwrap())?;
+        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Window).unwrap())?;
 
         for (pos, terminal) in self.data.terminals.iter().enumerate() {
             if let Some(current_terminal) = terminal {
                 let p = get_tile_params(ctx, pos as i32, self.data.camera, Some(current_terminal.front));
                 match current_terminal.variant {
                     TerminalType::Intercomm => {
-                        self.data.sprites.terminals.add(p);
+                        self.data.sprites.get(&SpriteId::Terminal(TerminalType::Intercomm)).unwrap().add(p);
                     },
                     TerminalType::ShipConsole => {
-                        self.data.sprites.ship_consoles.add(p);
+                        self.data.sprites.get(&SpriteId::Terminal(TerminalType::ShipConsole)).unwrap().add(p);
                     },
                     TerminalType::Hud => ()
                 };
             }
         }
-        draw_spritebatch(ctx, &mut self.data.sprites.terminals)?;
-        draw_spritebatch(ctx, &mut self.data.sprites.ship_consoles)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Terminal(TerminalType::Intercomm)).unwrap())?;
+        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Terminal(TerminalType::ShipConsole)).unwrap())?;
 
         for (pos, item) in self.data.pilot_seats.iter().enumerate() {
             if let Some(pilot_seat) = item {
                 let p = get_tile_params(ctx, pos as i32, self.data.camera, Some(pilot_seat.front));
-                self.data.sprites.pilot_seats.add(p);
+                self.data.sprites.get(&SpriteId::PilotSeat).unwrap().add(p);
             }
         }
-        draw_spritebatch(ctx, &mut self.data.sprites.pilot_seats)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::PilotSeat).unwrap())?;
 
         for (pos, item) in self.data.doors.iter().enumerate() {
             if let Some(door) = item {
                 let p = get_tile_params(ctx, pos as i32, self.data.camera, Some(door.face));
                 match door.status {
-                    DoorStatus::Open => self.data.sprites.doors_open.add(p),
-                    DoorStatus::Closed => self.data.sprites.doors.add(p)
+                    DoorStatus::Open => self.data.sprites.get(&SpriteId::Door(DoorStatus::Open)).unwrap().add(p),
+                    DoorStatus::Closed => self.data.sprites.get(&SpriteId::Door(DoorStatus::Closed)).unwrap().add(p)
                 };
             }
         }
-        draw_spritebatch(ctx, &mut self.data.sprites.doors)?;
-        draw_spritebatch(ctx, &mut self.data.sprites.doors_open)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Door(DoorStatus::Closed)).unwrap())?;
+        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Door(DoorStatus::Open)).unwrap())?;
 
         for (pos, item) in self.data.generators.iter().enumerate() {
             if item.is_some() {
                 let params = get_tile_params(ctx, pos as i32, self.data.camera, None);
-                self.data.sprites.generators.add(params);
+                self.data.sprites.get(&SpriteId::Generator).unwrap().add(params);
             }
         }
-        draw_spritebatch(ctx, &mut self.data.sprites.generators)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Generator).unwrap())?;
 
         for (pos, item) in self.data.storages.iter().enumerate() {
             if item.is_some() {
                 let params = get_tile_params(ctx, pos as i32, self.data.camera, None);
-                self.data.sprites.storages.add(params);
+                self.data.sprites.get(&SpriteId::Storage).unwrap().add(params);
             }
         }
-        draw_spritebatch(ctx, &mut self.data.sprites.storages)?;
+        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Storage).unwrap())?;
 
         if self.data.insight_view {
             for (pos, item) in self.data.circuitry.iter().enumerate() {
                 if item.is_some() {
                     let params = get_tile_params(ctx, pos as i32, self.data.camera, None);
-                    self.data.sprites.circuitry.add(params);
+                    self.data.sprites.get(&SpriteId::Circuitry).unwrap().add(params);
                 }
             }
-            draw_spritebatch(ctx, &mut self.data.sprites.circuitry)?;
+            draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Circuitry).unwrap())?;
         }
 
         for (pos, npc) in self.data.npc.iter().enumerate() {

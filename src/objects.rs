@@ -2,7 +2,7 @@ use misc::{Direction};
 use storage::{SelectionStorage, Node};
 use dialog::DialogItem;
 
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum WallType {
 	Wall,
 	Corner,
@@ -16,7 +16,7 @@ pub struct Wall {
 	pub face: Direction
 }
 
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum DecorationType {
 	Display,
 	Panel
@@ -28,7 +28,7 @@ pub struct Decoration {
 	pub face: Direction
 }
 
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum FloorType {
 	Regular,
 	Light
@@ -39,7 +39,7 @@ pub struct Floor {
 	pub variant: FloorType
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Clone, Copy, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Copy, Hash, Debug)]
 pub enum DoorStatus {
     Open,
     Closed
@@ -51,7 +51,7 @@ pub struct Door {
 	pub face: Direction
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, PartialEq, Eq)]
 pub enum TerminalType {
 	ShipConsole,
 	Intercomm,
