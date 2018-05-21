@@ -410,91 +410,91 @@ impl event::EventHandler for Scene {
             if let Some(floor) = item {
                 let p = get_tile_params(ctx, pos as i32, self.data.camera, None);
                 match floor.variant {
-                    FloorType::Regular => self.data.sprites.get(&SpriteId::Floor(FloorType::Regular)).unwrap().add(p),
-                    FloorType::Light => self.data.sprites.get(&SpriteId::Floor(FloorType::Light)).unwrap().add(p)
+                    FloorType::Regular => add_sprite(&mut self.data.sprites, SpriteId::Floor(FloorType::Regular), p),
+                    FloorType::Light => add_sprite(&mut self.data.sprites, SpriteId::Floor(FloorType::Light), p)
                 };
             }
         }
-        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Floor(FloorType::Regular)).unwrap())?;
-        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Floor(FloorType::Light)).unwrap())?;
+        draw_spritebatch(ctx, &mut self.data.sprites, SpriteId::Floor(FloorType::Regular))?;
+        draw_spritebatch(ctx, &mut self.data.sprites, SpriteId::Floor(FloorType::Light))?;
 
         for (pos, item) in self.data.walls.iter().enumerate() {
             if let Some(wall) = item {
                 let p = get_tile_params(ctx, pos as i32, self.data.camera, Some(wall.face));
                 match wall.variant {
-                    WallType::Wall => self.data.sprites.get(&SpriteId::Wall).unwrap().add(p),
-                    WallType::Corner => self.data.sprites.get(&SpriteId::Corner).unwrap().add(p),
-                    WallType::Edge => self.data.sprites.get(&SpriteId::Edge).unwrap().add(p),
-                    WallType::Window => self.data.sprites.get(&SpriteId::Window).unwrap().add(p),
+                    WallType::Wall => add_sprite(&mut self.data.sprites, SpriteId::Wall, p),
+                    WallType::Corner => add_sprite(&mut self.data.sprites, SpriteId::Corner, p),
+                    WallType::Edge => add_sprite(&mut self.data.sprites, SpriteId::Edge, p),
+                    WallType::Window => add_sprite(&mut self.data.sprites, SpriteId::Window, p),
                 };
             }
         }
-        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Wall).unwrap())?;
-        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Corner).unwrap())?;
-        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Edge).unwrap())?;
-        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Window).unwrap())?;
+        draw_spritebatch(ctx, &mut self.data.sprites, SpriteId::Wall)?;
+        draw_spritebatch(ctx, &mut self.data.sprites, SpriteId::Corner)?;
+        draw_spritebatch(ctx, &mut self.data.sprites, SpriteId::Edge)?;
+        draw_spritebatch(ctx, &mut self.data.sprites, SpriteId::Window)?;
 
         for (pos, terminal) in self.data.terminals.iter().enumerate() {
             if let Some(current_terminal) = terminal {
                 let p = get_tile_params(ctx, pos as i32, self.data.camera, Some(current_terminal.front));
                 match current_terminal.variant {
                     TerminalType::Intercomm => {
-                        self.data.sprites.get(&SpriteId::Terminal(TerminalType::Intercomm)).unwrap().add(p);
+                        add_sprite(&mut self.data.sprites, SpriteId::Terminal(TerminalType::Intercomm), p);
                     },
                     TerminalType::ShipConsole => {
-                        self.data.sprites.get(&SpriteId::Terminal(TerminalType::ShipConsole)).unwrap().add(p);
+                        add_sprite(&mut self.data.sprites, SpriteId::Terminal(TerminalType::ShipConsole), p);
                     },
                     TerminalType::Hud => ()
                 };
             }
         }
-        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Terminal(TerminalType::Intercomm)).unwrap())?;
-        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Terminal(TerminalType::ShipConsole)).unwrap())?;
+        draw_spritebatch(ctx, &mut self.data.sprites, SpriteId::Terminal(TerminalType::Intercomm))?;
+        draw_spritebatch(ctx, &mut self.data.sprites, SpriteId::Terminal(TerminalType::ShipConsole))?;
 
         for (pos, item) in self.data.pilot_seats.iter().enumerate() {
             if let Some(pilot_seat) = item {
                 let p = get_tile_params(ctx, pos as i32, self.data.camera, Some(pilot_seat.front));
-                self.data.sprites.get(&SpriteId::PilotSeat).unwrap().add(p);
+                add_sprite(&mut self.data.sprites, SpriteId::PilotSeat, p);
             }
         }
-        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::PilotSeat).unwrap())?;
+        draw_spritebatch(ctx, &mut self.data.sprites, SpriteId::PilotSeat)?;
 
         for (pos, item) in self.data.doors.iter().enumerate() {
             if let Some(door) = item {
                 let p = get_tile_params(ctx, pos as i32, self.data.camera, Some(door.face));
                 match door.status {
-                    DoorStatus::Open => self.data.sprites.get(&SpriteId::Door(DoorStatus::Open)).unwrap().add(p),
-                    DoorStatus::Closed => self.data.sprites.get(&SpriteId::Door(DoorStatus::Closed)).unwrap().add(p)
+                    DoorStatus::Open => add_sprite(&mut self.data.sprites, SpriteId::Door(DoorStatus::Open), p),
+                    DoorStatus::Closed => add_sprite(&mut self.data.sprites, SpriteId::Door(DoorStatus::Closed), p)
                 };
             }
         }
-        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Door(DoorStatus::Closed)).unwrap())?;
-        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Door(DoorStatus::Open)).unwrap())?;
+        draw_spritebatch(ctx, &mut self.data.sprites, SpriteId::Door(DoorStatus::Closed))?;
+        draw_spritebatch(ctx, &mut self.data.sprites, SpriteId::Door(DoorStatus::Open))?;
 
         for (pos, item) in self.data.generators.iter().enumerate() {
             if item.is_some() {
                 let params = get_tile_params(ctx, pos as i32, self.data.camera, None);
-                self.data.sprites.get(&SpriteId::Generator).unwrap().add(params);
+                add_sprite(&mut self.data.sprites, SpriteId::Generator, params);
             }
         }
-        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Generator).unwrap())?;
+        draw_spritebatch(ctx, &mut self.data.sprites, SpriteId::Generator)?;
 
         for (pos, item) in self.data.storages.iter().enumerate() {
             if item.is_some() {
                 let params = get_tile_params(ctx, pos as i32, self.data.camera, None);
-                self.data.sprites.get(&SpriteId::Storage).unwrap().add(params);
+                add_sprite(&mut self.data.sprites, SpriteId::Storage, params);
             }
         }
-        draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Storage).unwrap())?;
+        draw_spritebatch(ctx, &mut self.data.sprites, SpriteId::Storage)?;
 
         if self.data.insight_view {
             for (pos, item) in self.data.circuitry.iter().enumerate() {
                 if item.is_some() {
                     let params = get_tile_params(ctx, pos as i32, self.data.camera, None);
-                    self.data.sprites.get(&SpriteId::Circuitry).unwrap().add(params);
+                    add_sprite(&mut self.data.sprites, SpriteId::Circuitry, params);
                 }
             }
-            draw_spritebatch(ctx, &mut self.data.sprites.get(&SpriteId::Circuitry).unwrap())?;
+            draw_spritebatch(ctx, &mut self.data.sprites, SpriteId::Circuitry)?;
         }
 
         for (pos, npc) in self.data.npc.iter().enumerate() {
@@ -513,14 +513,16 @@ impl event::EventHandler for Scene {
     }
 }
 
-pub fn draw_spritebatch(ctx: &mut Context, spritebatch: &mut SpriteBatch) -> GameResult<()> {
+pub fn draw_spritebatch(ctx: &mut Context, sprites: &mut HashMap<SpriteId, SpriteBatch>, sprite_id: SpriteId) -> GameResult<()> {
     graphics::set_color(ctx, graphics::WHITE)?;
     let params = graphics::DrawParam {
         dest: graphics::Point2::new(0.0, 0.0),
         ..Default::default()
     };
-    graphics::draw_ex(ctx, spritebatch, params)?;
-    spritebatch.clear();
+    if let Some(spritebatch) = sprites.get_mut(&sprite_id) {
+        graphics::draw_ex(ctx, spritebatch, params)?;
+        spritebatch.clear();
+    }
 
     Ok(())
 }
@@ -583,4 +585,10 @@ pub fn draw_tile(ctx: &mut Context, tile_src: &str, pos: i32, camera: Position, 
     )?;
 
     Ok(())
+}
+
+pub fn add_sprite(sprites: &mut HashMap<SpriteId, SpriteBatch>, sprite_id: SpriteId, params: graphics::DrawParam) {
+    if let Some(spritebatch) = sprites.get_mut(&sprite_id) {
+        spritebatch.add(params);
+    }
 }
