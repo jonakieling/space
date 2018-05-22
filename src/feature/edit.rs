@@ -4,8 +4,7 @@ use ggez::event::{Keycode, Mod};
 
 use world::WorldData;
 use app::draw_selection;
-use app_state::ingame::InputState;
-use GameState;
+use game::{InputState, GameState};
 use misc::Direction;
 use objects::*;
 use storage::{SelectionStorage, Node};

@@ -2,9 +2,8 @@ use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
 use app::{draw_input_state, draw_dialog};
-use app_state::ingame::InputState;
+use game::{InputState, GameState};
 use world::WorldData;
-use GameState;
 use dialog::DialogAction;
 
 pub struct Handler {

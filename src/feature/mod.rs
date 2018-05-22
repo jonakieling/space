@@ -4,6 +4,7 @@ pub mod world;
 pub mod inventory;
 pub mod circuitry;
 pub mod menu;
+pub mod mainmenu;
 pub mod npc;
 pub mod npc_trade;
 pub mod storage;

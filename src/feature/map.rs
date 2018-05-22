@@ -4,8 +4,7 @@ use ggez::event::{Keycode, Mod};
 
 use world::WorldData;
 use misc::{Position, Direction};
-use app_state::ingame::InputState;
-use GameState;
+use game::{InputState, GameState};
 use constants::GRID_SIZE;
 use app::*;
 use storage::SelectionStorage;

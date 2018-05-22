@@ -4,8 +4,7 @@ use ggez::event::{Keycode, Mod};
 
 use world::WorldData;
 use app::{draw_input_state, draw_dialog};
-use app_state::ingame::InputState;
-use GameState;
+use game::{InputState, GameState};
 
 pub struct Handler {
     change_state: Option<InputState>

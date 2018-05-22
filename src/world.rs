@@ -47,7 +47,6 @@ pub struct WorldData {
     pub receipes: Vec<Receipe>,
     pub dialog: Node<DialogItem>,
     pub insight_view: bool,
-    pub main_menu: bool,
     pub overlay: bool,
     pub sprites: HashMap<SpriteId, SpriteBatch>,
     pub camera: Position
@@ -171,7 +170,6 @@ impl WorldData {
                 children: SelectionStorage::new()
             },
             insight_view: false,
-            main_menu: false,
             overlay: false,
             sprites,
             camera: Position { x: 0, y: 0}

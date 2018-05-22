@@ -13,7 +13,22 @@ use constants::*;
 use world::WorldData;
 use savegame::save_scene;
 use feature::{*, map::MapFeature};
-use GameState;
+
+pub trait GameState {
+    fn change_state(&mut self, _ctx: &mut Context, _world: &mut WorldData) -> Option<Box<GameState>> { None }
+    
+    fn update(&mut self, _ctx: &mut Context, _world: &mut WorldData) -> GameResult<()> { Ok(()) }
+
+    fn draw(&mut self, _ctx: &mut Context, _world: &mut WorldData) -> GameResult<()> { Ok(()) }
+
+    fn key_down_event(&mut self, _ctx: &mut Context, _world: &mut WorldData, _keycode: Keycode, _keymod: Mod, _repeat: bool) { }
+
+    fn key_up_event(&mut self, _ctx: &mut Context, _world: &mut WorldData, _keycode: Keycode, _keymod: Mod, _repeat: bool) { }
+
+    fn text_input_event(&mut self, _ctx: &mut Context, _world: &mut WorldData, _text: String) { }
+
+    fn quit_event(&mut self, _ctx: &mut Context, _world: &mut WorldData) -> bool { false }
+}
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum InputState {
@@ -23,6 +38,7 @@ pub enum InputState {
     Inventory,
     Circuitry,
     Menu,
+    Mainmenu,
     Npc,
     NpcTrade,
     Storage,
@@ -34,25 +50,14 @@ pub struct Handler {
 }
 
 impl Handler {
-    pub fn new() -> Handler {
+    pub fn new(data: &mut WorldData) -> Handler {
         Handler {
-            current_ingame_state: Box::new(world::Handler::new())
+            current_ingame_state: Box::new(mainmenu::Handler::new(data))
         }
     }
 }
 
 impl GameState for Handler {
-    fn change_state(&mut self, _ctx: &mut Context, data: &mut WorldData) -> Option<Box<GameState>> {
-        if data.main_menu {
-            data.main_menu = false;
-            save_scene(&data, "saves/auto-save.tar");
-            let menu = super::menu::Handler::new().unwrap();
-            Some(Box::new(menu))
-        } else {
-            None
-        }
-    }
-
     fn update(&mut self, ctx: &mut Context, data: &mut WorldData) -> GameResult<()> {
 
         if let Some(state) = self.current_ingame_state.change_state(ctx, data) {

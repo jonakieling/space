@@ -3,9 +3,9 @@ use ggez::event::{Keycode, Mod};
 
 use world::WorldData;
 use app::draw_selection;
-use app_state::ingame::InputState;
-use GameState;
+use game::{InputState, GameState};
 use storage::SelectionStorage;
+use savegame::save_scene;
 
 #[derive(Debug, Clone)]
 pub enum MenuOption {
@@ -35,17 +35,22 @@ impl Handler {
 
 impl GameState for Handler {
 
-    fn change_state(&mut self, _ctx: &mut Context, _scene_data: &mut WorldData) -> Option<Box<GameState>> {
+    fn change_state(&mut self, _ctx: &mut Context, data: &mut WorldData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
                 Some(Box::new(super::world::Handler::new()))
             },
-            _ => None,
+            Some(InputState::Mainmenu) => {
+                self.change_state = None;
+                save_scene(data, "saves/auto-save.tar");
+                Some(Box::new(super::mainmenu::Handler::new(data)))
+            },
+            _ => None
         }
     }
 
-    fn key_up_event(&mut self, ctx: &mut Context, scene_data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, ctx: &mut Context, _data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match keycode {
             Keycode::Escape => {
                 self.change_state = Some(InputState::World);
@@ -62,7 +67,8 @@ impl GameState for Handler {
                         ctx.quit().expect("game should have quit");
                     },
                     MenuOption::Menu => {
-                        scene_data.main_menu = true;
+
+                        self.change_state = Some(InputState::Mainmenu);
                     },
                 }
             },

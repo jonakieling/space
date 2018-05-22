@@ -7,11 +7,11 @@ use ggez::Context;
 use ggez::graphics;
 use ggez::event::*;
 
+use game::GameState;
 use storage::{SelectionStorage, Node};
 use dialog::DialogItem;
 use misc::{TextAlign, Position, Direction};
 use world::WorldData;
-use super::GameState;
 use objects::*;
 use constants::*;
 

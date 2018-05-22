@@ -2,10 +2,9 @@ use ggez::Context;
 use ggez::event::{Keycode, Mod};
 
 use world::WorldData;
-use app_state::ingame::InputState;
+use game::{InputState, GameState};
 use feature::map::MapFeature;
 use misc::*;
-use GameState;
 use objects::*;
 use savegame::static_levels::*;
 

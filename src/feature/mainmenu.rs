@@ -1,11 +1,10 @@
 use std::fs;
 
-use ggez::{graphics, Context, event::*, GameResult};
+use ggez::{Context, event::*, GameResult};
 
 use storage::SelectionStorage;
-use GameState;
 use savegame;
-use app_state::ingame;
+use game::GameState;
 use world::WorldData;
 use app::draw_selection;
 
@@ -34,17 +33,23 @@ impl ToString for SaveType {
 }
 
 impl Handler {
-    pub fn new() -> GameResult<Handler> {
+    pub fn new(data: &mut WorldData) -> Handler {
+        data.overlay = true;
     	let mut menu = Handler {
     		saves: SelectionStorage::new(),
             loading: None
     	};
 
-        for entry in fs::read_dir("saves")? {
-            let dir = entry?;
-            if let Some(extension) = dir.path().extension() {
-                if extension == "tar" {
-                    menu.saves.insert(SaveType::File(String::from(dir.path().to_str().unwrap())));
+        if let Ok(dir) = fs::read_dir("saves") {
+            for entry in dir {
+                if let Ok(entry) = entry {
+                    if let Some(extension) = entry.path().extension() {
+                        if extension == "tar" {
+                            if let Some(file) = entry.path().to_str() {
+                                menu.saves.insert(SaveType::File(String::from(file)));
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -53,42 +58,40 @@ impl Handler {
         menu.saves.insert(SaveType::DevShip);
         menu.saves.insert(SaveType::DevStation);
 
-    	Ok(menu)
+    	menu
     }
 }
 
 impl GameState for Handler {
     fn change_state(&mut self, _ctx: &mut Context, data: &mut WorldData) -> Option<Box<GameState>> {
+        let mut state: Option<Box<GameState>> = None;
         if let Some(ref savegame) = self.loading {
             match savegame {
                 SaveType::Empty => {
-                    let mut world = ingame::Handler::new();
-                    data.clear();
                     savegame::static_levels::empty(data);
-                    Some(Box::new(world))
+                    data.overlay = false;
+                    state = Some(Box::new(super::world::Handler::new()));
                 },
                 SaveType::DevShip => {
-                    let mut world = ingame::Handler::new();
-                    data.clear();
                     savegame::static_levels::static_ship_tech(data);
-                    Some(Box::new(world))
+                    data.overlay = false;
+                    state = Some(Box::new(super::world::Handler::new()));
                 },
                 SaveType::DevStation => {
-                    let mut world = ingame::Handler::new();
-                    data.clear();
                     savegame::static_levels::static_station_outpost(data);
-                    Some(Box::new(world))
+                    data.overlay = false;
+                    state = Some(Box::new(super::world::Handler::new()));
                 },
                 SaveType::File(savefile) => {
-                    let mut world = ingame::Handler::new();
-                    data.clear();
                     savegame::load_scene(data, savefile);
-                    Some(Box::new(world))
-                },
+                    data.overlay = false;
+                    state = Some(Box::new(super::world::Handler::new()));
+                }
             }
-        } else {
-            None
         }
+        self.loading = None;
+
+        state
     }
     
     fn key_up_event(&mut self, ctx: &mut Context, _world_data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
@@ -110,12 +113,6 @@ impl GameState for Handler {
     }
 
     fn draw(&mut self, ctx: &mut Context, _world_data: &mut WorldData) -> GameResult<()> {
-        graphics::clear(ctx);
-
-        draw_selection(&self.saves, ctx, true, false)?;
-
-        graphics::present(ctx);
-
-        Ok(())
+        draw_selection(&self.saves, ctx, true, false)
     }
 }

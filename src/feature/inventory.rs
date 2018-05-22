@@ -2,10 +2,9 @@ use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
 use app::{draw_selection_with_parameters, draw_input_state};
-use app_state::ingame::InputState;
+use game::{InputState, GameState};
 use world::WorldData;
 use objects::{Receipe, Item};
-use GameState;
 use misc::{Position, TextAlign};
 use storage::SelectionStorage;
 use feature::map::MapFeature;

@@ -3,8 +3,7 @@ use ggez::event::{Keycode, Mod};
 
 use world::WorldData;
 use app::{draw_input_state, draw_selection_with_parameters};
-use app_state::ingame::InputState;
-use GameState;
+use game::{InputState, GameState};
 use misc::{TextAlign, Position};
 use objects::Item;
 use storage::SelectionStorage;
