@@ -4,7 +4,7 @@ use misc::*;
 use savegame::static_npc::*;
 use storage::{Node, SelectionStorage};
 use dialog::*;
-use ingame_state::map::MapFeature;
+use feature::map::MapFeature;
 
 pub fn empty(scene_data: &mut WorldData) {
     scene_data.backdrop = String::from("");

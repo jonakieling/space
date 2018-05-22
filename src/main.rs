@@ -13,7 +13,7 @@ mod player;
 mod objects;
 mod misc;
 mod constants;
-mod ingame_state;
+mod feature;
 mod dialog;
 mod app;
 mod world;

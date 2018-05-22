@@ -3,7 +3,7 @@ use ggez::event::{Keycode, Mod};
 
 use world::WorldData;
 use app_state::ingame::InputState;
-use ingame_state::map::MapFeature;
+use feature::map::MapFeature;
 use misc::*;
 use GameState;
 use objects::*;

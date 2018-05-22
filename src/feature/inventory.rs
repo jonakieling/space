@@ -8,7 +8,7 @@ use objects::{Receipe, Item};
 use GameState;
 use misc::{Position, TextAlign};
 use storage::SelectionStorage;
-use ingame_state::map::MapFeature;
+use feature::map::MapFeature;
 
 #[derive(PartialEq, Eq)]
 enum Mode {

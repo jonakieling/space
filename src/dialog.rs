@@ -1,4 +1,4 @@
-use ingame_state::map::MapFeature;
+use feature::map::MapFeature;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct DialogItem {
