@@ -2,7 +2,9 @@ use world::WorldData;
 use objects::*;
 use misc::*;
 use savegame::static_npc::*;
-use storage::Node;
+use storage::{Node, SelectionStorage};
+use dialog::*;
+use ingame_state::map::MapFeature;
 
 pub fn empty(scene_data: &mut WorldData) {
     scene_data.backdrop = String::from("");
@@ -13,6 +15,7 @@ pub fn empty(scene_data: &mut WorldData) {
 }
 
 pub fn static_station_outpost(scene_data: &mut WorldData) {
+    scene_data.clear();
     scene_data.backdrop = String::from("");
 
     super::insert_floor(scene_data, vec![
@@ -68,7 +71,6 @@ pub fn static_station_outpost(scene_data: &mut WorldData) {
         (12, 12, WallType::Corner, Direction::Down),
         (13, 12, WallType::Wall, Direction::Down),
         (14, 12, WallType::Corner, Direction::Left),
-        (6, 13, WallType::Wall, Direction::Right),
         (11, 13, WallType::Wall, Direction::Left),
         (12, 13, WallType::Wall, Direction::Right),
         (14, 13, WallType::Wall, Direction::Left),
@@ -90,7 +92,8 @@ pub fn static_station_outpost(scene_data: &mut WorldData) {
     ]);
 
     super::insert_doors(scene_data, vec![
-        (11, 14, DoorStatus::Closed, Direction::Left)
+        (11, 14, DoorStatus::Closed, DoorType::Passage, Direction::Left),
+        (6, 13, DoorStatus::Closed, DoorType::Exit(Location::Ship("Tech 2.1".to_string())), Direction::Right)
     ]);
 
     scene_data.terminals.insert(Position::new(14, 14), Terminal {
@@ -108,12 +111,14 @@ pub fn static_station_outpost(scene_data: &mut WorldData) {
 
     super::insert_npc(scene_data, 9 ,9, gnoerf(Direction::Down));
 
-    super::insert_player(scene_data, (9, 11), Direction::Up, vec![]);
+    super::insert_player(scene_data, (7, 13), Direction::Right, vec![Item::Navcomp]);
 
     println!("game loaded: static station outpost");
 }
 
 pub fn static_ship_tech(scene_data: &mut WorldData) {
+    scene_data.clear();
+
     scene_data.backdrop = String::from("/realm_of_sol__0000s_0001_2.1.png");
 
     super::insert_floor(scene_data, vec![
@@ -173,8 +178,8 @@ pub fn static_ship_tech(scene_data: &mut WorldData) {
     ]);
 
     super::insert_doors(scene_data, vec![
-        (8, 11, DoorStatus::Open, Direction::Down),
-        (10, 13, DoorStatus::Closed, Direction::Left)
+        (8, 11, DoorStatus::Open, DoorType::Passage, Direction::Down),
+        (10, 13, DoorStatus::Closed, DoorType::Exit(Location::Station("Mun".to_string())), Direction::Left)
     ]);
 
     super::insert_generator(scene_data, vec![
@@ -209,9 +214,28 @@ pub fn static_ship_tech(scene_data: &mut WorldData) {
         (7, 13, Direction::Right)
     ]);
 
+    let mut ship_console_dialog_children =  SelectionStorage::new();
+    ship_console_dialog_children.insert(
+        Node {
+            value: DialogItem {
+                text: "Navigate".to_string(),
+                response: "".to_string(),
+                action: Some(DialogAction::Map(MapFeature::Navigate))
+            },
+            children: SelectionStorage::new()
+        }
+    );
+
     scene_data.terminals.insert(Position::new(8, 8), Terminal {
         variant: TerminalType::ShipConsole,
-        dialog: Node::new(),
+        dialog: Node {
+            value: DialogItem {
+                text: "".to_string(),
+                response: "ship console".to_string(),
+                action: None
+            },
+            children: ship_console_dialog_children
+        },
         front: Direction::Down
     });
 
@@ -221,7 +245,7 @@ pub fn static_ship_tech(scene_data: &mut WorldData) {
         front: Direction::Left
     });
 
-    super::insert_player(scene_data, (8, 10), Direction::Up, vec![]);
+    super::insert_player(scene_data, (9, 13), Direction::Left, vec![Item::Navcomp]);
 
     println!("game loaded: static ship tech");
 }

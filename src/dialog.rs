@@ -1,3 +1,5 @@
+use ingame_state::map::MapFeature;
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct DialogItem {
     pub text: String,
@@ -13,5 +15,6 @@ impl ToString for DialogItem {
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum DialogAction {
-    Trade
+    Trade,
+    Map(MapFeature)
 }

@@ -64,7 +64,8 @@ pub enum SpriteId {
     Generator,
     Decoration(DecorationType),
     MapSector,
-    MapStation
+    MapStation,
+    MapShip
 }
 
 pub fn draw_dialog(dialog: &Node<DialogItem>, ctx: &mut Context) -> GameResult<()> {

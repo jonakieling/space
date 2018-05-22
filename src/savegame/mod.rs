@@ -4,7 +4,6 @@ use std::io::Write;
 
 use tar::{Builder, Archive};
 use bincode;
-use serde_yaml;
 
 use constants::LEVEL_SIZE;
 use world::WorldData;
@@ -12,7 +11,6 @@ use player::Player;
 use objects::*;
 use misc::{Position, Direction};
 use storage::{Node, SelectionStorage};
-use dialog::*;
 
 pub mod static_levels;
 pub mod static_npc;
@@ -55,6 +53,17 @@ pub fn save_scene(world: &WorldData, filename: &str) {
     }
     let bytes: Vec<u8> = bincode::serialize(&level_floor).unwrap();
     File::create("temp-save/floor.bin").unwrap().write_all(&bytes).unwrap();
+
+    let mut level_pilot_seats: Vec<(i32, i32, PilotSeat)> = vec![];
+    for (pos, item) in world.pilot_seats.iter().enumerate() {
+        if let Some(ref pilot_seat) = *item {
+            let x = pos as i32 % LEVEL_SIZE;
+            let y = pos as i32 / LEVEL_SIZE;
+            level_pilot_seats.push((x, y, pilot_seat.clone()));
+        }
+    }
+    let bytes: Vec<u8> = bincode::serialize(&level_pilot_seats).unwrap();
+    File::create("temp-save/pilot-seats.bin").unwrap().write_all(&bytes).unwrap();
 
     let mut level_doors: Vec<(i32, i32, Door)> = vec![];
     for (pos, item) in world.doors.iter().enumerate() {
@@ -122,15 +131,6 @@ pub fn save_scene(world: &WorldData, filename: &str) {
     let bytes: Vec<u8> = bincode::serialize(&level_npc).unwrap();
     File::create("temp-save/npc.bin").unwrap().write_all(&bytes).unwrap();
 
-    let mut level_npc_dialog: Vec<Node<DialogItem>> = vec![];
-    for item in world.npc.iter() {
-        if let Some(ref npc) = *item {
-            level_npc_dialog.push(npc.dialog.clone());
-        }
-    }
-    let yaml = serde_yaml::to_string(&level_npc_dialog).unwrap();
-    File::create("temp-save/npc-dialog.yaml").unwrap().write_all(&yaml.as_bytes()).unwrap();
-
     let file = File::create(filename).unwrap();
     let mut a = Builder::new(file);
     a.append_dir_all("save", "temp-save").unwrap();
@@ -161,6 +161,12 @@ pub fn load_scene(world: &mut WorldData, filename: &str) {
                     let level_floor: Vec<(i32, i32, Floor)> = bincode::deserialize_from(file).unwrap();
                     for floor in level_floor {
                         world.floor.insert(Position {x: floor.0, y: floor.1}, floor.2);
+                    }
+                },
+                "pilot-seats" => {
+                    let level_pilot_seats: Vec<(i32, i32, PilotSeat)> = bincode::deserialize_from(file).unwrap();
+                    for pilot_seat in level_pilot_seats {
+                        world.pilot_seats.insert(Position {x: pilot_seat.0, y: pilot_seat.1}, pilot_seat.2);
                     }
                 },
                 "doors" => {
@@ -275,11 +281,11 @@ pub fn insert_storage(world: &mut WorldData, storages: Vec<(i32, i32, Direction)
     }
 }
 
-pub fn insert_doors(world: &mut WorldData, doors: Vec<(i32, i32, DoorStatus, Direction)>) {
+pub fn insert_doors(world: &mut WorldData, doors: Vec<(i32, i32, DoorStatus, DoorType, Direction)>) {
     for door in doors {
         world.doors.insert(
             Position { x: door.0, y: door.1 },
-            Door { status: door.2, face: door.3 }
+            Door { status: door.2, variant: door.3, face: door.4 }
         );
     }
 }

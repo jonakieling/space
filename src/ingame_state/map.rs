@@ -9,34 +9,84 @@ use GameState;
 use constants::GRID_SIZE;
 use app::*;
 use storage::SelectionStorage;
+use objects::Location;
+
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
+pub enum MapFeature {
+    View,
+    Navigate
+}
 
 pub struct Handler {
     cursor: Position,
     change_state: Option<InputState>,
-    map_selection: SelectionStorage<String>
+    map_selection: SelectionStorage<String>,
+    feature: MapFeature
 }
 
 impl Handler {
-    pub fn new() -> Handler {
-    	Handler {
-            cursor: Position {x: 0, y: 0},
-            change_state: None,
-            map_selection: SelectionStorage::new()
+    pub fn new(feature: MapFeature, data: &mut WorldData) -> Handler {
+        data.overlay = true;
+        let mut cursor = Position {x: 0, y: 0};
+
+        match data.player_location {
+            Location::Ship(ref ship_id) => {
+                for ship in data.ships.iter_mut() {
+                    if &ship.id == ship_id {
+                        cursor = ship.position;
+                    }
+                }
+            },
+            Location::Station(ref station_id) => {
+                for station in data.stations.iter_mut() {
+                    if &station.id == station_id {
+                        cursor = station.position;
+                    }
+                }
+            }
         }
+
+    	let mut handler = Handler {
+            cursor,
+            change_state: None,
+            map_selection: SelectionStorage::new(),
+            feature
+        };
+
+        let map_selection = handler.get_edit_selection(data);
+        handler.map_selection = map_selection;
+
+        handler
     }
 
     fn get_edit_selection(&mut self, data: &mut WorldData) -> SelectionStorage<String> {
         let mut selection_storage: SelectionStorage<String> = SelectionStorage::new();
         selection_storage.insert(self.cursor.to_string());
-        selection_storage.insert("-".to_string());
+        selection_storage.insert("".to_string());
         for sector in data.sectors.iter() {
             if sector.position == self.cursor {
-                selection_storage.insert("Sector".to_string());
-                if sector.stations.iter().len() > 0 {
-                selection_storage.insert("Station".to_string());
+                selection_storage.insert(sector.id.clone());
+            }
+        }
+        for station in data.stations.iter() {
+            if station.position == self.cursor {
+                selection_storage.insert(station.id.clone());
+                if let Location::Station(ref station_id) = data.player_location {
+                    if &station.id == station_id {
+                        selection_storage.insert("Player".to_string());
+                    }
                 }
             }
-
+        }
+        for ship in data.ships.iter() {
+            if ship.position == self.cursor {
+                selection_storage.insert(ship.id.clone());
+                if let Location::Ship(ref ship_id) = data.player_location {
+                    if &ship.id == ship_id {
+                        selection_storage.insert("Player".to_string());
+                    }
+                }
+            }
         }
 
         selection_storage
@@ -77,12 +127,29 @@ impl GameState for Handler {
                 self.cursor = &self.cursor + &Direction::Down.value();
                 self.map_selection = self.get_edit_selection(scene_data);
             },
+            Keycode::Return => {
+                if self.feature == MapFeature::Navigate {
+                    if let Location::Ship(ref ship_id) = scene_data.player_location {
+                        for ship in scene_data.ships.iter_mut() {
+                            if &ship.id == ship_id {
+                                ship.position = self.cursor;
+                            }
+                        }
+                    }
+                    self.map_selection = self.get_edit_selection(scene_data);
+                }
+            }
             _ => ()
         }
     }
 
     fn draw(&mut self, ctx: &mut Context, data: &mut WorldData) -> GameResult<()> {
         data.camera = self.cursor;
+
+        match self.feature {
+            MapFeature::View => draw_input_state("Map", ctx)?,
+            MapFeature::Navigate => draw_input_state("Navigation", ctx)?,
+        }
 
         graphics::set_color(ctx, graphics::WHITE)?;
 
@@ -91,13 +158,17 @@ impl GameState for Handler {
         for sector in data.sectors.iter() {
             let p = get_tile_params(ctx, sector.position, data.camera, None);
             add_sprite(&mut data.sprites, SpriteId::MapSector, p);
-
-            if sector.stations.iter().len() > 0 {
-                add_sprite(&mut data.sprites, SpriteId::MapStation, p);
-            }
-
+        }
+        for station in data.stations.iter() {
+            let p = get_tile_params(ctx, station.position, data.camera, None);
+            add_sprite(&mut data.sprites, SpriteId::MapStation, p);
+        }
+        for ship in data.ships.iter() {
+            let p = get_tile_params(ctx, ship.position, data.camera, None);
+            add_sprite(&mut data.sprites, SpriteId::MapShip, p);
         }
         draw_spritebatch(ctx, &mut data.sprites, SpriteId::MapSector)?;
+        draw_spritebatch(ctx, &mut data.sprites, SpriteId::MapShip)?;
         draw_spritebatch(ctx, &mut data.sprites, SpriteId::MapStation)?;
 
         graphics::set_color(ctx, graphics::Color{r: 0.2, g: 0.8, b: 0.2, a: 1.0,})?;

@@ -8,6 +8,7 @@ use objects::{Receipe, Item};
 use GameState;
 use misc::{Position, TextAlign};
 use storage::SelectionStorage;
+use ingame_state::map::MapFeature;
 
 #[derive(PartialEq, Eq)]
 enum Mode {
@@ -39,11 +40,15 @@ impl Handler {
 
 impl GameState for Handler {
 
-    fn change_state(&mut self, _ctx: &mut Context, _scene_data: &mut WorldData) -> Option<Box<GameState>> {
+    fn change_state(&mut self, _ctx: &mut Context, data: &mut WorldData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
                 Some(Box::new(super::world::Handler::new()))
+            },
+            Some(InputState::Map(feature)) => {
+                self.change_state = None;
+                Some(Box::new(super::map::Handler::new(feature, data)))
             },
             _ => None,
         }
@@ -103,6 +108,9 @@ impl GameState for Handler {
                 match self.mode {
                     Mode::Inventory => {
                         match scene_data.player.inventory.current() {
+                            Some(Item::Navcomp) => {
+                                self.change_state = Some(InputState::Map(MapFeature::View));
+                            },
                             _ => (),
                         }
                     },

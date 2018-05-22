@@ -45,9 +45,22 @@ pub enum DoorStatus {
     Closed
 }
 
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
+pub enum Location {
+	Ship(String),
+	Station(String)
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
+pub enum DoorType {
+	Passage,
+	Exit(Location)
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Door {
     pub status: DoorStatus,
+	pub variant: DoorType,
 	pub face: Direction
 }
 
@@ -90,7 +103,7 @@ pub struct Generator {
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
 pub enum Item {
 	PowerConductor,
-	Hud
+	Navcomp
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

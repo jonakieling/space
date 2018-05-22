@@ -125,7 +125,7 @@ impl GameState for Handler {
                 scene_data.storages.insert(self.edit_cursor, Storage { content: SelectionStorage::new(), face: Direction::Down });
             },
             Keycode::D => {
-                scene_data.doors.insert(self.edit_cursor, Door { status: DoorStatus::Closed, face: Direction::Down});
+                scene_data.doors.insert(self.edit_cursor, Door { status: DoorStatus::Closed, variant: DoorType::Passage, face: Direction::Down});
             },
             Keycode::T => {
                 scene_data.terminals.insert(self.edit_cursor, Terminal { variant: TerminalType::Intercomm, dialog: Node::new(), front: Direction::Down});

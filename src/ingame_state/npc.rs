@@ -50,7 +50,8 @@ impl GameState for Handler {
                             match *action {
                                 DialogAction::Trade => {
                                     self.change_state = Some(InputState::NpcTrade);
-                                }
+                                },
+                                DialogAction::Map(_) => { }
                             }
                         }
                     }

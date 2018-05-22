@@ -3,8 +3,11 @@ use ggez::event::{Keycode, Mod};
 
 use world::WorldData;
 use app_state::ingame::InputState;
+use ingame_state::map::MapFeature;
 use misc::*;
 use GameState;
+use objects::*;
+use savegame::static_levels::*;
 
 pub struct Handler {
     change_state: Option<InputState>
@@ -14,6 +17,41 @@ impl Handler {
     pub fn new() -> Handler {
     	Handler {
             change_state: None
+        }
+    }
+
+    fn interact_with_door(&mut self, scene_data: &mut WorldData) {
+        let mut load_static_ship = false;
+        let mut load_static_station = false;
+        if let Some(door) = scene_data.doors.get_mut(scene_data.player.front_tile) {
+            match &door.variant {
+                DoorType::Passage => {
+                    match door.status {
+                        DoorStatus::Closed => {
+                            door.status = DoorStatus::Open;
+                        },
+                        DoorStatus::Open => {
+                            door.status = DoorStatus::Closed;
+                        },
+                    }
+                },
+	            DoorType::Exit(Location::Ship(ref ship_id)) => {
+                    if ship_id == "Tech 2.1" {
+                        load_static_ship = true;
+                    }
+                },
+	            DoorType::Exit(Location::Station(ref station_id)) => {
+                    if station_id == "Mun" {
+                        load_static_station = true;
+                    }
+                },
+            }
+        }
+
+        if load_static_ship {
+            static_ship_tech(scene_data);
+        } else if load_static_station {
+            static_station_outpost(scene_data);
         }
     }
 
@@ -89,9 +127,9 @@ impl GameState for Handler {
                 self.change_state = None;
                 Some(Box::new(super::storage::Handler::new()))
             },
-            Some(InputState::Map) => {
+            Some(InputState::Map(feature)) => {
                 self.change_state = None;
-                Some(Box::new(super::map::Handler::new()))
+                Some(Box::new(super::map::Handler::new(feature, scene_data)))
             },
             _ => None,
         }
@@ -156,15 +194,14 @@ impl GameState for Handler {
                     self.interact_with_storage(scene_data);
                     self.interact_with_terminal(scene_data);
                     self.interact_with_npc(scene_data);
-                    scene_data.interact_with_door();
+                    self.interact_with_door(scene_data);
                 }
             },
             Keycode::I => {
                 self.change_state = Some(InputState::Inventory);
             },
             Keycode::M => {
-                scene_data.overlay = true;
-                self.change_state = Some(InputState::Map);
+                self.change_state = Some(InputState::Map(MapFeature::View));
             },
             Keycode::Escape => {
                 self.change_state = Some(InputState::Menu);

@@ -12,7 +12,7 @@ use misc::*;
 use constants::*;
 use world::WorldData;
 use savegame::save_scene;
-use ingame_state::*;
+use ingame_state::{*, map::MapFeature};
 use GameState;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
@@ -26,7 +26,7 @@ pub enum InputState {
     Npc,
     NpcTrade,
     Storage,
-    Map
+    Map(MapFeature)
 }
 
 pub struct Handler {

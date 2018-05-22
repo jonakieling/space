@@ -11,11 +11,19 @@ use misc::*;
 use dialog::*;
 use app::SpriteId;
 
-pub struct Station { }
+pub struct Station {
+    pub id: String,
+    pub position: Position
+}
+
+pub struct Ship {
+    pub id: String,
+    pub position: Position
+}
 
 pub struct Sector {
-    pub position: Position,
-    pub stations: Vec<Station>
+    pub id: String,
+    pub position: Position
 }
 
 pub struct WorldData {
@@ -33,6 +41,9 @@ pub struct WorldData {
     pub npc: PositionLevelStorage<Npc>,
     pub storages: PositionLevelStorage<Storage>,
     pub sectors: Vec<Sector>,
+    pub stations: Vec<Station>,
+    pub ships: Vec<Ship>,
+    pub player_location: Location,
     pub receipes: Vec<Receipe>,
     pub dialog: Node<DialogItem>,
     pub insight_view: bool,
@@ -92,6 +103,7 @@ impl WorldData {
         sprites.insert(SpriteId::Generator, SpriteBatch::new(Image::new(ctx, "/generator.png").unwrap()));
         sprites.insert(SpriteId::MapSector, SpriteBatch::new(Image::new(ctx, "/map-sector.png").unwrap()));
         sprites.insert(SpriteId::MapStation, SpriteBatch::new(Image::new(ctx, "/map-station.png").unwrap()));
+        sprites.insert(SpriteId::MapShip, SpriteBatch::new(Image::new(ctx, "/map-ship.png").unwrap()));
 
         WorldData {
             movement_timer: Duration::from_millis(0),
@@ -109,27 +121,46 @@ impl WorldData {
             storages,
             sectors: vec![
                 Sector {
+                    id: "Sol".to_string(),
                     position: Position {
                         x: -3,
                         y: -2
-                    },
-                    stations: vec![]
+                    }
                 },
                 Sector {
+                    id: "Andromeda".to_string(),
                     position: Position {
                         x: 4,
                         y: 4
-                    },
-                    stations: vec![ Station {} ]
+                    }
                 },
                 Sector {
+                    id: "Gaia".to_string(),
                     position: Position {
                         x: 11,
                         y: 6
-                    },
-                    stations: vec![]
+                    }
                 }
             ],
+            stations: vec![
+                Station {
+                    id: "Mun".to_string(),
+                    position: Position {
+                        x: -3,
+                        y: -2
+                    }
+                }
+            ],
+            ships: vec![
+                Ship {
+                    id: "Tech 2.1".to_string(),
+                    position: Position {
+                        x: -2,
+                        y: -2
+                    }
+                }
+            ],
+            player_location: Location::Ship("Tech 2.1".to_string()),
             receipes,
             dialog: Node {
                 value: DialogItem {
@@ -149,6 +180,7 @@ impl WorldData {
 
     pub fn clear(&mut self) {
         self.walls.clear();
+        self.floor.clear();
         self.doors.clear();
         self.terminals.clear();
         self.circuitry.clear();
@@ -190,19 +222,6 @@ impl WorldData {
         }
 
         found_collision
-    }
-
-    pub fn interact_with_door(&mut self) {
-        if let Some(door) = self.doors.get_mut(self.player.front_tile) {
-            match door.status {
-                DoorStatus::Closed => {
-                    door.status = DoorStatus::Open;
-                },
-                DoorStatus::Open => {
-                    door.status = DoorStatus::Closed;
-                },
-            }
-        }
     }
 
     pub fn reset_powert(&mut self) {
