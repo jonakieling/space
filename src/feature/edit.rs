@@ -26,37 +26,37 @@ impl Handler {
         }
     }
 
-    fn get_edit_selection(&mut self, scene_data: &mut WorldData) -> SelectionStorage<String> {
+    fn get_edit_selection(&mut self, data: &mut WorldData) -> SelectionStorage<String> {
         let mut selection_storage: SelectionStorage<String> = SelectionStorage::new();
-        if let Some(_) = scene_data.walls.get(self.edit_cursor) {
+        if let Some(_) = data.level.walls.get(self.edit_cursor) {
             selection_storage.insert("Wall".to_string());
         }
         
-        if let Some(_) = scene_data.doors.get(self.edit_cursor) {
+        if let Some(_) = data.level.doors.get(self.edit_cursor) {
             selection_storage.insert("Door".to_string());
         }
         
-        if let Some(_) = scene_data.terminals.get(self.edit_cursor) {
+        if let Some(_) = data.level.terminals.get(self.edit_cursor) {
             selection_storage.insert("Terminal".to_string());
         }
         
-        if let Some(_) = scene_data.circuitry.get(self.edit_cursor) {
+        if let Some(_) = data.level.circuitry.get(self.edit_cursor) {
             selection_storage.insert("Circuitry".to_string());
         }
         
-        if let Some(_) = scene_data.generators.get(self.edit_cursor) {
+        if let Some(_) = data.level.generators.get(self.edit_cursor) {
             selection_storage.insert("Generator".to_string());
         }
         
-        if let Some(npc) = scene_data.npc.get(self.edit_cursor) {
+        if let Some(npc) = data.level.npc.get(self.edit_cursor) {
             selection_storage.insert(npc.name.clone());
         }
         
-        if let Some(_) = scene_data.storages.get(self.edit_cursor) {
+        if let Some(_) = data.level.storages.get(self.edit_cursor) {
             selection_storage.insert("Storage".to_string());
         }
 
-        if self.edit_cursor.x == scene_data.player.position.x && self.edit_cursor.y == scene_data.player.position.y {
+        if self.edit_cursor.x == data.level.player.position.x && self.edit_cursor.y == data.level.player.position.y {
             selection_storage.insert("Player".to_string());
         }
 
@@ -76,9 +76,9 @@ impl GameState for Handler {
         }
     }
     
-    fn key_up_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, _ctx: &mut Context, data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
 
-        self.edit_selection = self.get_edit_selection(scene_data);
+        self.edit_selection = self.get_edit_selection(data);
         
         match keycode {
             Keycode::Escape => {
@@ -86,51 +86,51 @@ impl GameState for Handler {
             },
             Keycode::Left => {
                 self.edit_cursor = &self.edit_cursor + &Direction::Left.value();
-                self.edit_selection = self.get_edit_selection(scene_data);
+                self.edit_selection = self.get_edit_selection(data);
             },
             Keycode::Right => {
                 self.edit_cursor = &self.edit_cursor + &Direction::Right.value();
-                self.edit_selection = self.get_edit_selection(scene_data);
+                self.edit_selection = self.get_edit_selection(data);
             },
             Keycode::Up => {
                 self.edit_cursor = &self.edit_cursor + &Direction::Up.value();
-                self.edit_selection = self.get_edit_selection(scene_data);
+                self.edit_selection = self.get_edit_selection(data);
             },
             Keycode::Down => {
                 self.edit_cursor = &self.edit_cursor + &Direction::Down.value();
-                self.edit_selection = self.get_edit_selection(scene_data);
+                self.edit_selection = self.get_edit_selection(data);
             },
             Keycode::Delete => {
-                scene_data.walls.remove(self.edit_cursor);
-                scene_data.doors.remove(self.edit_cursor);
-                scene_data.terminals.remove(self.edit_cursor);
-                scene_data.circuitry.remove(self.edit_cursor);
-                scene_data.generators.remove(self.edit_cursor);
-                scene_data.storages.remove(self.edit_cursor);
-                scene_data.update_power();
+                data.level.walls.remove(self.edit_cursor);
+                data.level.doors.remove(self.edit_cursor);
+                data.level.terminals.remove(self.edit_cursor);
+                data.level.circuitry.remove(self.edit_cursor);
+                data.level.generators.remove(self.edit_cursor);
+                data.level.storages.remove(self.edit_cursor);
+                data.level.update_power();
             },
             Keycode::W => {
-                scene_data.walls.insert(self.edit_cursor, Wall { variant: WallType::Wall, face: Direction::Right});
+                data.level.walls.insert(self.edit_cursor, Wall { variant: WallType::Wall, face: Direction::Right});
             },
             Keycode::C => {
-                scene_data.circuitry.insert(self.edit_cursor, Circuitry {parts: SelectionStorage::new(), powered: false});
-                scene_data.update_power();
+                data.level.circuitry.insert(self.edit_cursor, Circuitry {parts: SelectionStorage::new(), powered: false});
+                data.level.update_power();
             },
             Keycode::G => {
-                scene_data.generators.insert(self.edit_cursor, Generator { face: Direction::Down });
-                scene_data.update_power();
+                data.level.generators.insert(self.edit_cursor, Generator { face: Direction::Down });
+                data.level.update_power();
             },
             Keycode::S => {
-                scene_data.storages.insert(self.edit_cursor, Storage { content: SelectionStorage::new(), face: Direction::Down });
+                data.level.storages.insert(self.edit_cursor, Storage { content: SelectionStorage::new(), face: Direction::Down });
             },
             Keycode::D => {
-                scene_data.doors.insert(self.edit_cursor, Door { status: DoorStatus::Closed, variant: DoorType::Passage, face: Direction::Down});
+                data.level.doors.insert(self.edit_cursor, Door { status: DoorStatus::Closed, variant: DoorType::Passage, face: Direction::Down});
             },
             Keycode::T => {
-                scene_data.terminals.insert(self.edit_cursor, Terminal { variant: TerminalType::Intercomm, dialog: Node::new(), front: Direction::Down});
+                data.level.terminals.insert(self.edit_cursor, Terminal { variant: TerminalType::Intercomm, dialog: Node::new(), front: Direction::Down});
             },
             Keycode::Tab => {
-                if let Some(ref mut door) = scene_data.doors.get_mut(self.edit_cursor) {
+                if let Some(ref mut door) = data.level.doors.get_mut(self.edit_cursor) {
                     match door.status {
                         DoorStatus::Open => {
                             door.status = DoorStatus::Closed;
@@ -140,7 +140,7 @@ impl GameState for Handler {
                         }
                     }
                 }
-                if let Some(ref mut terminal) = scene_data.terminals.get_mut(self.edit_cursor) {
+                if let Some(ref mut terminal) = data.level.terminals.get_mut(self.edit_cursor) {
                     match terminal.front {
                         Direction::Up => {
                             terminal.front = Direction::Right;
@@ -161,12 +161,12 @@ impl GameState for Handler {
         }
     }
 
-    fn draw(&mut self, ctx: &mut Context, scene_data: &mut WorldData) -> GameResult<()> {
+    fn draw(&mut self, ctx: &mut Context, data: &mut WorldData) -> GameResult<()> {
         draw_selection(&self.edit_selection, ctx, false, false)?;
 
         graphics::set_color(ctx, graphics::Color{r: 0.2, g: 0.8, b: 0.2, a: 1.0,})?;
 
-        let viewport_pos = self.edit_cursor.viewport(scene_data.camera);
+        let viewport_pos = self.edit_cursor.viewport(data.camera);
 
         let sceen_horizontal_center = get_screen_coordinates(ctx).w / 2.0 - (GRID_SIZE / 2) as f32;
         let sceen_vertical_center = get_screen_coordinates(ctx).h / 2.0 - (GRID_SIZE / 2) as f32;

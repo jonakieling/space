@@ -54,7 +54,7 @@ impl GameState for Handler {
         }
     }
 
-    fn key_up_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, _ctx: &mut Context, data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match keycode {
             Keycode::Escape => {
                 self.change_state = Some(InputState::World);
@@ -62,15 +62,15 @@ impl GameState for Handler {
             Keycode::Tab => {
                 match self.active_storage_area {
                     StorageArea::Storage => {
-                        let item = scene_data.current_storage().unwrap().content.extract_current();
+                        let item = data.level.current_storage().unwrap().content.extract_current();
                         if item.is_some() {
-                            scene_data.player.inventory.insert(item.unwrap());
+                            data.level.player.inventory.insert(item.unwrap());
                         }
                     },
                     StorageArea::Inventory => {
-                        let item = scene_data.player.inventory.extract_current();
+                        let item = data.level.player.inventory.extract_current();
                         if item.is_some() {
-                            scene_data.current_storage().unwrap().content.insert(item.unwrap());
+                            data.level.current_storage().unwrap().content.insert(item.unwrap());
                         }
                     },
                 }
@@ -98,10 +98,10 @@ impl GameState for Handler {
             Keycode::Up => {
                 match self.active_storage_area {
                     StorageArea::Inventory => {
-                        scene_data.player.inventory.prev();
+                        data.level.player.inventory.prev();
                     },
                     StorageArea::Storage => {
-                        if let Some(current_storage) = scene_data.current_storage() {
+                        if let Some(current_storage) = data.level.current_storage() {
                             current_storage.content.prev();
                         }
                     },
@@ -110,10 +110,10 @@ impl GameState for Handler {
             Keycode::Down => {
                 match self.active_storage_area {
                     StorageArea::Inventory => {
-                        scene_data.player.inventory.next();
+                        data.level.player.inventory.next();
                     },
                     StorageArea::Storage => {
-                        if let Some(current_storage) = scene_data.current_storage() {
+                        if let Some(current_storage) = data.level.current_storage() {
                             current_storage.content.next();
                         }
                     },
@@ -123,12 +123,12 @@ impl GameState for Handler {
         }
     }
 
-    fn draw(&mut self, ctx: &mut Context, scene_data: &mut WorldData) -> GameResult<()> {
+    fn draw(&mut self, ctx: &mut Context, data: &mut WorldData) -> GameResult<()> {
 
         draw_input_state("Storage", ctx)?;
 
-        self.draw_storage_area(&scene_data.current_storage().unwrap().content, ctx, StorageArea::Storage)?;
-        self.draw_storage_area(&scene_data.player.inventory, ctx, StorageArea::Inventory)?;
+        self.draw_storage_area(&data.level.current_storage().unwrap().content, ctx, StorageArea::Storage)?;
+        self.draw_storage_area(&data.level.player.inventory, ctx, StorageArea::Inventory)?;
 
         Ok(())
     }

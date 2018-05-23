@@ -67,15 +67,15 @@ impl GameState for Handler {
         data.movement_timer += get_delta(ctx);
 
         if data.movement_timer > Duration::from_millis(MOVEMENT_DURATION) {
-            if let Some(&current_movement) = data.player.movement.last() {
-                if !data.check_player_collision(&current_movement) {
+            if let Some(&current_movement) = data.level.player.movement.last() {
+                if !data.level.check_player_collision(&current_movement) {
                     data.movement_timer = Duration::from_millis(0);
-                    data.player.position = &data.player.position + &current_movement.value();
+                    data.level.player.position = &data.level.player.position + &current_movement.value();
                 }
             };
         }
 
-        data.player.front_tile = &data.player.direction.value() + &data.player.position;
+        data.level.player.front_tile = &data.level.player.direction.value() + &data.level.player.position;
 
         Ok(())
     }
@@ -118,10 +118,10 @@ impl GameState for Handler {
         graphics::clear(ctx);
 
         if !data.overlay {
-            data.camera = data.player.position;
-            if data.backdrop != "" {
+            data.camera = data.level.player.position;
+            if data.level.backdrop != "" {
                 graphics::set_color(ctx, graphics::Color{r: 1.0, g: 1.0, b: 1.0, a: 0.25})?;
-                let mut backdrop = graphics::Image::new(ctx, &data.backdrop)?;
+                let mut backdrop = graphics::Image::new(ctx, &data.level.backdrop)?;
                 backdrop.set_filter(graphics::FilterMode::Nearest);
 
                 // this is a convention for levels now (got stuck when setting up static levels via functions)
@@ -141,7 +141,7 @@ impl GameState for Handler {
 
             graphics::set_color(ctx, graphics::BLACK)?;
 
-            for (pos, item) in data.floor.iter().enumerate() {
+            for (pos, item) in data.level.floor.iter().enumerate() {
                 if let Some(floor) = item {
                     let p = get_tile_params(ctx, Position::from_int(pos as i32), data.camera, None);
                     match floor.variant {
@@ -153,7 +153,7 @@ impl GameState for Handler {
             draw_spritebatch(ctx, &mut data.sprites, SpriteId::Floor(FloorType::Regular))?;
             draw_spritebatch(ctx, &mut data.sprites, SpriteId::Floor(FloorType::Light))?;
 
-            for (pos, item) in data.walls.iter().enumerate() {
+            for (pos, item) in data.level.walls.iter().enumerate() {
                 if let Some(wall) = item {
                     let p = get_tile_params(ctx, Position::from_int(pos as i32), data.camera, Some(wall.face));
                     match wall.variant {
@@ -169,7 +169,7 @@ impl GameState for Handler {
             draw_spritebatch(ctx, &mut data.sprites, SpriteId::Edge)?;
             draw_spritebatch(ctx, &mut data.sprites, SpriteId::Window)?;
 
-            for (pos, terminal) in data.terminals.iter().enumerate() {
+            for (pos, terminal) in data.level.terminals.iter().enumerate() {
                 if let Some(current_terminal) = terminal {
                     let p = get_tile_params(ctx, Position::from_int(pos as i32), data.camera, Some(current_terminal.front));
                     match current_terminal.variant {
@@ -186,7 +186,7 @@ impl GameState for Handler {
             draw_spritebatch(ctx, &mut data.sprites, SpriteId::Terminal(TerminalType::Intercomm))?;
             draw_spritebatch(ctx, &mut data.sprites, SpriteId::Terminal(TerminalType::ShipConsole))?;
 
-            for (pos, item) in data.pilot_seats.iter().enumerate() {
+            for (pos, item) in data.level.pilot_seats.iter().enumerate() {
                 if let Some(pilot_seat) = item {
                     let p = get_tile_params(ctx, Position::from_int(pos as i32), data.camera, Some(pilot_seat.front));
                     add_sprite(&mut data.sprites, SpriteId::PilotSeat, p);
@@ -194,7 +194,7 @@ impl GameState for Handler {
             }
             draw_spritebatch(ctx, &mut data.sprites, SpriteId::PilotSeat)?;
 
-            for (pos, item) in data.doors.iter().enumerate() {
+            for (pos, item) in data.level.doors.iter().enumerate() {
                 if let Some(door) = item {
                     let p = get_tile_params(ctx, Position::from_int(pos as i32), data.camera, Some(door.face));
                     match door.status {
@@ -206,7 +206,7 @@ impl GameState for Handler {
             draw_spritebatch(ctx, &mut data.sprites, SpriteId::Door(DoorStatus::Closed))?;
             draw_spritebatch(ctx, &mut data.sprites, SpriteId::Door(DoorStatus::Open))?;
 
-            for (pos, item) in data.generators.iter().enumerate() {
+            for (pos, item) in data.level.generators.iter().enumerate() {
                 if item.is_some() {
                     let params = get_tile_params(ctx, Position::from_int(pos as i32), data.camera, None);
                     add_sprite(&mut data.sprites, SpriteId::Generator, params);
@@ -214,7 +214,7 @@ impl GameState for Handler {
             }
             draw_spritebatch(ctx, &mut data.sprites, SpriteId::Generator)?;
 
-            for (pos, item) in data.storages.iter().enumerate() {
+            for (pos, item) in data.level.storages.iter().enumerate() {
                 if item.is_some() {
                     let params = get_tile_params(ctx, Position::from_int(pos as i32), data.camera, None);
                     add_sprite(&mut data.sprites, SpriteId::Storage, params);
@@ -223,7 +223,7 @@ impl GameState for Handler {
             draw_spritebatch(ctx, &mut data.sprites, SpriteId::Storage)?;
 
             if data.insight_view {
-                for (pos, item) in data.circuitry.iter().enumerate() {
+                for (pos, item) in data.level.circuitry.iter().enumerate() {
                     if item.is_some() {
                         let params = get_tile_params(ctx, Position::from_int(pos as i32), data.camera, None);
                         add_sprite(&mut data.sprites, SpriteId::Circuitry, params);
@@ -232,13 +232,13 @@ impl GameState for Handler {
                 draw_spritebatch(ctx, &mut data.sprites, SpriteId::Circuitry)?;
             }
 
-            for (pos, npc) in data.npc.iter().enumerate() {
+            for (pos, npc) in data.level.npc.iter().enumerate() {
                 if let Some(npc) = npc {
                     draw_tile(ctx, npc.tile(), pos as i32, data.camera, None)?;
                 }
             }
 
-            draw_tile(ctx, data.player.tile(), data.player.position.to_int(), data.camera, None)?;
+            draw_tile(ctx, data.level.player.tile(), data.level.player.position.to_int(), data.camera, None)?;
         }
 
         self.current_ingame_state.draw(ctx, data)?;

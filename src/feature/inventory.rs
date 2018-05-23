@@ -30,9 +30,9 @@ impl Handler {
         }
     }
 
-    pub fn reset_craft_area(&mut self, scene_data: &mut WorldData) {
+    pub fn reset_craft_area(&mut self, data: &mut WorldData) {
         while let Some(item) = self.craft_area.extract_current() {
-            scene_data.player.inventory.insert(item);
+            data.level.player.inventory.insert(item);
         }
     }
 }
@@ -53,26 +53,26 @@ impl GameState for Handler {
         }
     }
 
-    fn key_up_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, _ctx: &mut Context, data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match keycode {
             Keycode::Escape => {
-                self.reset_craft_area(scene_data);
+                self.reset_craft_area(data);
                 self.change_state = Some(InputState::World);
             },
             Keycode::I => {
-                self.reset_craft_area(scene_data);
+                self.reset_craft_area(data);
                 self.change_state = Some(InputState::World);
             },
             Keycode::Up => {
                 match self.mode {
                     Mode::Crafting => self.craft_area.prev(),
-                    Mode::Inventory => scene_data.player.inventory.prev(),
+                    Mode::Inventory => data.level.player.inventory.prev(),
                 };
             },
             Keycode::Down => {
                 match self.mode {
                     Mode::Crafting => self.craft_area.next(),
-                    Mode::Inventory => scene_data.player.inventory.next(),
+                    Mode::Inventory => data.level.player.inventory.next(),
                 };
             },
             Keycode::Left => {
@@ -90,7 +90,7 @@ impl GameState for Handler {
             Keycode::Tab => {
                 match self.mode {
                     Mode::Inventory => {
-                        let item = scene_data.player.inventory.extract_current();
+                        let item = data.level.player.inventory.extract_current();
                         if item.is_some() {
                             self.craft_area.insert(item.unwrap());
                         }
@@ -98,7 +98,7 @@ impl GameState for Handler {
                     Mode::Crafting => {
                         let item = self.craft_area.extract_current();
                         if item.is_some() {
-                            scene_data.player.inventory.insert(item.unwrap());
+                            data.level.player.inventory.insert(item.unwrap());
                         }
                     }
                 }
@@ -106,7 +106,7 @@ impl GameState for Handler {
             Keycode::Return => {
                 match self.mode {
                     Mode::Inventory => {
-                        match scene_data.player.inventory.current() {
+                        match data.level.player.inventory.current() {
                             Some(Item::Navcomp) => {
                                 self.change_state = Some(InputState::Map(MapFeature::View));
                             },
@@ -115,10 +115,10 @@ impl GameState for Handler {
                     },
                     Mode::Crafting => {
                         let ref crafts = &self.craft_area.storage();
-                        let products = Receipe::receipe_match(crafts, &scene_data.receipes);
+                        let products = Receipe::receipe_match(crafts, &data.receipes);
                         if let Some(receipe) = products.get(0) {
                             self.craft_area.clear();
-                            scene_data.player.inventory.insert(receipe.result.clone());
+                            data.level.player.inventory.insert(receipe.result.clone());
                         }
                     },
                 }
@@ -127,15 +127,15 @@ impl GameState for Handler {
         }
     }
 
-    fn quit_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData) -> bool {
-        self.reset_craft_area(scene_data);
+    fn quit_event(&mut self, _ctx: &mut Context, data: &mut WorldData) -> bool {
+        self.reset_craft_area(data);
         
         false
     }
 
-    fn draw(&mut self, ctx: &mut Context, scene_data: &mut WorldData) -> GameResult<()> {
+    fn draw(&mut self, ctx: &mut Context, data: &mut WorldData) -> GameResult<()> {
         let cursor = self.mode == Mode::Inventory;
-        draw_selection_with_parameters(&scene_data.player.inventory, ctx, Position {x: 770, y: 20}, TextAlign::Left, cursor, true)?;
+        draw_selection_with_parameters(&data.level.player.inventory, ctx, Position {x: 770, y: 20}, TextAlign::Left, cursor, true)?;
         draw_selection_with_parameters(&self.craft_area, ctx, Position {x: 580, y: 20}, TextAlign::Left, !cursor, false)?;
 
         draw_input_state("Inventory", ctx)?;

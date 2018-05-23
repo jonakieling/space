@@ -33,13 +33,13 @@ impl Handler {
         }
     }
 
-    fn reset_trade_areas(&mut self, scene_data: &mut WorldData) {
+    fn reset_trade_areas(&mut self, data: &mut WorldData) {
         while let Some(item) = self.npc_trade_area.extract_current() {
-            scene_data.current_npc().unwrap().inventory.insert(item);
+            data.level.current_npc().unwrap().inventory.insert(item);
         }
 
         while let Some(item) = self.player_trade_area.extract_current() {
-            scene_data.player.inventory.insert(item);
+            data.level.player.inventory.insert(item);
         }
     }
 
@@ -76,29 +76,29 @@ impl GameState for Handler {
         }
     }
 
-    fn key_up_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, _ctx: &mut Context, data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
 
         match keycode {
             Keycode::Escape => {
-                self.reset_trade_areas(scene_data);
+                self.reset_trade_areas(data);
                 self.change_state = Some(InputState::World);
-                if let Some(npc) = scene_data.current_npc() {
+                if let Some(npc) = data.level.current_npc() {
                     npc.direction = npc.look_at;
                 }
             },
             Keycode::Return => {    
                 while let Some(item) = self.npc_trade_area.extract_current() {
-                    scene_data.player.inventory.insert(item);
+                    data.level.player.inventory.insert(item);
                 }
 
                 while let Some(item) = self.player_trade_area.extract_current() {
-                    scene_data.current_npc().unwrap().inventory.insert(item);
+                    data.level.current_npc().unwrap().inventory.insert(item);
                 }
             },
             Keycode::Tab => {
                 match self.active_trade_area {
                     TradeArea::NpcInventory => {
-                        let item = scene_data.current_npc().unwrap().inventory.extract_current();
+                        let item = data.level.current_npc().unwrap().inventory.extract_current();
                         if item.is_some() {
                             self.npc_trade_area.insert(item.unwrap());
                         }
@@ -106,17 +106,17 @@ impl GameState for Handler {
                     TradeArea::NpcStaging => {
                         let item = self.npc_trade_area.extract_current();
                         if item.is_some() {
-                            scene_data.current_npc().unwrap().inventory.insert(item.unwrap());
+                            data.level.current_npc().unwrap().inventory.insert(item.unwrap());
                         }
                     },
                     TradeArea::PlayerStaging => {
                         let item = self.player_trade_area.extract_current();
                         if item.is_some() {
-                            scene_data.player.inventory.insert(item.unwrap());
+                            data.level.player.inventory.insert(item.unwrap());
                         }
                     },
                     TradeArea::PlayerInventory => {
-                        let item = scene_data.player.inventory.extract_current();
+                        let item = data.level.player.inventory.extract_current();
                         if item.is_some() {
                             self.player_trade_area.insert(item.unwrap());
                         }
@@ -158,7 +158,7 @@ impl GameState for Handler {
             Keycode::Up => {
                 match self.active_trade_area {
                     TradeArea::NpcInventory => {
-                        scene_data.current_npc().unwrap().inventory.prev();
+                        data.level.current_npc().unwrap().inventory.prev();
                     },
                     TradeArea::NpcStaging => {
                         self.npc_trade_area.prev();
@@ -167,14 +167,14 @@ impl GameState for Handler {
                         self.player_trade_area.prev();
                     },
                     TradeArea::PlayerInventory => {
-                        scene_data.player.inventory.prev();
+                        data.level.player.inventory.prev();
                     },
                 }
             },
             Keycode::Down => {
                 match self.active_trade_area {
                     TradeArea::NpcInventory => {
-                        scene_data.current_npc().unwrap().inventory.next();
+                        data.level.current_npc().unwrap().inventory.next();
                     },
                     TradeArea::NpcStaging => {
                         self.npc_trade_area.next();
@@ -183,7 +183,7 @@ impl GameState for Handler {
                         self.player_trade_area.next();
                     },
                     TradeArea::PlayerInventory => {
-                        scene_data.player.inventory.next();
+                        data.level.player.inventory.next();
                     },
                 }
             },
@@ -191,19 +191,19 @@ impl GameState for Handler {
         }
     }
 
-    fn draw(&mut self, ctx: &mut Context, scene_data: &mut WorldData) -> GameResult<()> {
+    fn draw(&mut self, ctx: &mut Context, data: &mut WorldData) -> GameResult<()> {
         draw_input_state("Trade", ctx)?;
-        let npc_inventory = scene_data.current_npc().unwrap().inventory.clone();
+        let npc_inventory = data.level.current_npc().unwrap().inventory.clone();
         self.draw_trade_area(&npc_inventory, ctx, TradeArea::NpcInventory)?;
         self.draw_trade_area(&self.npc_trade_area, ctx, TradeArea::NpcStaging)?;
         self.draw_trade_area(&self.player_trade_area, ctx, TradeArea::PlayerStaging)?;
-        self.draw_trade_area(&scene_data.player.inventory, ctx, TradeArea::PlayerInventory)?;
+        self.draw_trade_area(&data.level.player.inventory, ctx, TradeArea::PlayerInventory)?;
 
         Ok(())
     }
 
-    fn quit_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData) -> bool {
-        self.reset_trade_areas(scene_data);
+    fn quit_event(&mut self, _ctx: &mut Context, data: &mut WorldData) -> bool {
+        self.reset_trade_areas(data);
 
         false
     }

@@ -11,23 +11,26 @@ use misc::*;
 use dialog::*;
 use app::SpriteId;
 
+#[derive(Serialize, Deserialize)]
 pub struct Station {
     pub id: String,
     pub position: Position
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Ship {
     pub id: String,
     pub position: Position
 }
 
+#[derive(Serialize, Deserialize)]
 pub struct Sector {
     pub id: String,
     pub position: Position
 }
 
-pub struct WorldData {
-    pub movement_timer: Duration,
+#[derive(Serialize, Deserialize)]
+pub struct Level {
     pub backdrop: String,
     pub player: Player,
     pub walls: PositionLevelStorage<Wall>,
@@ -39,11 +42,21 @@ pub struct WorldData {
     pub generators: PositionLevelStorage<Generator>,
     pub pilot_seats: PositionLevelStorage<PilotSeat>,
     pub npc: PositionLevelStorage<Npc>,
-    pub storages: PositionLevelStorage<Storage>,
+    pub storages: PositionLevelStorage<Storage>
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Universe {
     pub sectors: Vec<Sector>,
     pub stations: Vec<Station>,
     pub ships: Vec<Ship>,
-    pub player_location: Location,
+    pub player_location: Location
+}
+
+pub struct WorldData {
+    pub movement_timer: Duration,
+    pub level: Level,
+    pub universe: Universe,
     pub receipes: Vec<Receipe>,
     pub dialog: Node<DialogItem>,
     pub insight_view: bool,
@@ -106,60 +119,64 @@ impl WorldData {
 
         WorldData {
             movement_timer: Duration::from_millis(0),
-            backdrop: String::from(""),
-            player,
-            walls,
-            floor,
-            doors,
-            terminals,
-            decorations,
-            circuitry,
-            generators,
-            pilot_seats,
-            npc,
-            storages,
-            sectors: vec![
-                Sector {
-                    id: "Sol".to_string(),
-                    position: Position {
-                        x: -3,
-                        y: -2
+            level: Level {
+                backdrop: String::from(""),
+                player,
+                walls,
+                floor,
+                doors,
+                terminals,
+                decorations,
+                circuitry,
+                generators,
+                pilot_seats,
+                npc,
+                storages
+            },
+            universe: Universe {
+                sectors: vec![
+                    Sector {
+                        id: "Sol".to_string(),
+                        position: Position {
+                            x: -3,
+                            y: -2
+                        }
+                    },
+                    Sector {
+                        id: "Andromeda".to_string(),
+                        position: Position {
+                            x: 4,
+                            y: 4
+                        }
+                    },
+                    Sector {
+                        id: "Gaia".to_string(),
+                        position: Position {
+                            x: 11,
+                            y: 6
+                        }
                     }
-                },
-                Sector {
-                    id: "Andromeda".to_string(),
-                    position: Position {
-                        x: 4,
-                        y: 4
+                ],
+                stations: vec![
+                    Station {
+                        id: "Mun".to_string(),
+                        position: Position {
+                            x: -3,
+                            y: -2
+                        }
                     }
-                },
-                Sector {
-                    id: "Gaia".to_string(),
-                    position: Position {
-                        x: 11,
-                        y: 6
+                ],
+                ships: vec![
+                    Ship {
+                        id: "Tech 2.1".to_string(),
+                        position: Position {
+                            x: -2,
+                            y: -2
+                        }
                     }
-                }
-            ],
-            stations: vec![
-                Station {
-                    id: "Mun".to_string(),
-                    position: Position {
-                        x: -3,
-                        y: -2
-                    }
-                }
-            ],
-            ships: vec![
-                Ship {
-                    id: "Tech 2.1".to_string(),
-                    position: Position {
-                        x: -2,
-                        y: -2
-                    }
-                }
-            ],
-            player_location: Location::Ship("Tech 2.1".to_string()),
+                ],
+                player_location: Location::Ship("Tech 2.1".to_string())
+            },
             receipes,
             dialog: Node {
                 value: DialogItem {
@@ -175,7 +192,9 @@ impl WorldData {
             camera: Position { x: 0, y: 0}
         }
     }
+}
 
+impl Level {
     pub fn clear(&mut self) {
         self.walls.clear();
         self.floor.clear();

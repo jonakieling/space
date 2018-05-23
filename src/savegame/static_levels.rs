@@ -6,19 +6,19 @@ use storage::{Node, SelectionStorage};
 use dialog::*;
 use feature::map::MapFeature;
 
-pub fn empty(scene_data: &mut WorldData) {
-    scene_data.backdrop = String::from("");
+pub fn empty(data: &mut WorldData) {
+    data.level.backdrop = String::from("");
 
-    super::insert_player(scene_data, (1, 1), Direction::Down, vec![]);
+    super::insert_player(data, (1, 1), Direction::Down, vec![]);
     
     println!("game loaded: static empty");
 }
 
-pub fn static_station_outpost(scene_data: &mut WorldData) {
-    scene_data.clear();
-    scene_data.backdrop = String::from("");
+pub fn static_station_outpost(data: &mut WorldData) {
+    data.level.clear();
+    data.level.backdrop = String::from("");
 
-    super::insert_floor(scene_data, vec![
+    super::insert_floor(data, vec![
         (7, 9, FloorType::Regular),
         (8, 9, FloorType::Regular),
         (9, 9, FloorType::Regular),
@@ -53,7 +53,7 @@ pub fn static_station_outpost(scene_data: &mut WorldData) {
         (13, 15, FloorType::Regular),
     ]);
 
-    super::insert_walls(scene_data, vec![
+    super::insert_walls(data, vec![
         (6, 8, WallType::Corner, Direction::Down),
         (7, 8, WallType::Wall, Direction::Down),
         (8, 8, WallType::Wall, Direction::Down),
@@ -91,37 +91,37 @@ pub fn static_station_outpost(scene_data: &mut WorldData) {
         (14, 16, WallType::Corner, Direction::Up)       
     ]);
 
-    super::insert_doors(scene_data, vec![
+    super::insert_doors(data, vec![
         (11, 14, DoorStatus::Closed, DoorType::Passage, Direction::Left),
         (6, 13, DoorStatus::Closed, DoorType::Exit(Location::Ship("Tech 2.1".to_string())), Direction::Right)
     ]);
 
-    scene_data.terminals.insert(Position::new(14, 14), Terminal {
+    data.level.terminals.insert(Position::new(14, 14), Terminal {
         variant: TerminalType::Intercomm,
         dialog: Node::new(),
         front: Direction::Left
     });
 
-    super::insert_storage(scene_data, vec![
+    super::insert_storage(data, vec![
         (7, 9, Direction::Right),
         (7, 10, Direction::Right)
     ]);
 
-    super::insert_npc(scene_data, 10 ,13, guard(Direction::Left));
+    super::insert_npc(data, 10 ,13, guard(Direction::Left));
 
-    super::insert_npc(scene_data, 9 ,9, gnoerf(Direction::Down));
+    super::insert_npc(data, 9 ,9, gnoerf(Direction::Down));
 
-    super::insert_player(scene_data, (7, 13), Direction::Right, vec![Item::Navcomp]);
+    super::insert_player(data, (7, 13), Direction::Right, vec![Item::Navcomp]);
 
     println!("game loaded: static station outpost");
 }
 
-pub fn static_ship_tech(scene_data: &mut WorldData) {
-    scene_data.clear();
+pub fn static_ship_tech(data: &mut WorldData) {
+    data.level.clear();
 
-    scene_data.backdrop = String::from("/realm_of_sol__0000s_0001_2.1.png");
+    data.level.backdrop = String::from("/realm_of_sol__0000s_0001_2.1.png");
 
-    super::insert_floor(scene_data, vec![
+    super::insert_floor(data, vec![
         (7, 9, FloorType::Light),
         (8, 9, FloorType::Light),
         (9, 9, FloorType::Light),
@@ -145,7 +145,7 @@ pub fn static_ship_tech(scene_data: &mut WorldData) {
         (9, 16, FloorType::Regular),
     ]);
 
-    super::insert_walls(scene_data, vec![
+    super::insert_walls(data, vec![
         (6, 8, WallType::Corner, Direction::Down),
         (7, 8, WallType::Window, Direction::Down),
         (8, 8, WallType::Wall, Direction::Down),
@@ -177,20 +177,20 @@ pub fn static_ship_tech(scene_data: &mut WorldData) {
         (10, 17, WallType::Corner, Direction::Up)
     ]);
 
-    super::insert_doors(scene_data, vec![
+    super::insert_doors(data, vec![
         (8, 11, DoorStatus::Open, DoorType::Passage, Direction::Down),
         (10, 13, DoorStatus::Closed, DoorType::Exit(Location::Station("Mun".to_string())), Direction::Left)
     ]);
 
-    super::insert_generator(scene_data, vec![
+    super::insert_generator(data, vec![
         (8, 15, Direction::Down)
     ]);
 
-    super::insert_pilot_seat(scene_data, vec![
+    super::insert_pilot_seat(data, vec![
         (8, 9, Direction::Down)
     ]);
 
-    super::insert_circuitry(scene_data, vec![
+    super::insert_circuitry(data, vec![
                         (10, 2),
                         (10, 3),          (12, 3),
                         (10, 4),          (12, 4),
@@ -207,9 +207,9 @@ pub fn static_ship_tech(scene_data: &mut WorldData) {
                 (9, 15),(10, 15)
     ]);
 
-    scene_data.update_power();
+    data.level.update_power();
 
-    super::insert_storage(scene_data, vec![
+    super::insert_storage(data, vec![
         (7, 12, Direction::Right),
         (7, 13, Direction::Right)
     ]);
@@ -226,7 +226,7 @@ pub fn static_ship_tech(scene_data: &mut WorldData) {
         }
     );
 
-    scene_data.terminals.insert(Position::new(8, 8), Terminal {
+    data.level.terminals.insert(Position::new(8, 8), Terminal {
         variant: TerminalType::ShipConsole,
         dialog: Node {
             value: DialogItem {
@@ -239,13 +239,13 @@ pub fn static_ship_tech(scene_data: &mut WorldData) {
         front: Direction::Down
     });
 
-    scene_data.terminals.insert(Position::new(10, 15), Terminal {
+    data.level.terminals.insert(Position::new(10, 15), Terminal {
         variant: TerminalType::Intercomm,
         dialog: Node::new(),
         front: Direction::Left
     });
 
-    super::insert_player(scene_data, (9, 13), Direction::Left, vec![Item::Navcomp]);
+    super::insert_player(data, (9, 13), Direction::Left, vec![Item::Navcomp]);
 
     println!("game loaded: static ship tech");
 }

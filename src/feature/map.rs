@@ -28,16 +28,16 @@ impl Handler {
         data.overlay = true;
         let mut cursor = Position {x: 0, y: 0};
 
-        match data.player_location {
+        match data.universe.player_location {
             Location::Ship(ref ship_id) => {
-                for ship in data.ships.iter_mut() {
+                for ship in data.universe.ships.iter_mut() {
                     if &ship.id == ship_id {
                         cursor = ship.position;
                     }
                 }
             },
             Location::Station(ref station_id) => {
-                for station in data.stations.iter_mut() {
+                for station in data.universe.stations.iter_mut() {
                     if &station.id == station_id {
                         cursor = station.position;
                     }
@@ -62,25 +62,25 @@ impl Handler {
         let mut selection_storage: SelectionStorage<String> = SelectionStorage::new();
         selection_storage.insert(self.cursor.to_string());
         selection_storage.insert("".to_string());
-        for sector in data.sectors.iter() {
+        for sector in data.universe.sectors.iter() {
             if sector.position == self.cursor {
                 selection_storage.insert(sector.id.clone());
             }
         }
-        for station in data.stations.iter() {
+        for station in data.universe.stations.iter() {
             if station.position == self.cursor {
                 selection_storage.insert(station.id.clone());
-                if let Location::Station(ref station_id) = data.player_location {
+                if let Location::Station(ref station_id) = data.universe.player_location {
                     if &station.id == station_id {
                         selection_storage.insert("Player".to_string());
                     }
                 }
             }
         }
-        for ship in data.ships.iter() {
+        for ship in data.universe.ships.iter() {
             if ship.position == self.cursor {
                 selection_storage.insert(ship.id.clone());
-                if let Location::Ship(ref ship_id) = data.player_location {
+                if let Location::Ship(ref ship_id) = data.universe.player_location {
                     if &ship.id == ship_id {
                         selection_storage.insert("Player".to_string());
                     }
@@ -128,8 +128,8 @@ impl GameState for Handler {
             },
             Keycode::Return => {
                 if self.feature == MapFeature::Navigate {
-                    if let Location::Ship(ref ship_id) = scene_data.player_location {
-                        for ship in scene_data.ships.iter_mut() {
+                    if let Location::Ship(ref ship_id) = scene_data.universe.player_location {
+                        for ship in scene_data.universe.ships.iter_mut() {
                             if &ship.id == ship_id {
                                 ship.position = self.cursor;
                             }
@@ -154,15 +154,15 @@ impl GameState for Handler {
 
         draw_selection(&self.map_selection, ctx, false, false)?;
 
-        for sector in data.sectors.iter() {
+        for sector in data.universe.sectors.iter() {
             let p = get_tile_params(ctx, sector.position, data.camera, None);
             add_sprite(&mut data.sprites, SpriteId::MapSector, p);
         }
-        for station in data.stations.iter() {
+        for station in data.universe.stations.iter() {
             let p = get_tile_params(ctx, station.position, data.camera, None);
             add_sprite(&mut data.sprites, SpriteId::MapStation, p);
         }
-        for ship in data.ships.iter() {
+        for ship in data.universe.ships.iter() {
             let p = get_tile_params(ctx, ship.position, data.camera, None);
             add_sprite(&mut data.sprites, SpriteId::MapShip, p);
         }

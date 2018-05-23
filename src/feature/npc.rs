@@ -34,17 +34,17 @@ impl GameState for Handler {
         }
     }
     
-    fn key_up_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, _ctx: &mut Context, data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match keycode {
             Keycode::Escape => {
-                if let Some(npc) = scene_data.current_npc() {
+                if let Some(npc) = data.level.current_npc() {
                     npc.direction = npc.look_at;
                 }
                 self.change_state = Some(InputState::World);
             },
             Keycode::Return => {
-                if scene_data.dialog.children.iter().len() > 0 {
-                    if let Some(dialog_item) = scene_data.dialog.children.current() {
+                if data.dialog.children.iter().len() > 0 {
+                    if let Some(dialog_item) = data.dialog.children.current() {
                         if let Some(ref action) = dialog_item.value.action {
                             match *action {
                                 DialogAction::Trade => {
@@ -54,31 +54,31 @@ impl GameState for Handler {
                             }
                         }
                     }
-                    scene_data.dialog = scene_data.dialog.children.current().unwrap().clone();	
+                    data.dialog = data.dialog.children.current().unwrap().clone();	
                 } else {
-                    if let Some(npc) = scene_data.current_npc() {
+                    if let Some(npc) = data.level.current_npc() {
                         npc.direction = npc.look_at;
                     }
                     self.change_state = Some(InputState::World);
                 }
             },
             Keycode::Up => {
-                scene_data.dialog.children.prev();
+                data.dialog.children.prev();
             },
             Keycode::Down => {
-                scene_data.dialog.children.next();
+                data.dialog.children.next();
             },
             _ => ()
         }
     }
 
-    fn draw(&mut self, ctx: &mut Context, scene_data: &mut WorldData) -> GameResult<()> {
+    fn draw(&mut self, ctx: &mut Context, data: &mut WorldData) -> GameResult<()> {
         {
-            let current_npc = scene_data.current_npc().unwrap();
+            let current_npc = data.level.current_npc().unwrap();
             draw_input_state(&current_npc.name, ctx)?;
         }
 
-        draw_dialog(&scene_data.dialog, ctx)
+        draw_dialog(&data.dialog, ctx)
     }
 
 }

@@ -4,7 +4,7 @@ use std::slice;
 use dialog::DialogItem;
 use misc::Position;
 
-#[derive(Clone)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct PositionLevelStorage<T: Clone> {
     storage: Box<Vec<Option<T>>>
 }

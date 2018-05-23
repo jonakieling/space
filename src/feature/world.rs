@@ -19,10 +19,10 @@ impl Handler {
         }
     }
 
-    fn interact_with_door(&mut self, scene_data: &mut WorldData) {
+    fn interact_with_door(&mut self, data: &mut WorldData) {
         let mut load_static_ship = false;
         let mut load_static_station = false;
-        if let Some(door) = scene_data.doors.get_mut(scene_data.player.front_tile) {
+        if let Some(door) = data.level.doors.get_mut(data.level.player.front_tile) {
             match &door.variant {
                 DoorType::Passage => {
                     match door.status {
@@ -48,43 +48,43 @@ impl Handler {
         }
 
         if load_static_ship {
-            static_ship_tech(scene_data);
+            static_ship_tech(data);
         } else if load_static_station {
-            static_station_outpost(scene_data);
+            static_station_outpost(data);
         }
     }
 
-    fn interact_with_npc(&mut self, scene_data: &mut WorldData) {
-        if let Some(npc) = scene_data.npc.get_mut(scene_data.player.front_tile) {
-            match scene_data.player.direction {
+    fn interact_with_npc(&mut self, data: &mut WorldData) {
+        if let Some(npc) = data.level.npc.get_mut(data.level.player.front_tile) {
+            match data.level.player.direction {
                 Direction::Down => npc.direction = Direction::Up,
                 Direction::Left => npc.direction = Direction::Right,
                 Direction::Up => npc.direction = Direction::Down,
                 Direction::Right => npc.direction = Direction::Left,
             }
-            scene_data.dialog = npc.dialog.clone();
+            data.dialog = npc.dialog.clone();
             self.change_state = Some(InputState::Npc);
         }
     }
 
-    fn interact_with_circuitry(&mut self, scene_data: &mut WorldData) {
-        if let Some(_) = scene_data.circuitry.get_mut(scene_data.player.front_tile) {
+    fn interact_with_circuitry(&mut self, data: &mut WorldData) {
+        if let Some(_) = data.level.circuitry.get_mut(data.level.player.front_tile) {
             self.change_state = Some(InputState::Circuitry);
         }
     }
 
-    fn interact_with_storage(&mut self, scene_data: &mut WorldData) {
-        if let Some(_) = scene_data.storages.get_mut(scene_data.player.front_tile) {
+    fn interact_with_storage(&mut self, data: &mut WorldData) {
+        if let Some(_) = data.level.storages.get_mut(data.level.player.front_tile) {
             self.change_state = Some(InputState::Storage);
         }
     }
 
-    fn interact_with_terminal(&mut self, scene_data: &mut WorldData) {
-        if let Some(ref terminal) = scene_data.terminals.get_mut(scene_data.player.front_tile) {
-            let terminal_front_tile = &terminal.front.value() + &scene_data.player.front_tile;
-            if terminal_front_tile == scene_data.player.position {
+    fn interact_with_terminal(&mut self, data: &mut WorldData) {
+        if let Some(ref terminal) = data.level.terminals.get_mut(data.level.player.front_tile) {
+            let terminal_front_tile = &terminal.front.value() + &data.level.player.front_tile;
+            if terminal_front_tile == data.level.player.position {
                 self.change_state = Some(InputState::Terminal);
-                scene_data.dialog = terminal.dialog.clone();
+                data.dialog = terminal.dialog.clone();
             }
         }
     }
@@ -92,7 +92,7 @@ impl Handler {
 
 impl GameState for Handler {
 
-    fn change_state(&mut self, _ctx: &mut Context, scene_data: &mut WorldData) -> Option<Box<GameState>> {
+    fn change_state(&mut self, _ctx: &mut Context, data: &mut WorldData) -> Option<Box<GameState>> {
         match self.change_state {
             Some(InputState::World) => {
                 self.change_state = None;
@@ -100,7 +100,7 @@ impl GameState for Handler {
             },
             Some(InputState::Edit) => {
                 self.change_state = None;
-                Some(Box::new(super::edit::Handler::new(scene_data.player.position)))
+                Some(Box::new(super::edit::Handler::new(data.level.player.position)))
             },
             Some(InputState::Menu) => {
                 self.change_state = None;
@@ -128,43 +128,43 @@ impl GameState for Handler {
             },
             Some(InputState::Map(feature)) => {
                 self.change_state = None;
-                Some(Box::new(super::map::Handler::new(feature, scene_data)))
+                Some(Box::new(super::map::Handler::new(feature, data)))
             },
             _ => None,
         }
     }
     
-    fn key_down_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData, keycode: Keycode, _keymod: Mod, repeat: bool) {
+    fn key_down_event(&mut self, _ctx: &mut Context, data: &mut WorldData, keycode: Keycode, _keymod: Mod, repeat: bool) {
         if !repeat {
             match keycode {
                 Keycode::Left => {
-                    scene_data.player.movement(Direction::Left, Direction::Right);
+                    data.level.player.movement(Direction::Left, Direction::Right);
                 },
                 Keycode::Right => {
-                    scene_data.player.movement(Direction::Right, Direction::Left);
+                    data.level.player.movement(Direction::Right, Direction::Left);
                 },
                 Keycode::Up => {
-                    scene_data.player.movement(Direction::Up, Direction::Down);
+                    data.level.player.movement(Direction::Up, Direction::Down);
                 },
                 Keycode::Down => {
-                    scene_data.player.movement(Direction::Down, Direction::Up);
+                    data.level.player.movement(Direction::Down, Direction::Up);
                 },
                 _ => ()
             }
         } else {
-            if let None = scene_data.player.movement.last() {
+            if let None = data.level.player.movement.last() {
                 match keycode {
                     Keycode::Left => {
-                        scene_data.player.movement(Direction::Left, Direction::Right);
+                        data.level.player.movement(Direction::Left, Direction::Right);
                     },
                     Keycode::Right => {
-                        scene_data.player.movement(Direction::Right, Direction::Left);
+                        data.level.player.movement(Direction::Right, Direction::Left);
                     },
                     Keycode::Up => {
-                        scene_data.player.movement(Direction::Up, Direction::Down);
+                        data.level.player.movement(Direction::Up, Direction::Down);
                     },
                     Keycode::Down => {
-                        scene_data.player.movement(Direction::Down, Direction::Up);
+                        data.level.player.movement(Direction::Down, Direction::Up);
                     },
                     _ => ()
                 }
@@ -172,28 +172,28 @@ impl GameState for Handler {
         }
     }
 
-    fn key_up_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, _ctx: &mut Context, data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match keycode {
             Keycode::Left => {
-                scene_data.player.remove_movement(Direction::Left);
+                data.level.player.remove_movement(Direction::Left);
             },
             Keycode::Right => {
-                scene_data.player.remove_movement(Direction::Right);
+                data.level.player.remove_movement(Direction::Right);
             },
             Keycode::Up => {
-                scene_data.player.remove_movement(Direction::Up);
+                data.level.player.remove_movement(Direction::Up);
             },
             Keycode::Down => {
-                scene_data.player.remove_movement(Direction::Down);
+                data.level.player.remove_movement(Direction::Down);
             },
             Keycode::Return => {
-                if scene_data.insight_view {
-                    self.interact_with_circuitry(scene_data);
+                if data.insight_view {
+                    self.interact_with_circuitry(data);
                 } else {
-                    self.interact_with_storage(scene_data);
-                    self.interact_with_terminal(scene_data);
-                    self.interact_with_npc(scene_data);
-                    self.interact_with_door(scene_data);
+                    self.interact_with_storage(data);
+                    self.interact_with_terminal(data);
+                    self.interact_with_npc(data);
+                    self.interact_with_door(data);
                 }
             },
             Keycode::I => {
