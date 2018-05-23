@@ -79,4 +79,14 @@ impl Player {
         
 		image_src
     }
+
+    pub fn has(&self, needle: Item) -> bool {
+        for item in self.inventory.iter() {
+            if *item == needle {
+                return true;
+            }
+        }
+
+        false
+    }
 }

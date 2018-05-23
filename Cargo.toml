@@ -1,7 +1,7 @@
 [package]
 name = "space"
-version = "0.3.0"
-authors = ["jonathan"]
+version = "0.4.0"
+authors = ["jonakieling"]
 
 [dependencies]
 ggez = "^0.4"

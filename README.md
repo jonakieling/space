@@ -1,14 +1,20 @@
 space
 =====
 
+This little game startet out as a means to learn Rust. Keeping things simple has proven to be very engaging and productive. Although there might the occasional small commit out of line :smiley face:
+
+A good start → [The Rust Programming Language](https://doc.rust-lang.org/book/second-edition/index.html "The Rust Programming Language")
+
+The game framework used is → [ggez](http://ggez.rs/ "ggez game framework")
+
 setup
 -----
 
-wip
-developed on linux
+developed on linux. on windows you need to place the sdl2 library in the project root. read [here](https://github.com/ggez/ggez/blob/master/docs/FAQ.md#how-do-i-build-on-platform-x "ggez game framework") for more information.
 
 * clone this
-* run `cargo run` to compile
+* install rust (using rustup is recommended)
+* run `cargo run` to compile and run the game
 * levels are loaded statically from functions
 * current state is stored in saves/auto-save.tar
 
@@ -17,48 +23,11 @@ and here is what you can do
 
 * move around with `↑`,`→`,`↓` and `←`
 * interact with `Return`
-* items can be move with `Tab`
+* items can be moved with `Tab`
+* inventory `i`
+* map `m` (when equiped with a *Navcomp*)
 
-edit mode
----------
+what it looks like right now
+----------------------------
 
-this needs a rework with all the new tiles and variations added.
-
-outline
--------
-
-thoughts before implmentation.
-
-parts
------
-
-* stations (✓)
-* objects (✓)
-* ships (✓)
-* npc (✓)
-
-interaction
------------
-
-* conversations (✓)
-* terminals, consoles (✓)
-* space flight (✓)
-* inventory (✓)
-
-systems
--------
-
-* object crafting (✓)
-* energy, circuits (✓)
-* navigation (✓)
-* scanners
-* logs (✓)
-
-thoughts after implmentation start.
-
-engine tech
------------
-
-* next up: spritebatch (✓), camera (✓), ui
-* gui for selections and lists (✓)
-* ~~scene/storage management (how to deal with space, ship, level, objects)~~ kiss
+![a screenshot of an early stage in development](screenshot.png "Onboard a simple ship. You can see storages next to the player character, the main ship console on the front and the exit on the right. The generator powers the circuitry from the back of the ship.")

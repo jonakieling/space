@@ -201,7 +201,9 @@ impl GameState for Handler {
                 self.change_state = Some(InputState::Inventory);
             },
             Keycode::M => {
-                self.change_state = Some(InputState::Map(MapFeature::View));
+                if data.level.player.has(Item::Navcomp) {
+                    self.change_state = Some(InputState::Map(MapFeature::View));
+                }
             },
             Keycode::Escape => {
                 self.change_state = Some(InputState::Menu);
