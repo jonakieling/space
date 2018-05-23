@@ -48,7 +48,8 @@ pub enum DoorStatus {
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub enum Location {
 	Ship(String),
-	Station(String)
+	Station(String),
+	Space
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]

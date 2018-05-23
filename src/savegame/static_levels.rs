@@ -17,6 +17,7 @@ pub fn empty(data: &mut WorldData) {
 pub fn static_station_outpost(data: &mut WorldData) {
     data.level.clear();
     data.level.backdrop = String::from("");
+    data.level.location = Location::Station("Mun".to_string());
 
     super::insert_floor(data, vec![
         (7, 9, FloorType::Regular),
@@ -120,6 +121,7 @@ pub fn static_ship_tech(data: &mut WorldData) {
     data.level.clear();
 
     data.level.backdrop = String::from("/realm_of_sol__0000s_0001_2.1.png");
+    data.level.location = Location::Station("Tech 2.1".to_string());
 
     super::insert_floor(data, vec![
         (7, 9, FloorType::Light),

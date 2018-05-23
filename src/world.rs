@@ -32,6 +32,7 @@ pub struct Sector {
 #[derive(Serialize, Deserialize)]
 pub struct Level {
     pub backdrop: String,
+    pub location: Location,
     pub player: Player,
     pub walls: PositionLevelStorage<Wall>,
     pub floor: PositionLevelStorage<Floor>,
@@ -121,6 +122,7 @@ impl WorldData {
             movement_timer: Duration::from_millis(0),
             level: Level {
                 backdrop: String::from(""),
+                location: Location::Space,
                 player,
                 walls,
                 floor,

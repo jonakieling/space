@@ -16,7 +16,7 @@ pub mod static_npc;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Save {
-    name: String,
+    location: Location,
     backdrop: String,
     offset: Position
 }
@@ -24,7 +24,7 @@ pub struct Save {
 pub fn save_scene(world: &WorldData, filename: &str) {
     fs::create_dir("temp-save").unwrap();
 
-    let save_info = Save { name: String::from(filename), backdrop: world.level.backdrop.clone(), offset: Position { x: 0, y: 0} };
+    let save_info = Save { location: world.level.location.clone(), backdrop: world.level.backdrop.clone(), offset: Position { x: 0, y: 0} };
     let bytes: Vec<u8> = bincode::serialize(&save_info).unwrap();
     File::create("temp-save/save-meta.bin").unwrap().write_all(&bytes).unwrap();
 
@@ -63,6 +63,7 @@ pub fn load_scene(world: &mut WorldData, filename: &str) {
                 "save-meta" => {
                     let level_info: Save = bincode::deserialize_from(file).unwrap();
                     world.level.backdrop = level_info.backdrop;
+                    world.level.location = level_info.location;
                 },
                 _ => (),
             }

@@ -44,6 +44,7 @@ impl Handler {
                         load_static_station = true;
                     }
                 },
+	            DoorType::Exit(Location::Space) => { },
             }
         }
 

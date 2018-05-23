@@ -42,7 +42,8 @@ impl Handler {
                         cursor = station.position;
                     }
                 }
-            }
+            },
+            Location::Space => { }
         }
 
     	let mut handler = Handler {
