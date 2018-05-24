@@ -31,3 +31,5 @@ what it looks like right now
 ----------------------------
 
 ![a screenshot of an early stage in development](screenshot.png "Onboard a simple ship. You can see storages next to the player character, the main ship console on the front and the exit on the right. The generator powers the circuitry from the back of the ship.")
+
+*Onboard a simple ship. You can see storages next to the player character, the main ship console on the front and the exit on the right. The generator powers the circuitry from the back of the ship.*
