@@ -11,7 +11,7 @@ use objects::*;
 use misc::*;
 use constants::*;
 use world::WorldData;
-use savegame::save_scene;
+use savegame::{save_location, save_game};
 use feature::{*, map::MapFeature};
 
 pub trait GameState {
@@ -109,7 +109,8 @@ impl GameState for Handler {
     fn quit_event(&mut self, ctx: &mut Context, data: &mut WorldData) -> bool {
         self.current_ingame_state.quit_event(ctx, data);
 
-        save_scene(data, "saves/auto-save.tar");
+        save_location(data);
+        save_game(data);
 
         false
     }

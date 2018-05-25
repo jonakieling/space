@@ -5,7 +5,7 @@ use world::WorldData;
 use app::draw_selection;
 use game::{InputState, GameState};
 use storage::SelectionStorage;
-use savegame::save_scene;
+use savegame::save_game;
 
 #[derive(Debug, Clone)]
 pub enum MenuOption {
@@ -43,7 +43,7 @@ impl GameState for Handler {
             },
             Some(InputState::Mainmenu) => {
                 self.change_state = None;
-                save_scene(data, "saves/auto-save.tar");
+                save_game(data);
                 Some(Box::new(super::mainmenu::Handler::new(data)))
             },
             _ => None

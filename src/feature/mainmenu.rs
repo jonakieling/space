@@ -1,5 +1,3 @@
-use std::fs;
-
 use ggez::{Context, event::*, GameResult};
 
 use storage::SelectionStorage;
@@ -15,19 +13,15 @@ pub struct Handler {
 
 #[derive(Clone, Debug)]
 enum SaveType {
-    File(String),
-    DevShip,
-    DevStation,
-    Empty
+    New,
+    Continue
 }
 
 impl ToString for SaveType {
     fn to_string(&self) -> String {
         match self {
-            &SaveType::Empty => "Empty".to_string(),
-            &SaveType::DevShip => "DevShip".to_string(),
-            &SaveType::DevStation => "DevStation".to_string(),
-            &SaveType::File(ref file) => file.clone(),
+            &SaveType::New => "New".to_string(),
+            &SaveType::Continue => "Continue".to_string(),
         }
     }
 }
@@ -40,23 +34,8 @@ impl Handler {
             loading: None
     	};
 
-        if let Ok(dir) = fs::read_dir("saves") {
-            for entry in dir {
-                if let Ok(entry) = entry {
-                    if let Some(extension) = entry.path().extension() {
-                        if extension == "tar" {
-                            if let Some(file) = entry.path().to_str() {
-                                menu.saves.insert(SaveType::File(String::from(file)));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        menu.saves.insert(SaveType::Empty);
-        menu.saves.insert(SaveType::DevShip);
-        menu.saves.insert(SaveType::DevStation);
+        menu.saves.insert(SaveType::New);
+        menu.saves.insert(SaveType::Continue);
 
     	menu
     }
@@ -67,23 +46,13 @@ impl GameState for Handler {
         let mut state: Option<Box<GameState>> = None;
         if let Some(ref savegame) = self.loading {
             match savegame {
-                SaveType::Empty => {
-                    savegame::static_levels::empty(data);
-                    data.overlay = false;
-                    state = Some(Box::new(super::world::Handler::new()));
-                },
-                SaveType::DevShip => {
+                SaveType::New => {
                     savegame::static_levels::static_ship_tech(data);
                     data.overlay = false;
                     state = Some(Box::new(super::world::Handler::new()));
                 },
-                SaveType::DevStation => {
-                    savegame::static_levels::static_station_outpost(data);
-                    data.overlay = false;
-                    state = Some(Box::new(super::world::Handler::new()));
-                },
-                SaveType::File(savefile) => {
-                    savegame::load_scene(data, savefile);
+                SaveType::Continue => {
+                    savegame::load_game(data);
                     data.overlay = false;
                     state = Some(Box::new(super::world::Handler::new()));
                 }

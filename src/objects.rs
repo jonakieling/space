@@ -45,7 +45,7 @@ pub enum DoorStatus {
     Closed
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Clone, Debug, Hash)]
 pub enum Location {
 	Ship(String),
 	Station(String),

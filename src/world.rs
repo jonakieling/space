@@ -10,6 +10,7 @@ use objects::*;
 use misc::*;
 use dialog::*;
 use app::SpriteId;
+use savegame;
 
 #[derive(Serialize, Deserialize)]
 pub struct Station {
@@ -29,7 +30,7 @@ pub struct Sector {
     pub position: Position
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Level {
     pub backdrop: String,
     pub location: Location,
@@ -48,6 +49,7 @@ pub struct Level {
 
 #[derive(Serialize, Deserialize)]
 pub struct Universe {
+    pub id: i32,
     pub sectors: Vec<Sector>,
     pub stations: Vec<Station>,
     pub ships: Vec<Ship>,
@@ -63,6 +65,7 @@ pub struct WorldData {
     pub insight_view: bool,
     pub overlay: bool,
     pub sprites: HashMap<SpriteId, SpriteBatch>,
+    pub levels: HashMap<Location, Level>,
     pub camera: Position
 }
 
@@ -117,6 +120,8 @@ impl WorldData {
         sprites.insert(SpriteId::MapSector, SpriteBatch::new(Image::new(ctx, "/map-sector.png").unwrap()));
         sprites.insert(SpriteId::MapStation, SpriteBatch::new(Image::new(ctx, "/map-station.png").unwrap()));
         sprites.insert(SpriteId::MapShip, SpriteBatch::new(Image::new(ctx, "/map-ship.png").unwrap()));
+        sprites.insert(SpriteId::Decoration(DecorationType::Display), SpriteBatch::new(Image::new(ctx, "/display.png").unwrap()));
+        sprites.insert(SpriteId::Decoration(DecorationType::Panel), SpriteBatch::new(Image::new(ctx, "/panel.png").unwrap()));
 
         WorldData {
             movement_timer: Duration::from_millis(0),
@@ -135,50 +140,7 @@ impl WorldData {
                 npc,
                 storages
             },
-            universe: Universe {
-                sectors: vec![
-                    Sector {
-                        id: "Sol".to_string(),
-                        position: Position {
-                            x: -3,
-                            y: -2
-                        }
-                    },
-                    Sector {
-                        id: "Andromeda".to_string(),
-                        position: Position {
-                            x: 4,
-                            y: 4
-                        }
-                    },
-                    Sector {
-                        id: "Gaia".to_string(),
-                        position: Position {
-                            x: 11,
-                            y: 6
-                        }
-                    }
-                ],
-                stations: vec![
-                    Station {
-                        id: "Mun".to_string(),
-                        position: Position {
-                            x: -3,
-                            y: -2
-                        }
-                    }
-                ],
-                ships: vec![
-                    Ship {
-                        id: "Tech 2.1".to_string(),
-                        position: Position {
-                            x: -2,
-                            y: -2
-                        }
-                    }
-                ],
-                player_location: Location::Ship("Tech 2.1".to_string())
-            },
+            universe: savegame::static_levels::default_universe(),
             receipes,
             dialog: Node {
                 value: DialogItem {
@@ -191,6 +153,7 @@ impl WorldData {
             insight_view: false,
             overlay: false,
             sprites,
+            levels: HashMap::new(),
             camera: Position { x: 0, y: 0}
         }
     }

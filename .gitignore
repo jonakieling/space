@@ -3,7 +3,9 @@
 **/*.rs.bk
 *.sublime-workspace
 *.sublime-project
-/saves/*
-!/saves/.gitkeep
+levels/*
+!levels/.gitkeep
+saves/*
+!saves/.gitkeep
 SDL2.dll
 SDL2.lib

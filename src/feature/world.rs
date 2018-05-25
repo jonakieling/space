@@ -6,7 +6,7 @@ use game::{InputState, GameState};
 use feature::map::MapFeature;
 use misc::*;
 use objects::*;
-use savegame::static_levels::*;
+use savegame::*;
 
 pub struct Handler {
     change_state: Option<InputState>
@@ -20,8 +20,8 @@ impl Handler {
     }
 
     fn interact_with_door(&mut self, data: &mut WorldData) {
-        let mut load_static_ship = false;
-        let mut load_static_station = false;
+        let mut location = None;
+
         if let Some(door) = data.level.doors.get_mut(data.level.player.front_tile) {
             match &door.variant {
                 DoorType::Passage => {
@@ -34,24 +34,15 @@ impl Handler {
                         },
                     }
                 },
-	            DoorType::Exit(Location::Ship(ref ship_id)) => {
-                    if ship_id == "Tech 2.1" {
-                        load_static_ship = true;
-                    }
-                },
-	            DoorType::Exit(Location::Station(ref station_id)) => {
-                    if station_id == "Mun" {
-                        load_static_station = true;
-                    }
-                },
-	            DoorType::Exit(Location::Space) => { },
+                DoorType::Exit(new_location) => {
+                    location = Some(new_location.clone());
+                }
             }
         }
 
-        if load_static_ship {
-            static_ship_tech(data);
-        } else if load_static_station {
-            static_station_outpost(data);
+        if let Some(ref location) = location {
+            save_location(data);
+            load_location(data, location);
         }
     }
 

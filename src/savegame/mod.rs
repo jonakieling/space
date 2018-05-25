@@ -1,5 +1,6 @@
 use std::fs;
 use std::fs::File;
+use std::io;
 use std::io::Write;
 
 use tar::{Builder, Archive};
@@ -21,7 +22,7 @@ pub struct Save {
     offset: Position
 }
 
-pub fn save_scene(world: &WorldData, filename: &str) {
+pub fn save_game(world: &WorldData) {
     fs::create_dir("temp-save").unwrap();
 
     let save_info = Save { location: world.level.location.clone(), backdrop: world.level.backdrop.clone(), offset: Position { x: 0, y: 0} };
@@ -34,16 +35,16 @@ pub fn save_scene(world: &WorldData, filename: &str) {
     let bytes: Vec<u8> = bincode::serialize(&world.universe).unwrap();
     File::create("temp-save/universe.bin").unwrap().write_all(&bytes).unwrap();
 
-    let file = File::create(filename).unwrap();
+    let file = File::create("saves/autosave.tar").expect("saves/autosave.tar");
     let mut a = Builder::new(file);
     a.append_dir_all("save", "temp-save").unwrap();
     a.finish().unwrap();
     fs::remove_dir_all("temp-save").unwrap();
-    println!("saved game: {}", filename);
+    println!("saved game to saves/autosave.tar");
 }
 
-pub fn load_scene(world: &mut WorldData, filename: &str) {
-    if let Ok(file) = File::open(filename) {
+pub fn load_game(world: &mut WorldData) {
+    if let Ok(file) = File::open("saves/autosave.tar") {
 
         world.level.clear();
 
@@ -70,11 +71,124 @@ pub fn load_scene(world: &mut WorldData, filename: &str) {
 
             world.level.update_power();
         }
-        println!("game loaded: from file {}", filename);
+        println!("game loaded from saves/autosave.tar");
     } else {
         static_levels::empty(world);
     }
-    
+}
+
+pub fn save_location(world: &mut WorldData) {
+    world.levels.insert(world.level.location.clone(), world.level.clone());
+
+    let dir = format!("levels/u{}", world.universe.id);
+    fs::create_dir_all(dir).expect("universe folder could not be created");
+    match &world.level.location {
+        Location::Ship(id) => {
+            let file = format!("levels/u{}/{}.ship.tar", world.universe.id, id);
+            save_level(world, &file);
+        },
+        Location::Station(id) => {
+            let file = format!("levels/u{}/{}.station.tar", world.universe.id, id);
+            save_level(world, &file);
+        },
+        Location::Space => {
+            let file = format!("levels/u{}/space.tar", world.universe.id);
+            save_level(world, &file);
+        }
+    }
+}
+
+pub fn load_location(world: &mut WorldData, location: &Location) {
+    let mut loaded = false;
+    let inventory = world.level.player.inventory.clone();
+    let direction = world.level.player.direction.clone();
+
+    {
+        if let Some(level) = world.levels.get(location) {
+            world.level = level.clone();
+            loaded = true;
+            println!("loaded game from memory");
+        }
+    }
+
+    if !loaded {
+        match location {
+            Location::Ship(id) => {
+                let file = format!("levels/u{}/{}.ship.tar", world.universe.id, id);
+                if load_level(world, &file).is_err() {
+                    if id == "Tech 2.1" {
+                        static_levels::static_ship_tech(world);
+                    } else {
+                        static_levels::empty(world);
+                        world.level.location = location.clone();
+                    }
+                }
+            },
+            Location::Station(id) => {
+                let file = format!("levels/u{}/{}.station.tar", world.universe.id, id);
+                if load_level(world, &file).is_err() {
+                    if id == "Mun" {
+                        static_levels::static_station_outpost(world);
+                    } else {
+                        static_levels::empty(world);
+                        world.level.location = location.clone();
+                    }    
+                }
+            },
+            Location::Space => static_levels::empty(world),
+        }
+    }
+
+    world.level.player.inventory = inventory;
+    world.level.player.direction = direction;
+}
+
+fn save_level(world: &WorldData, filename: &str) {
+    fs::create_dir("temp-save").unwrap();
+
+    let save_info = Save { location: world.level.location.clone(), backdrop: world.level.backdrop.clone(), offset: Position { x: 0, y: 0} };
+    let bytes: Vec<u8> = bincode::serialize(&save_info).unwrap();
+    File::create("temp-save/save-meta.bin").unwrap().write_all(&bytes).unwrap();
+
+    let bytes: Vec<u8> = bincode::serialize(&world.level).unwrap();
+    File::create("temp-save/level.bin").unwrap().write_all(&bytes).unwrap();
+
+    let file = File::create(filename).expect(filename);
+    let mut a = Builder::new(file);
+    a.append_dir_all("save", "temp-save").unwrap();
+    a.finish().unwrap();
+    fs::remove_dir_all("temp-save").unwrap();
+    println!("saved level: {}", filename);
+}
+
+fn load_level(world: &mut WorldData, filename: &str) -> Result<(), io::Error> {
+    let file = File::open(filename)?;
+
+    world.level.clear();
+
+    let mut a = Archive::new(file);
+
+    for file in a.entries().unwrap() {
+        // Make sure there wasn't an I/O error
+        let file = file.unwrap();
+
+        match file.path().unwrap().file_stem().unwrap().to_str().unwrap() as &str {
+            "level" => {
+                world.level = bincode::deserialize_from(file).unwrap();
+            },
+            "save-meta" => {
+                let level_info: Save = bincode::deserialize_from(file).unwrap();
+                world.level.backdrop = level_info.backdrop;
+                world.level.location = level_info.location;
+            },
+            _ => (),
+        }
+
+        world.level.update_power();
+    }
+    println!("level loaded: from file {}", filename);
+
+    Ok(())
 }
 
 pub fn insert_walls(world: &mut WorldData, walls: Vec<(i32, i32, WallType, Direction)>) {

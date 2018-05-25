@@ -5,8 +5,11 @@ use savegame::static_npc::*;
 use storage::{Node, SelectionStorage};
 use dialog::*;
 use feature::map::MapFeature;
+use world::{Universe, Sector, Ship, Station};
 
 pub fn empty(data: &mut WorldData) {
+    data.level.clear();
+    
     data.level.backdrop = String::from("");
 
     super::insert_player(data, (1, 1), Direction::Down, vec![]);
@@ -18,6 +21,8 @@ pub fn static_station_outpost(data: &mut WorldData) {
     data.level.clear();
     data.level.backdrop = String::from("");
     data.level.location = Location::Station("Mun".to_string());
+
+    data.universe = default_universe();
 
     super::insert_floor(data, vec![
         (7, 9, FloorType::Regular),
@@ -114,6 +119,8 @@ pub fn static_station_outpost(data: &mut WorldData) {
 
     super::insert_player(data, (7, 13), Direction::Right, vec![Item::Navcomp]);
 
+    data.levels.insert(data.level.location.clone(), data.level.clone());
+
     println!("game loaded: static station outpost");
 }
 
@@ -121,8 +128,10 @@ pub fn static_ship_tech(data: &mut WorldData) {
     data.level.clear();
 
     data.level.backdrop = String::from("/realm_of_sol__0000s_0001_2.1.png");
-    data.level.location = Location::Station("Tech 2.1".to_string());
+    data.level.location = Location::Ship("Tech 2.1".to_string());
 
+    data.universe = default_universe();
+    
     super::insert_floor(data, vec![
         (7, 9, FloorType::Light),
         (8, 9, FloorType::Light),
@@ -249,5 +258,55 @@ pub fn static_ship_tech(data: &mut WorldData) {
 
     super::insert_player(data, (9, 13), Direction::Left, vec![Item::Navcomp]);
 
+    data.levels.insert(data.level.location.clone(), data.level.clone());
+
     println!("game loaded: static ship tech");
+}
+
+pub fn default_universe() -> Universe {
+    Universe {
+        id: 0,
+        sectors: vec![
+            Sector {
+                id: "Sol".to_string(),
+                position: Position {
+                    x: -3,
+                    y: -2
+                }
+            },
+            Sector {
+                id: "Andromeda".to_string(),
+                position: Position {
+                    x: 4,
+                    y: 4
+                }
+            },
+            Sector {
+                id: "Gaia".to_string(),
+                position: Position {
+                    x: 11,
+                    y: 6
+                }
+            }
+        ],
+        stations: vec![
+            Station {
+                id: "Mun".to_string(),
+                position: Position {
+                    x: -3,
+                    y: -2
+                }
+            }
+        ],
+        ships: vec![
+            Ship {
+                id: "Tech 2.1".to_string(),
+                position: Position {
+                    x: -2,
+                    y: -2
+                }
+            }
+        ],
+        player_location: Location::Ship("Tech 2.1".to_string())
+    }
 }
