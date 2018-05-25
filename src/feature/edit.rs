@@ -1,6 +1,6 @@
 use ggez::graphics::get_screen_coordinates;
 use ggez::{Context, GameResult, graphics};
-use ggez::event::{Keycode, Mod};
+use ggez::event::{Keycode, Mod, LSHIFTMOD};
 
 use world::WorldData;
 use app::draw_selection;
@@ -76,7 +76,7 @@ impl GameState for Handler {
         }
     }
     
-    fn key_up_event(&mut self, _ctx: &mut Context, data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, _ctx: &mut Context, data: &mut WorldData, keycode: Keycode, keymod: Mod, _repeat: bool) {
 
         self.edit_selection = self.get_edit_selection(data);
         
@@ -107,6 +107,7 @@ impl GameState for Handler {
                 data.level.circuitry.remove(self.edit_cursor);
                 data.level.generators.remove(self.edit_cursor);
                 data.level.storages.remove(self.edit_cursor);
+                data.level.floor.remove(self.edit_cursor);
                 data.level.update_power();
             },
             Keycode::W => {
@@ -132,30 +133,124 @@ impl GameState for Handler {
                 data.level.terminals.insert(self.edit_cursor, Terminal { variant: TerminalType::Intercomm, dialog: Node::new(), front: Direction::Down});
             },
             Keycode::Tab => {
-                if let Some(ref mut door) = data.level.doors.get_mut(self.edit_cursor) {
-                    match door.status {
-                        DoorStatus::Open => {
-                            door.status = DoorStatus::Closed;
+                if let Some(ref mut generator) = data.level.generators.get_mut(self.edit_cursor) {
+                    match generator.face {
+                        Direction::Up => {
+                            generator.face = Direction::Right;
                         },
-                        DoorStatus::Closed => {
-                            door.status = DoorStatus::Open;
+                        Direction::Right => {
+                            generator.face = Direction::Down;
+                        },
+                        Direction::Down => {
+                            generator.face = Direction::Left;
+                        },
+                        Direction::Left => {
+                            generator.face = Direction::Up;
+                        },
+                    }
+                }
+                if let Some(ref mut storage) = data.level.storages.get_mut(self.edit_cursor) {
+                    match storage.face {
+                        Direction::Up => {
+                            storage.face = Direction::Right;
+                        },
+                        Direction::Right => {
+                            storage.face = Direction::Down;
+                        },
+                        Direction::Down => {
+                            storage.face = Direction::Left;
+                        },
+                        Direction::Left => {
+                            storage.face = Direction::Up;
+                        },
+                    }
+                }
+                if let Some(ref mut wall) = data.level.walls.get_mut(self.edit_cursor) {
+                    if keymod == LSHIFTMOD {
+                        match wall.variant {
+                            WallType::Corner => {
+                                wall.variant = WallType::Edge;
+                            },
+                            WallType::Edge => {
+                                wall.variant = WallType::Wall;
+                            },
+                            WallType::Wall => {
+                                wall.variant = WallType::Window;
+                            },
+                            WallType::Window => {
+                                wall.variant = WallType::Corner;
+                            }
+                        }
+                    } else {
+                        match wall.face {
+                            Direction::Up => {
+                                wall.face = Direction::Right;
+                            },
+                            Direction::Right => {
+                                wall.face = Direction::Down;
+                            },
+                            Direction::Down => {
+                                wall.face = Direction::Left;
+                            },
+                            Direction::Left => {
+                                wall.face = Direction::Up;
+                            },
+                        }
+                    }
+                }
+                if let Some(ref mut door) = data.level.doors.get_mut(self.edit_cursor) {
+                    if keymod == LSHIFTMOD {
+                        match door.status {
+                            DoorStatus::Open => {
+                                door.status = DoorStatus::Closed;
+                            },
+                            DoorStatus::Closed => {
+                                door.status = DoorStatus::Open;
+                            }
+                        }
+                    } else {
+                        match door.face {
+                            Direction::Up => {
+                                door.face = Direction::Right;
+                            },
+                            Direction::Right => {
+                                door.face = Direction::Down;
+                            },
+                            Direction::Down => {
+                                door.face = Direction::Left;
+                            },
+                            Direction::Left => {
+                                door.face = Direction::Up;
+                            },
                         }
                     }
                 }
                 if let Some(ref mut terminal) = data.level.terminals.get_mut(self.edit_cursor) {
-                    match terminal.front {
-                        Direction::Up => {
-                            terminal.front = Direction::Right;
-                        },
-                        Direction::Right => {
-                            terminal.front = Direction::Down;
-                        },
-                        Direction::Down => {
-                            terminal.front = Direction::Left;
-                        },
-                        Direction::Left => {
-                            terminal.front = Direction::Up;
-                        },
+                    if keymod == LSHIFTMOD {
+                        match terminal.variant {
+                            TerminalType::Intercomm => {
+                                terminal.variant = TerminalType::ShipConsole;
+                            },
+                            TerminalType::ShipConsole => {
+                                terminal.variant = TerminalType::Intercomm;
+                            },
+                            _ => { }
+                        }
+                    } else {
+                        match terminal.front {
+                            Direction::Up => {
+                                terminal.front = Direction::Right;
+                            },
+                            Direction::Right => {
+                                terminal.front = Direction::Down;
+                            },
+                            Direction::Down => {
+                                terminal.front = Direction::Left;
+                            },
+                            Direction::Left => {
+                                terminal.front = Direction::Up;
+                            },
+                        }
                     }
                 }
             },
