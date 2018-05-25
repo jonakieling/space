@@ -182,10 +182,18 @@ impl GameState for Handler {
                 if data.insight_view {
                     self.interact_with_circuitry(data);
                 } else {
-                    self.interact_with_storage(data);
-                    self.interact_with_terminal(data);
+                    let mut powered = false;
+                    if let Some(circuitry) = data.level.current_circuitry() {
+                        if circuitry.powered() {
+                            powered = true;
+                        }
+                    }
+                    if powered {
+                        self.interact_with_terminal(data);
+                        self.interact_with_door(data);
+                    }
                     self.interact_with_npc(data);
-                    self.interact_with_door(data);
+                    self.interact_with_storage(data);
                 }
             },
             Keycode::I => {

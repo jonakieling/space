@@ -100,6 +100,14 @@ impl Circuitry {
     pub fn tile(&self) -> &'static str {
 	    "/circuitry.png"
 	}
+
+	pub fn contains(&self, needle: Item) -> bool {
+		self.parts.iter().find(|&&item| (item == needle)).is_some()
+	}
+
+	pub fn powered(&self) -> bool {
+		self.variant == CircuitryType::Powered
+	}
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

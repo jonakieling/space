@@ -241,7 +241,7 @@ impl Level {
                             
                             if let None = open_set.iter().find(|&&visited| (neighbor == visited)) {
                                 if let Some(circuitry) = self.circuitry.get(neighbor) {
-                                    if let Some(_) = circuitry.parts.iter().find(|&&item| (item == Item::PowerConductor)) {
+                                    if circuitry.contains(Item::PowerConductor) {
                                         open_set.push_back(neighbor);
                                     }
                                 }
@@ -249,7 +249,7 @@ impl Level {
                         }
 
                         if let Some(circuitry) = self.circuitry.get(subtree_root_position) {
-                            if let Some(_) = circuitry.parts.iter().find(|&&item| (item == Item::PowerConductor)) {
+                            if circuitry.contains(Item::PowerConductor) {
                                 closed_set.insert(subtree_root);
                             }
                         }

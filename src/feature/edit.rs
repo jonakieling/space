@@ -113,7 +113,9 @@ impl GameState for Handler {
                 data.level.walls.insert(self.edit_cursor, Wall { variant: WallType::Wall, face: Direction::Right});
             },
             Keycode::C => {
-                data.level.circuitry.insert(self.edit_cursor, Circuitry {parts: SelectionStorage::new(), variant: CircuitryType::Inactive});
+                let mut parts = SelectionStorage::new();
+                parts.insert(Item::PowerConductor);
+                data.level.circuitry.insert(self.edit_cursor, Circuitry {parts, variant: CircuitryType::Inactive});
                 data.level.update_power();
             },
             Keycode::G => {
