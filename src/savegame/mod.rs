@@ -139,6 +139,7 @@ pub fn load_location(world: &mut WorldData, location: &Location) {
         }
     }
 
+    world.universe.player_location = world.level.location.clone();
     world.level.player.inventory = inventory;
     world.level.player.direction = direction;
 }
