@@ -199,13 +199,19 @@ pub fn insert_pilot_seat(world: &mut WorldData, pilot_seats: Vec<(i32, i32, Dire
     }
 }
 
-pub fn insert_circuitry(world: &mut WorldData, circuitry: Vec<(i32, i32)>) {
-    let mut parts = SelectionStorage::new();
-    parts.insert(Item::PowerConductor);
+pub fn insert_circuitry(world: &mut WorldData, circuitry: Vec<(i32, i32, bool)>) {
+    let mut default_parts = SelectionStorage::new();
+    default_parts.insert(Item::PowerConductor);
     for circuit in circuitry {
+        let parts;
+        if circuit.2 {
+            parts = default_parts.clone();
+        } else {
+            parts = SelectionStorage::new();
+        }
         world.level.circuitry.insert(
             Position { x: circuit.0, y: circuit.1 },
-            Circuitry { parts: parts.clone(), powered: false }
+            Circuitry { parts: parts, variant: CircuitryType::Inactive }
         );
     }
 }

@@ -56,7 +56,7 @@ pub enum SpriteId {
     Edge,
     Window,
     Floor(FloorType),
-    Circuitry,
+    Circuitry(CircuitryType),
     Door(DoorStatus),
     Terminal(TerminalType),
     PilotSeat,

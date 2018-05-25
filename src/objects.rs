@@ -84,10 +84,16 @@ pub struct PilotSeat {
     pub front: Direction,
 }
 
+#[derive(Serialize, Deserialize, Debug, Clone, Hash, PartialEq, Eq)]
+pub enum CircuitryType {
+	Powered,
+	Inactive
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub struct Circuitry {
     pub parts: SelectionStorage<Item>,
-    pub powered: bool
+    pub variant: CircuitryType
 }
 
 impl Circuitry {

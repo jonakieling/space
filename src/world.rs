@@ -108,7 +108,8 @@ impl WorldData {
         sprites.insert(SpriteId::Window, SpriteBatch::new(Image::new(ctx, "/window.png").unwrap()));
         sprites.insert(SpriteId::Floor(FloorType::Regular), SpriteBatch::new(Image::new(ctx, "/floor.png").unwrap()));
         sprites.insert(SpriteId::Floor(FloorType::Light), SpriteBatch::new(Image::new(ctx, "/floor-light.png").unwrap()));
-        sprites.insert(SpriteId::Circuitry, SpriteBatch::new(Image::new(ctx, "/circuitry.png").unwrap()));
+        sprites.insert(SpriteId::Circuitry(CircuitryType::Powered), SpriteBatch::new(Image::new(ctx, "/circuitry.png").unwrap()));
+        sprites.insert(SpriteId::Circuitry(CircuitryType::Inactive), SpriteBatch::new(Image::new(ctx, "/circuitry-inactive.png").unwrap()));
         sprites.insert(SpriteId::Door(DoorStatus::Closed), SpriteBatch::new(Image::new(ctx, "/door.png").unwrap()));
         sprites.insert(SpriteId::Door(DoorStatus::Open), SpriteBatch::new(Image::new(ctx, "/door-open.png").unwrap()));
         sprites.insert(SpriteId::Terminal(TerminalType::Intercomm), SpriteBatch::new(Image::new(ctx, "/terminal.png").unwrap()));
@@ -208,7 +209,7 @@ impl Level {
     pub fn reset_powert(&mut self) {
         for circuitry in self.circuitry.iter_mut() {
             if let &mut Some(ref mut circuitry) = circuitry {
-                circuitry.powered = false;
+                circuitry.variant = CircuitryType::Inactive;
             }
         }
     }
@@ -239,17 +240,25 @@ impl Level {
                             }
                             
                             if let None = open_set.iter().find(|&&visited| (neighbor == visited)) {
-                                open_set.push_back(neighbor);
+                                if let Some(circuitry) = self.circuitry.get(neighbor) {
+                                    if let Some(_) = circuitry.parts.iter().find(|&&item| (item == Item::PowerConductor)) {
+                                        open_set.push_back(neighbor);
+                                    }
+                                }
                             }
                         }
 
-                        closed_set.insert(subtree_root);
+                        if let Some(circuitry) = self.circuitry.get(subtree_root_position) {
+                            if let Some(_) = circuitry.parts.iter().find(|&&item| (item == Item::PowerConductor)) {
+                                closed_set.insert(subtree_root);
+                            }
+                        }
                     }
                 }
 
                 for pos in closed_set {
                     if let Some(ref mut circuitry) = self.circuitry.get_mut(pos.unwrap()) {
-                        circuitry.powered = true;
+                        circuitry.variant = CircuitryType::Powered;
                     }
                 }
             }

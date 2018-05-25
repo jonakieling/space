@@ -198,10 +198,7 @@ impl GameState for Handler {
             for (pos, item) in data.level.doors.iter().enumerate() {
                 if let Some(door) = item {
                     let p = get_tile_params(ctx, Position::from_int(pos as i32), data.camera, Some(door.face));
-                    match door.status {
-                        DoorStatus::Open => add_sprite(&mut data.sprites, SpriteId::Door(DoorStatus::Open), p),
-                        DoorStatus::Closed => add_sprite(&mut data.sprites, SpriteId::Door(DoorStatus::Closed), p)
-                    };
+                    add_sprite(&mut data.sprites, SpriteId::Door(door.status), p);
                 }
             }
             draw_spritebatch(ctx, &mut data.sprites, SpriteId::Door(DoorStatus::Closed))?;
@@ -225,12 +222,13 @@ impl GameState for Handler {
 
             if data.insight_view {
                 for (pos, item) in data.level.circuitry.iter().enumerate() {
-                    if item.is_some() {
+                    if let Some(circuitry) = item {
                         let params = get_tile_params(ctx, Position::from_int(pos as i32), data.camera, None);
-                        add_sprite(&mut data.sprites, SpriteId::Circuitry, params);
+                        add_sprite(&mut data.sprites, SpriteId::Circuitry(circuitry.variant.clone()), params);
                     }
                 }
-                draw_spritebatch(ctx, &mut data.sprites, SpriteId::Circuitry)?;
+                draw_spritebatch(ctx, &mut data.sprites, SpriteId::Circuitry(CircuitryType::Powered))?;
+                draw_spritebatch(ctx, &mut data.sprites, SpriteId::Circuitry(CircuitryType::Inactive))?;
             }
 
             for (pos, npc) in data.level.npc.iter().enumerate() {
