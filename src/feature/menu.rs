@@ -5,7 +5,7 @@ use world::WorldData;
 use app::draw_selection;
 use game::{InputState, GameState};
 use storage::SelectionStorage;
-use savegame::save_game;
+use savegame::{save_location, save_game};
 
 #[derive(Debug, Clone)]
 pub enum MenuOption {
@@ -43,14 +43,13 @@ impl GameState for Handler {
             },
             Some(InputState::Mainmenu) => {
                 self.change_state = None;
-                save_game(data);
                 Some(Box::new(super::mainmenu::Handler::new(data)))
             },
             _ => None
         }
     }
 
-    fn key_up_event(&mut self, ctx: &mut Context, _data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, ctx: &mut Context, data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match keycode {
             Keycode::Escape => {
                 self.change_state = Some(InputState::World);
@@ -64,10 +63,13 @@ impl GameState for Handler {
             Keycode::Return => {
                 match *self.menu.current().unwrap() {
                     MenuOption::Quit => {
+                        save_location(data);
+                        save_game(data);
                         ctx.quit().expect("game should have quit");
                     },
                     MenuOption::Menu => {
-
+                        save_location(data);
+                        save_game(data);
                         self.change_state = Some(InputState::Mainmenu);
                     },
                 }

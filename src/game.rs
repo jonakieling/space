@@ -11,7 +11,6 @@ use objects::*;
 use misc::*;
 use constants::*;
 use world::WorldData;
-use savegame::{save_location, save_game};
 use feature::{*, map::MapFeature};
 
 pub trait GameState {
@@ -108,9 +107,6 @@ impl GameState for Handler {
 
     fn quit_event(&mut self, ctx: &mut Context, data: &mut WorldData) -> bool {
         self.current_ingame_state.quit_event(ctx, data);
-
-        save_location(data);
-        save_game(data);
 
         false
     }
@@ -219,6 +215,15 @@ impl GameState for Handler {
                 }
             }
             draw_spritebatch(ctx, &mut data.sprites, SpriteId::Storage)?;
+
+            for (pos, item) in data.level.decorations.iter().enumerate() {
+                if let Some(deco) = item {
+                    let p = get_tile_params(ctx, Position::from_int(pos as i32), data.camera, Some(deco.face));
+                    add_sprite(&mut data.sprites, SpriteId::Decoration(deco.variant), p);
+                }
+            }
+            draw_spritebatch(ctx, &mut data.sprites, SpriteId::Decoration(DecorationType::Display))?;
+            draw_spritebatch(ctx, &mut data.sprites, SpriteId::Decoration(DecorationType::Panel))?;
 
             if data.insight_view {
                 for (pos, item) in data.level.circuitry.iter().enumerate() {

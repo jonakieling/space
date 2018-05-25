@@ -55,6 +55,10 @@ impl Handler {
         if let Some(_) = data.level.storages.get(self.edit_cursor) {
             selection_storage.insert("Storage".to_string());
         }
+        
+        if let Some(_) = data.level.decorations.get(self.edit_cursor) {
+            selection_storage.insert("Decoration".to_string());
+        }
 
         if self.edit_cursor.x == data.level.player.position.x && self.edit_cursor.y == data.level.player.position.y {
             selection_storage.insert("Player".to_string());
@@ -108,6 +112,7 @@ impl GameState for Handler {
                 data.level.generators.remove(self.edit_cursor);
                 data.level.storages.remove(self.edit_cursor);
                 data.level.floor.remove(self.edit_cursor);
+                data.level.decorations.remove(self.edit_cursor);
                 data.level.update_power();
             },
             Keycode::W => {
@@ -126,6 +131,9 @@ impl GameState for Handler {
             Keycode::S => {
                 data.level.storages.insert(self.edit_cursor, Storage { content: SelectionStorage::new(), face: Direction::Down });
             },
+            Keycode::X => {
+                data.level.decorations.insert(self.edit_cursor, Decoration { variant: DecorationType::Display, face: Direction::Down });
+            },
             Keycode::D => {
                 data.level.doors.insert(self.edit_cursor, Door { status: DoorStatus::Closed, variant: DoorType::Passage, face: Direction::Down});
             },
@@ -133,6 +141,33 @@ impl GameState for Handler {
                 data.level.terminals.insert(self.edit_cursor, Terminal { variant: TerminalType::Intercomm, dialog: Node::new(), front: Direction::Down});
             },
             Keycode::Tab => {
+                if let Some(ref mut deco) = data.level.decorations.get_mut(self.edit_cursor) {
+                    if keymod == LSHIFTMOD {
+                        match deco.variant {
+                            DecorationType::Display => {
+                                deco.variant = DecorationType::Panel;
+                            },
+                            DecorationType::Panel => {
+                                deco.variant = DecorationType::Display;
+                            }
+                        }
+                    } else {
+                        match deco.face {
+                            Direction::Up => {
+                                deco.face = Direction::Right;
+                            },
+                            Direction::Right => {
+                                deco.face = Direction::Down;
+                            },
+                            Direction::Down => {
+                                deco.face = Direction::Left;
+                            },
+                            Direction::Left => {
+                                deco.face = Direction::Up;
+                            },
+                        }
+                    }
+                }
                 if let Some(ref mut generator) = data.level.generators.get_mut(self.edit_cursor) {
                     match generator.face {
                         Direction::Up => {

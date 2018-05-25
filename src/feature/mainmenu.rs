@@ -34,8 +34,8 @@ impl Handler {
             loading: None
     	};
 
-        menu.saves.insert(SaveType::New);
         menu.saves.insert(SaveType::Continue);
+        menu.saves.insert(SaveType::New);
 
     	menu
     }
