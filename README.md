@@ -5,7 +5,7 @@ This little game startet out as a means to learn Rust. Keeping things simple has
 
 A good start → [The Rust Programming Language](https://doc.rust-lang.org/book/second-edition/index.html "The Rust Programming Language")
 
-The game framework used is → [ggez](http://ggez.rs/ "ggez game framework")
+The game framework in use → [ggez](http://ggez.rs/ "ggez game framework")
 
 setup
 -----
@@ -32,4 +32,4 @@ what it looks like right now
 
 ![a screenshot of an early stage in development](screenshot.png "Onboard a simple ship. You can see storages next to the player character, the main ship console on the front and the exit on the right. The generator powers the circuitry from the back of the ship.")
 
-*Onboard a simple ship. You can see storages next to the player character, the main ship console on the front and the exit on the right. The generator powers the circuitry from the back of the ship.*
+*Onboard a simple ship. There are storages next to the player character, the main ship console on the front and the exit on the right. The generator powers the circuitry from the back of the ship.*
