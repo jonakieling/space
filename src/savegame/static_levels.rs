@@ -265,7 +265,6 @@ pub fn static_ship_tech(data: &mut WorldData) {
 
 pub fn default_universe() -> Universe {
     Universe {
-        id: 0,
         sectors: vec![
             Sector {
                 id: "Sol".to_string(),

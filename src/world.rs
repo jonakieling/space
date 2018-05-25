@@ -49,7 +49,6 @@ pub struct Level {
 
 #[derive(Serialize, Deserialize)]
 pub struct Universe {
-    pub id: i32,
     pub sectors: Vec<Sector>,
     pub stations: Vec<Station>,
     pub ships: Vec<Ship>,

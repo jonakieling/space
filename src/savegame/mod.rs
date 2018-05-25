@@ -35,6 +35,9 @@ pub fn save_game(world: &WorldData) {
     let bytes: Vec<u8> = bincode::serialize(&world.universe).unwrap();
     File::create("temp-save/universe.bin").unwrap().write_all(&bytes).unwrap();
 
+    let bytes: Vec<u8> = bincode::serialize(&world.levels).unwrap();
+    File::create("temp-save/levels.bin").unwrap().write_all(&bytes).unwrap();
+
     let file = File::create("saves/autosave.tar").expect("saves/autosave.tar");
     let mut a = Builder::new(file);
     a.append_dir_all("save", "temp-save").unwrap();
@@ -61,12 +64,15 @@ pub fn load_game(world: &mut WorldData) {
                 "universe" => {
                     world.universe = bincode::deserialize_from(file).unwrap();
                 },
+                "levels" => {
+                    world.levels = bincode::deserialize_from(file).unwrap();
+                },
                 "save-meta" => {
                     let level_info: Save = bincode::deserialize_from(file).unwrap();
                     world.level.backdrop = level_info.backdrop;
                     world.level.location = level_info.location;
                 },
-                _ => (),
+                _ => { },
             }
 
             world.level.update_power();
@@ -79,23 +85,6 @@ pub fn load_game(world: &mut WorldData) {
 
 pub fn save_location(world: &mut WorldData) {
     world.levels.insert(world.level.location.clone(), world.level.clone());
-
-    let dir = format!("levels/u{}", world.universe.id);
-    fs::create_dir_all(dir).expect("universe folder could not be created");
-    match &world.level.location {
-        Location::Ship(id) => {
-            let file = format!("levels/u{}/{}.ship.tar", world.universe.id, id);
-            save_level(world, &file);
-        },
-        Location::Station(id) => {
-            let file = format!("levels/u{}/{}.station.tar", world.universe.id, id);
-            save_level(world, &file);
-        },
-        Location::Space => {
-            let file = format!("levels/u{}/space.tar", world.universe.id);
-            save_level(world, &file);
-        }
-    }
 }
 
 pub fn load_location(world: &mut WorldData, location: &Location) {
@@ -114,7 +103,7 @@ pub fn load_location(world: &mut WorldData, location: &Location) {
     if !loaded {
         match location {
             Location::Ship(id) => {
-                let file = format!("levels/u{}/{}.ship.tar", world.universe.id, id);
+                let file = format!("levels/{}.ship.tar", id);
                 if load_level(world, &file).is_err() {
                     if id == "Tech 2.1" {
                         static_levels::static_ship_tech(world);
@@ -125,7 +114,7 @@ pub fn load_location(world: &mut WorldData, location: &Location) {
                 }
             },
             Location::Station(id) => {
-                let file = format!("levels/u{}/{}.station.tar", world.universe.id, id);
+                let file = format!("levels/{}.station.tar", id);
                 if load_level(world, &file).is_err() {
                     if id == "Mun" {
                         static_levels::static_station_outpost(world);
@@ -142,24 +131,6 @@ pub fn load_location(world: &mut WorldData, location: &Location) {
     world.universe.player_location = world.level.location.clone();
     world.level.player.inventory = inventory;
     world.level.player.direction = direction;
-}
-
-fn save_level(world: &WorldData, filename: &str) {
-    fs::create_dir("temp-save").unwrap();
-
-    let save_info = Save { location: world.level.location.clone(), backdrop: world.level.backdrop.clone(), offset: Position { x: 0, y: 0} };
-    let bytes: Vec<u8> = bincode::serialize(&save_info).unwrap();
-    File::create("temp-save/save-meta.bin").unwrap().write_all(&bytes).unwrap();
-
-    let bytes: Vec<u8> = bincode::serialize(&world.level).unwrap();
-    File::create("temp-save/level.bin").unwrap().write_all(&bytes).unwrap();
-
-    let file = File::create(filename).expect(filename);
-    let mut a = Builder::new(file);
-    a.append_dir_all("save", "temp-save").unwrap();
-    a.finish().unwrap();
-    fs::remove_dir_all("temp-save").unwrap();
-    println!("saved level: {}", filename);
 }
 
 fn load_level(world: &mut WorldData, filename: &str) -> Result<(), io::Error> {
