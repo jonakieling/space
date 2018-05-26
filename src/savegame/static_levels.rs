@@ -115,8 +115,7 @@ pub fn static_station_outpost(data: &mut WorldData) {
         (13,15,true),
         (13,16,true),
         (14,14,true),
-        (14,15,true),
-        (14,16,true),
+        (14,15,true)
     ]);
 
     super::insert_generator(data, vec![
@@ -237,7 +236,7 @@ pub fn static_ship_tech(data: &mut WorldData) {
                         (10, 6, true),          (12, 6, true),
                         (10, 7, false),          (12, 7, true),
         (8, 8, true), (9, 8, true), (10, 8, true), (11, 8, false), (12, 8, true),
-        (8, 9, true),         (10, 9, true),
+                     (10, 9, true),
                         (10, 10, true),
         (8, 11, true),(9, 11, false),(10, 11, true),
                         (10, 12, true),
