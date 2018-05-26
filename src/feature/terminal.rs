@@ -14,6 +14,7 @@ pub struct Handler {
 
 impl Handler {
     pub fn new(data: &mut WorldData) -> Handler {
+        println!("{:?}", data.level.terminal_connected());
     	Handler {
             change_state: None,
             dialog: data.level.current_terminal().unwrap().dialog.clone()

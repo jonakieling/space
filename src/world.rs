@@ -215,7 +215,12 @@ impl Level {
 
                 {
                     let mut root = generator_pos;
-                    open_set.push_back(root);
+
+                    if let Some(circuitry) = self.circuitry.get(root) {
+                        if circuitry.contains(Item::PowerConductor) {
+                            open_set.push_back(root);
+                        }
+                    }
 
                     while open_set.len() != 0 {
                         let subtree_root = open_set.pop_front();
@@ -255,7 +260,66 @@ impl Level {
         }
     }
 
-    pub fn current_storage(&mut self) -> Option<&mut Storage>{
+    pub fn terminal_connected(&mut self) -> SelectionStorage<(Position, Object)> {
+        let mut connected =  SelectionStorage::new();
+
+        if let Some(_) = self.current_terminal() {
+            let mut open_set = VecDeque::new();
+            let mut closed_set: BTreeSet<Option<Position>> = BTreeSet::new();
+
+            {
+                let mut root = self.player.front_tile;
+                
+                if let Some(circuitry) = self.circuitry.get(root) {
+                        if circuitry.contains(Item::PowerConductor) {
+                            open_set.push_back(root);
+                        }
+                    }
+
+                while open_set.len() != 0 {
+                    let subtree_root = open_set.pop_front();
+
+                    if subtree_root == None {
+                        break;
+                    }
+                    let subtree_root_position = subtree_root.unwrap();
+                    for neighbor in self.circuitry.get_neighbors_at(subtree_root_position) {
+                        if closed_set.contains(&Some(neighbor)) {
+                            continue;
+                        }
+                        
+                        if let None = open_set.iter().find(|&&visited| (neighbor == visited)) {
+                            if let Some(circuitry) = self.circuitry.get(neighbor) {
+                                if circuitry.contains(Item::PowerConductor) {
+                                    open_set.push_back(neighbor);
+                                }
+                            }
+                        }
+                    }
+
+                    if let Some(circuitry) = self.circuitry.get(subtree_root_position) {
+                        if circuitry.contains(Item::PowerConductor) {
+                            closed_set.insert(subtree_root);
+                            if let Some(pos) = subtree_root {
+                                if pos != self.player.front_tile {
+                                    if let Some(_) = self.terminals.get(pos) {
+                                        connected.insert((pos, Object::Terminal));
+                                    }
+                                    if let Some(_) = self.doors.get(pos) {
+                                        connected.insert((pos, Object::Door));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        connected
+    }
+
+    pub fn current_storage(&mut self) -> Option<&mut Storage> {
         if let Some(current_storage) = self.storages.get_mut(self.player.front_tile) {
             Some(current_storage)
         } else {
@@ -263,7 +327,7 @@ impl Level {
         }
     }
 
-    pub fn current_circuitry(&mut self) -> Option<&mut Circuitry>{
+    pub fn current_circuitry(&mut self) -> Option<&mut Circuitry> {
         if let Some(current_circuitry) = self.circuitry.get_mut(self.player.front_tile) {
             Some(current_circuitry)
         } else {
@@ -271,7 +335,7 @@ impl Level {
         }
     }
 
-    pub fn current_terminal(&mut self) -> Option<&mut Terminal>{
+    pub fn current_terminal(&mut self) -> Option<&mut Terminal> {
         if let Some(current_terminal) = self.terminals.get_mut(self.player.front_tile) {
             Some(current_terminal)
         } else {
@@ -279,7 +343,7 @@ impl Level {
         }
     }
 
-    pub fn current_npc(&mut self) -> Option<&mut Npc>{
+    pub fn current_npc(&mut self) -> Option<&mut Npc> {
         if let Some(current_npc) = self.npc.get_mut(self.player.front_tile) {
             Some(current_npc)
         } else {

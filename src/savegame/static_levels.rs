@@ -112,6 +112,7 @@ pub fn static_station_outpost(data: &mut WorldData) {
         (11,15,true),
         (11,16,true),
         (12,16,true),
+        (13,15,true),
         (13,16,true),
         (14,14,true),
         (14,15,true),
@@ -242,7 +243,7 @@ pub fn static_ship_tech(data: &mut WorldData) {
                         (10, 12, true),
                         (10, 13, true),
                         (10, 14, true),
-                (9, 15, true),(10, 15, true)
+        (8, 15, true),(9, 15, true),(10, 15, true)
     ]);
 
     data.level.update_power();

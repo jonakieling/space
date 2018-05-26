@@ -2,6 +2,12 @@ use misc::{Direction};
 use storage::{SelectionStorage, Node};
 use dialog::DialogItem;
 
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq)]
+pub enum Object {
+	Terminal,
+	Door
+}
+
 #[derive(Serialize, Deserialize, Debug, Copy, Clone, Hash, PartialEq, Eq)]
 pub enum WallType {
 	Wall,
@@ -98,7 +104,10 @@ pub struct Circuitry {
 
 impl Circuitry {
     pub fn tile(&self) -> &'static str {
-	    "/circuitry.png"
+		match self.variant {
+			CircuitryType::Inactive => "/circuitry-inactive.png",
+			CircuitryType::Powered => "/circuitry.png",
+		}
 	}
 
 	pub fn contains(&self, needle: Item) -> bool {
