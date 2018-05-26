@@ -58,6 +58,16 @@ pub enum Location {
 	Space
 }
 
+impl ToString for Location {
+    fn to_string(&self) -> String {
+		match self {
+			Location::Ship(id) => id.clone(),
+			Location::Station(id) => id.clone(),
+			Location::Space => "Space".to_string()
+		}
+    }
+}
+
 #[derive(Serialize, Deserialize, PartialEq, Clone, Debug)]
 pub enum DoorType {
 	Passage,

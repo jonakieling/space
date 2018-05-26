@@ -20,7 +20,8 @@ pub struct Station {
 #[derive(Serialize, Deserialize)]
 pub struct Ship {
     pub id: String,
-    pub position: Position
+    pub position: Position,
+    pub docked: Location
 }
 
 #[derive(Serialize, Deserialize)]

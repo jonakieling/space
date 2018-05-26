@@ -330,7 +330,8 @@ pub fn default_universe() -> Universe {
                 position: Position {
                     x: -2,
                     y: -2
-                }
+                },
+                docked: Location::Space
             }
         ],
         player_location: Location::Ship("Tech 2.1".to_string())
