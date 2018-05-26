@@ -96,7 +96,6 @@ pub fn load_location(world: &mut WorldData, location: &Location) {
         if let Some(level) = world.levels.get(location) {
             world.level = level.clone();
             loaded = true;
-            println!("loaded game from memory");
         }
     }
 
@@ -158,7 +157,7 @@ fn load_level(world: &mut WorldData, filename: &str) -> Result<(), io::Error> {
 
         world.level.update_power();
     }
-    println!("level loaded: from file {}", filename);
+    println!("location loaded from file: {}", filename);
 
     Ok(())
 }
