@@ -135,8 +135,8 @@ impl GameState for Handler {
 
     fn draw(&mut self, ctx: &mut Context, data: &mut WorldData) -> GameResult<()> {
         let cursor = self.mode == Mode::Inventory;
-        draw_selection_with_parameters(&data.level.player.inventory, ctx, Position {x: 770, y: 20}, TextAlign::Left, cursor, true)?;
-        draw_selection_with_parameters(&self.craft_area, ctx, Position {x: 580, y: 20}, TextAlign::Left, !cursor, false)?;
+        draw_selection_with_parameters(&data.level.player.inventory, ctx, Position {x: 580, y: 80}, TextAlign::Right, cursor, true)?;
+        draw_selection_with_parameters(&self.craft_area, ctx, Position {x: 540, y: 80}, TextAlign::Left, !cursor, false)?;
 
         draw_input_state("Inventory", ctx)?;
 

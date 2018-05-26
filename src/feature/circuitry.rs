@@ -2,17 +2,27 @@ use ggez::{Context, GameResult};
 use ggez::event::{Keycode, Mod};
 
 use world::WorldData;
-use app::{draw_selection, draw_tile};
+use app::{draw_selection_with_parameters, draw_tile};
 use game::{InputState, GameState};
+use misc::{Position, TextAlign};
+use objects::Item;
+
+#[derive(PartialEq, Eq)]
+enum Mode {
+    Inventory,
+    Circuitry
+}
 
 pub struct Handler {
-    change_state: Option<InputState>
+    change_state: Option<InputState>,
+    mode: Mode
 }
 
 impl Handler {
     pub fn new() -> Handler {
     	Handler {
-            change_state: None
+            change_state: None,
+            mode: Mode::Circuitry
         }
     }
 }
@@ -35,13 +45,53 @@ impl GameState for Handler {
                 self.change_state = Some(InputState::World);
             },
             Keycode::Up => {
-                if let Some(current_circuitry) = data.level.current_circuitry() {
-                    current_circuitry.parts.prev();
-                }
+                match self.mode {
+                    Mode::Circuitry => data.level.current_circuitry().unwrap().parts.prev(),
+                    Mode::Inventory => data.level.player.inventory.prev(),
+                };
             },
             Keycode::Down => {
-                if let Some(current_circuitry) = data.level.current_circuitry() {
-                    current_circuitry.parts.next();
+                match self.mode {
+                    Mode::Circuitry => data.level.current_circuitry().unwrap().parts.next(),
+                    Mode::Inventory => data.level.player.inventory.next(),
+                };
+            },
+            Keycode::Left => {
+                match self.mode {
+                    Mode::Circuitry => self.mode = Mode::Inventory,
+                    Mode::Inventory => self.mode = Mode::Circuitry,
+                }
+            },
+            Keycode::Right => {
+                match self.mode {
+                    Mode::Circuitry => self.mode = Mode::Inventory,
+                    Mode::Inventory => self.mode = Mode::Circuitry,
+                }
+            },
+            Keycode::Tab => {
+                match self.mode {
+                    Mode::Inventory => {
+                        let mut current = None;
+                        if let Some(item) = data.level.player.inventory.current() {
+                            current = Some(item.clone());
+                        }
+                        if let Some(item) = current {
+                            if item == Item::PowerConductor {
+                                let item = data.level.player.inventory.extract_current();
+                                if item.is_some() {
+                                    &data.level.current_circuitry().unwrap().parts.insert(item.unwrap());
+                                    data.level.update_power();
+                                }
+                            }
+                        }
+                    },
+                    Mode::Circuitry => {
+                        let item = data.level.current_circuitry().unwrap().parts.extract_current();
+                        if let Some(item) = item {    
+                            data.level.player.inventory.insert(item.clone());
+                            data.level.update_power();
+                        }
+                    }
                 }
             },
             _ => ()
@@ -49,7 +99,9 @@ impl GameState for Handler {
     }
 
     fn draw(&mut self, ctx: &mut Context, data: &mut WorldData) -> GameResult<()> {
-        draw_selection(&data.level.current_circuitry().unwrap().parts, ctx, true, false)?;
+        let cursor = self.mode == Mode::Inventory;
+        draw_selection_with_parameters(&data.level.player.inventory, ctx, Position {x: 580, y: 80}, TextAlign::Right, cursor, true)?;
+        draw_selection_with_parameters(&data.level.current_circuitry().unwrap().parts, ctx, Position {x: 540, y: 80}, TextAlign::Left, !cursor, true)?;
 
         if !data.insight_view {
             let front_index = data.level.player.front_tile.to_int();
