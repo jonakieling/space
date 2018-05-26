@@ -5,15 +5,19 @@ use ggez::event::{Keycode, Mod};
 use world::WorldData;
 use app::{draw_input_state, draw_dialog};
 use game::{InputState, GameState};
+use storage::Node;
+use dialog::DialogItem;
 
 pub struct Handler {
-    change_state: Option<InputState>
+    change_state: Option<InputState>,
+    dialog: Node<DialogItem>
 }
 
 impl Handler {
-    pub fn new() -> Handler {
+    pub fn new(data: &mut WorldData) -> Handler {
     	Handler {
-            change_state: None
+            change_state: None,
+            dialog: data.level.current_npc().unwrap().dialog.clone()
         }
     }
 }
@@ -43,8 +47,8 @@ impl GameState for Handler {
                 self.change_state = Some(InputState::World);
             },
             Keycode::Return => {
-                if data.dialog.children.iter().len() > 0 {
-                    if let Some(dialog_item) = data.dialog.children.current() {
+                if self.dialog.children.iter().len() > 0 {
+                    if let Some(dialog_item) = self.dialog.children.current() {
                         if let Some(ref action) = dialog_item.value.action {
                             match *action {
                                 DialogAction::Trade => {
@@ -54,7 +58,7 @@ impl GameState for Handler {
                             }
                         }
                     }
-                    data.dialog = data.dialog.children.current().unwrap().clone();	
+                    self.dialog = self.dialog.children.current().unwrap().clone();	
                 } else {
                     if let Some(npc) = data.level.current_npc() {
                         npc.direction = npc.look_at;
@@ -63,10 +67,10 @@ impl GameState for Handler {
                 }
             },
             Keycode::Up => {
-                data.dialog.children.prev();
+                self.dialog.children.prev();
             },
             Keycode::Down => {
-                data.dialog.children.next();
+                self.dialog.children.next();
             },
             _ => ()
         }
@@ -78,7 +82,7 @@ impl GameState for Handler {
             draw_input_state(&current_npc.name, ctx)?;
         }
 
-        draw_dialog(&data.dialog, ctx)
+        draw_dialog(&self.dialog, ctx)
     }
 
 }

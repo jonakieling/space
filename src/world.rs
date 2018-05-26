@@ -8,7 +8,6 @@ use player::*;
 use storage::*;
 use objects::*;
 use misc::*;
-use dialog::*;
 use app::SpriteId;
 use savegame;
 
@@ -60,7 +59,6 @@ pub struct WorldData {
     pub level: Level,
     pub universe: Universe,
     pub receipes: Vec<Receipe>,
-    pub dialog: Node<DialogItem>,
     pub insight_view: bool,
     pub overlay: bool,
     pub sprites: HashMap<SpriteId, SpriteBatch>,
@@ -142,14 +140,6 @@ impl WorldData {
             },
             universe: savegame::static_levels::default_universe(),
             receipes,
-            dialog: Node {
-                value: DialogItem {
-                    text: "".to_string(),
-                    response: "".to_string(),
-                    action: None
-                },
-                children: SelectionStorage::new()
-            },
             insight_view: false,
             overlay: false,
             sprites,

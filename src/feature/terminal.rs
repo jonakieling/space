@@ -4,16 +4,19 @@ use ggez::event::{Keycode, Mod};
 use app::{draw_input_state, draw_dialog};
 use game::{InputState, GameState};
 use world::WorldData;
-use dialog::DialogAction;
+use dialog::{DialogAction, DialogItem};
+use storage::Node;
 
 pub struct Handler {
-    change_state: Option<InputState>
+    change_state: Option<InputState>,
+    dialog: Node<DialogItem>
 }
 
 impl Handler {
-    pub fn new() -> Handler {
+    pub fn new(data: &mut WorldData) -> Handler {
     	Handler {
-            change_state: None
+            change_state: None,
+            dialog: data.level.current_terminal().unwrap().dialog.clone()
         }
     }
 }
@@ -34,14 +37,14 @@ impl GameState for Handler {
         }
     }
 
-    fn key_up_event(&mut self, _ctx: &mut Context, scene_data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
+    fn key_up_event(&mut self, _ctx: &mut Context, _data: &mut WorldData, keycode: Keycode, _keymod: Mod, _repeat: bool) {
         match keycode {
             Keycode::Escape => {
                 self.change_state = Some(InputState::World);
             },
             Keycode::Return => {
-                if scene_data.dialog.children.iter().len() > 0 {
-                    if let Some(dialog_item) = scene_data.dialog.children.current() {
+                if self.dialog.children.iter().len() > 0 {
+                    if let Some(dialog_item) = self.dialog.children.current() {
                         if let Some(ref action) = dialog_item.value.action {
                             match *action {
                                 DialogAction::Map(feature) => {
@@ -51,24 +54,24 @@ impl GameState for Handler {
                             }
                         }
                     }
-                    scene_data.dialog = scene_data.dialog.children.current().unwrap().clone();	
+                    self.dialog = self.dialog.children.current().unwrap().clone();	
                 } else {
                     self.change_state = Some(InputState::World);
                 }
             },
             Keycode::Up => {
-                scene_data.dialog.children.prev();
+                self.dialog.children.prev();
             },
             Keycode::Down => {
-                scene_data.dialog.children.next();
+                self.dialog.children.next();
             },
             _ => ()
         }
     }
 
-    fn draw(&mut self, ctx: &mut Context, scene_data: &mut WorldData) -> GameResult<()> {
+    fn draw(&mut self, ctx: &mut Context, _data: &mut WorldData) -> GameResult<()> {
         draw_input_state("Terminal", ctx)?;
 
-        draw_dialog(&scene_data.dialog, ctx)
+        draw_dialog(&self.dialog, ctx)
     }
 }
