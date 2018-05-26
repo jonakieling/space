@@ -62,8 +62,8 @@ pub fn static_station_outpost(data: &mut WorldData) {
     super::insert_walls(data, vec![
         (6, 8, WallType::Corner, Direction::Down),
         (7, 8, WallType::Wall, Direction::Down),
-        (8, 8, WallType::Wall, Direction::Down),
-        (9, 8, WallType::Wall, Direction::Down),
+        (8, 8, WallType::Window, Direction::Down),
+        (9, 8, WallType::Window, Direction::Down),
         (10, 8, WallType::Wall, Direction::Down),
         (11, 8, WallType::Corner, Direction::Left),
         (6, 9, WallType::Wall, Direction::Right),
@@ -71,31 +71,58 @@ pub fn static_station_outpost(data: &mut WorldData) {
         (6, 10, WallType::Wall, Direction::Right),
         (11, 10, WallType::Wall, Direction::Left),
         (6, 11, WallType::Wall, Direction::Right),
-        (11, 11, WallType::Wall, Direction::Left),
+        (11, 11, WallType::Corner, Direction::Up),
         (6, 12, WallType::Wall, Direction::Right),
-        (11, 12, WallType::Wall, Direction::Left),
+        (10, 11, WallType::Edge, Direction::Up),
+        (10, 12, WallType::Edge, Direction::Left),
+        (11, 12, WallType::Corner, Direction::Left),
         (12, 12, WallType::Corner, Direction::Down),
         (13, 12, WallType::Wall, Direction::Down),
         (14, 12, WallType::Corner, Direction::Left),
-        (11, 13, WallType::Wall, Direction::Left),
-        (12, 13, WallType::Wall, Direction::Right),
+        (11, 13, WallType::Edge, Direction::Left),
+        (12, 13, WallType::Edge, Direction::Down),
         (14, 13, WallType::Wall, Direction::Left),
         (6, 14, WallType::Wall, Direction::Right),                                                     
         (6, 15, WallType::Wall, Direction::Right), 
         (14, 14, WallType::Wall, Direction::Left),
-        (11, 15, WallType::Wall, Direction::Left),
-        (12, 15, WallType::Wall, Direction::Right),
+        (11, 15, WallType::Edge, Direction::Up),
+        (12, 15, WallType::Edge, Direction::Right),
         (14, 15, WallType::Wall, Direction::Left),
         (6, 16, WallType::Corner, Direction::Right),
         (7, 16, WallType::Wall, Direction::Up),
-        (8, 16, WallType::Wall, Direction::Up),
-        (9, 16, WallType::Wall, Direction::Up),
+        (8, 16, WallType::Window, Direction::Up),
+        (9, 16, WallType::Window, Direction::Up),
         (10, 16, WallType::Wall, Direction::Up),
         (11, 16, WallType::Corner, Direction::Up),
         (12, 16, WallType::Corner, Direction::Right),
         (13, 16, WallType::Wall, Direction::Up),
         (14, 16, WallType::Corner, Direction::Up)       
     ]);
+
+    super::insert_circuitry(data, vec![
+        (6,13,true),
+        (6,14,true),
+        (6,15,true),
+        (6,16,true),
+        (7,16,true),
+        (8,16,true),
+        (9,16,true),
+        (10,16,true),
+        (11,14,true),
+        (11,15,true),
+        (11,16,true),
+        (12,16,true),
+        (13,16,true),
+        (14,14,true),
+        (14,15,true),
+        (14,16,true),
+    ]);
+
+    super::insert_generator(data, vec![
+        (13,15,Direction::Up)
+    ]);
+
+    data.level.update_power();
 
     super::insert_doors(data, vec![
         (11, 14, DoorStatus::Closed, DoorType::Passage, Direction::Left),
@@ -211,7 +238,7 @@ pub fn static_ship_tech(data: &mut WorldData) {
         (8, 8, true), (9, 8, true), (10, 8, true), (11, 8, false), (12, 8, true),
         (8, 9, true),         (10, 9, true),
                         (10, 10, true),
-                        (10, 11, true),
+        (8, 11, true),(9, 11, false),(10, 11, true),
                         (10, 12, true),
                         (10, 13, true),
                         (10, 14, true),
@@ -256,7 +283,7 @@ pub fn static_ship_tech(data: &mut WorldData) {
         front: Direction::Left
     });
 
-    super::insert_player(data, (9, 13), Direction::Left, vec![Item::Navcomp]);
+    super::insert_player(data, (9, 13), Direction::Left, vec![Item::Navcomp, Item::PowerConductor]);
 
     data.levels.insert(data.level.location.clone(), data.level.clone());
 
