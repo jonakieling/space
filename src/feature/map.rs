@@ -239,75 +239,28 @@ impl GameState for Handler {
 
         let backdrop = data.backdrops.get(&BackdropId::MapSector);
         if let Some(backdrop) = backdrop {
-            let mut p = graphics::DrawParam {
-                ..Default::default()
-            };
-            p.scale = graphics::Point2::new(8.0, 8.0);
             graphics::set_color(ctx, graphics::Color{r: 1.0, g: 1.0, b: 1.0, a: 0.25})?;
-            graphics::draw_ex(
-                ctx,
-                backdrop,
-                p,
-            )?;
+            draw_backdrop(ctx, backdrop)?;
         }
 
         match self.mode {
             Mode::Sector => {
                 let backdrop = data.backdrops.get(&BackdropId::MapSector);
                 if let Some(backdrop) = backdrop {
-                    let mut p = graphics::DrawParam {
-                        ..Default::default()
-                    };
-                    p.scale = graphics::Point2::new(8.0, 8.0);
-                    graphics::set_color(ctx, graphics::WHITE)?;
-                    graphics::draw_ex(
-                        ctx,
-                        backdrop,
-                        p,
-                    )?;
+                    draw_backdrop(ctx, backdrop)?;
                 }
 
-                let mut stations = false;
-                for station in data.universe.stations.iter() {
-                    if station.position == self.cursor {
-                        stations = true;
-                    }
-                }
-                if stations {
+                if data.universe.has_stations(&self.cursor) {
                     let backdrop = data.backdrops.get(&BackdropId::MapStation);
                     if let Some(backdrop) = backdrop {
-                        let mut p = graphics::DrawParam {
-                            ..Default::default()
-                        };
-                        p.scale = graphics::Point2::new(8.0, 8.0);
-                        graphics::set_color(ctx, graphics::WHITE)?;
-                        graphics::draw_ex(
-                            ctx,
-                            backdrop,
-                            p,
-                        )?;
+                        draw_backdrop(ctx, backdrop)?;
                     }
                 }
 
-                let mut planets = false;
-                for planet in data.universe.planets.iter() {
-                    if planet.position == self.cursor {
-                        planets = true;
-                    }
-                }
-                if planets {
+                if data.universe.has_planets(&self.cursor) {
                     let backdrop = data.backdrops.get(&BackdropId::MapPlanet);
                     if let Some(backdrop) = backdrop {
-                        let mut p = graphics::DrawParam {
-                            ..Default::default()
-                        };
-                        p.scale = graphics::Point2::new(8.0, 8.0);
-                        graphics::set_color(ctx, graphics::WHITE)?;
-                        graphics::draw_ex(
-                            ctx,
-                            backdrop,
-                            p,
-                        )?;
+                        draw_backdrop(ctx, backdrop)?;
                     }
                 }
                 match self.feature {

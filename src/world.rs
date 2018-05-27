@@ -62,6 +62,30 @@ pub struct Universe {
     pub player_location: Location
 }
 
+impl Universe {
+    pub fn has_stations(&self, pos: &Position) -> bool {
+        let mut stations = false;
+        for station in self.stations.iter() {
+            if &station.position == pos {
+                stations = true;
+            }
+        }
+
+        stations
+    }
+
+    pub fn has_planets(&self, pos: &Position) -> bool {
+        let mut planets = false;
+        for planet in self.planets.iter() {
+            if &planet.position == pos {
+                planets = true;
+            }
+        }
+
+        planets
+    }
+}
+
 pub struct WorldData {
     pub movement_timer: Duration,
     pub level: Level,

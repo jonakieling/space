@@ -236,3 +236,16 @@ pub fn add_sprite(sprites: &mut HashMap<SpriteId, SpriteBatch>, sprite_id: Sprit
         spritebatch.add(params);
     }
 }
+
+pub fn draw_backdrop(ctx: &mut Context, backdrop: &graphics::Image) -> GameResult<()> {
+    let mut p = graphics::DrawParam {
+        ..Default::default()
+    };
+    p.scale = graphics::Point2::new(8.0, 8.0);
+    graphics::set_color(ctx, graphics::WHITE)?;
+    graphics::draw_ex(
+        ctx,
+        backdrop,
+        p,
+    )
+}
