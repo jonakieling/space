@@ -167,7 +167,6 @@ impl GameState for Handler {
                                 for ship in data.universe.ships.iter_mut() {
                                     if &ship.id == ship_id {
                                         ship.position = self.cursor;
-                                        self.mode = Mode::Universe;
                                     }
                                 }
                             }
