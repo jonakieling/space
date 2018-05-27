@@ -47,16 +47,16 @@ impl Handler {
         let active = area == self.active_trade_area;
         match area {
             TradeArea::NpcInventory => {
-                draw_selection_with_parameters(&selection, ctx, Position { x: 180, y: 80 }, TextAlign::Left, active, true)?;
+                draw_selection_with_parameters(&selection, ctx, Position { x: 160, y: 80 }, TextAlign::Left, active, true)?;
             },
             TradeArea::NpcStaging => {
-                draw_selection_with_parameters(&selection, ctx, Position { x: 220, y: 80 }, TextAlign::Right, active, true)?;
+                draw_selection_with_parameters(&selection, ctx, Position { x: 200, y: 80 }, TextAlign::Right, active, true)?;
             },
             TradeArea::PlayerStaging => {
-                draw_selection_with_parameters(&selection, ctx, Position { x: 540, y: 80 }, TextAlign::Left, active, true)?;
+                draw_selection_with_parameters(&selection, ctx, Position { x: 520, y: 80 }, TextAlign::Left, active, true)?;
             },
             TradeArea::PlayerInventory => {
-                draw_selection_with_parameters(&selection, ctx, Position { x: 580, y: 80 }, TextAlign::Right, active, true)?;
+                draw_selection_with_parameters(&selection, ctx, Position { x: 560, y: 80 }, TextAlign::Right, active, true)?;
             },
         }
 

@@ -100,8 +100,8 @@ impl GameState for Handler {
 
     fn draw(&mut self, ctx: &mut Context, data: &mut WorldData) -> GameResult<()> {
         let cursor = self.mode == Mode::Inventory;
-        draw_selection_with_parameters(&data.level.player.inventory, ctx, Position {x: 580, y: 80}, TextAlign::Right, cursor, true)?;
-        draw_selection_with_parameters(&data.level.current_circuitry().unwrap().parts, ctx, Position {x: 540, y: 80}, TextAlign::Left, !cursor, true)?;
+        draw_selection_with_parameters(&data.level.player.inventory, ctx, Position {x: 560, y: 80}, TextAlign::Right, cursor, true)?;
+        draw_selection_with_parameters(&data.level.current_circuitry().unwrap().parts, ctx, Position {x: 520, y: 80}, TextAlign::Left, !cursor, true)?;
 
         if !data.insight_view {
             let front_index = data.level.player.front_tile.to_int();

@@ -86,13 +86,13 @@ pub fn draw_dialog(dialog: &Node<DialogItem>, ctx: &mut Context) -> GameResult<(
     graphics::set_color(ctx, graphics::WHITE)?;
     graphics::draw(ctx, &text, graphics::Point2::new(310.0, 400.0), 0.0)?;
     
-    draw_selection_with_parameters(&dialog.children, ctx, Position { x: 300, y: 430 }, TextAlign::Right, true, false)?;
+    draw_selection_with_parameters(&dialog.children, ctx, Position { x: 280, y: 430 }, TextAlign::Right, true, false)?;
 
     Ok(())
 }
 
 pub fn draw_selection<T: Clone + ToString>(selection: &SelectionStorage<T>, ctx: &mut Context, cursor: bool, draw_empty: bool) -> GameResult<()> {
-    draw_selection_with_parameters(&selection, ctx, Position { x: 760, y: 20 }, TextAlign::Left, cursor, draw_empty)?;
+    draw_selection_with_parameters(&selection, ctx, Position { x: 740, y: 20 }, TextAlign::Left, cursor, draw_empty)?;
 
     Ok(())
 }

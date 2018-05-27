@@ -22,14 +22,17 @@ use std::env;
 use std::path;
 use std::io::Write;
 
-use ggez::{graphics, Context, conf, event::*};
+use ggez::{graphics, conf, event::*, ContextBuilder};
 
 fn main() {
-    let mut c = conf::Conf::new();
-    c.window_mode.dimensions(768, 512);
-    c.window_mode.fullscreen_type(conf::FullscreenType::Desktop);
-    c.window_setup = c.window_setup.title("space");
-    let mut ctx = &mut Context::load_from_conf("Space", "Jonathan Kieling", c).unwrap();
+    let screen_height = 512;
+    let screen_width = 768;
+
+    let cb = ContextBuilder::new("space", "jonakieling")
+        .window_setup(conf::WindowSetup::default().title("space"))
+        .window_mode(conf::WindowMode::default().dimensions(screen_width, screen_height));
+
+    let mut ctx = &mut cb.build().unwrap();
     graphics::set_background_color(ctx, graphics::BLACK);
     graphics::set_default_filter(ctx, graphics::FilterMode::Nearest);
 

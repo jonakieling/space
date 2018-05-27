@@ -31,10 +31,10 @@ impl Handler {
         let active = area == self.active_storage_area;
         match area {
             StorageArea::Storage => {
-                draw_selection_with_parameters(&selection, ctx, Position { x: 540, y: 80 }, TextAlign::Left, active, true)?;
+                draw_selection_with_parameters(&selection, ctx, Position { x: 520, y: 80 }, TextAlign::Left, active, true)?;
             },
             StorageArea::Inventory => {
-                draw_selection_with_parameters(&selection, ctx, Position { x: 580, y: 80 }, TextAlign::Right, active, true)?;
+                draw_selection_with_parameters(&selection, ctx, Position { x: 560, y: 80 }, TextAlign::Right, active, true)?;
             },
         }
 
