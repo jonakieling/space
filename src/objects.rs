@@ -55,6 +55,7 @@ pub enum DoorStatus {
 pub enum Location {
 	Ship(String),
 	Station(String),
+	Planet(String),
 	Space
 }
 
@@ -63,6 +64,7 @@ impl ToString for Location {
 		match self {
 			Location::Ship(id) => id.clone(),
 			Location::Station(id) => id.clone(),
+			Location::Planet(id) => id.clone(),
 			Location::Space => "Space".to_string()
 		}
     }

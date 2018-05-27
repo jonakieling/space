@@ -10,6 +10,7 @@ use app::*;
 use storage::SelectionStorage;
 use objects::Location;
 
+#[derive(PartialEq, Eq)]
 pub enum Mode {
     Universe,
     Sector,
@@ -50,7 +51,8 @@ impl Handler {
                     }
                 }
             },
-            Location::Space => { }
+            Location::Space => { },
+            Location::Planet(_) => { }
         }
 
     	let mut handler = Handler {
@@ -235,60 +237,133 @@ impl GameState for Handler {
     fn draw(&mut self, ctx: &mut Context, data: &mut WorldData) -> GameResult<()> {
         data.camera = self.cursor;
 
-        match self.feature {
-            MapFeature::Navigate => {
-                match self.mode {
-                    Mode::Universe => draw_input_state("Navigation Universe", ctx)?,
-                    Mode::Sector => {
+        let backdrop = data.backdrops.get(&BackdropId::MapSector);
+        if let Some(backdrop) = backdrop {
+            let mut p = graphics::DrawParam {
+                ..Default::default()
+            };
+            p.scale = graphics::Point2::new(8.0, 8.0);
+            graphics::set_color(ctx, graphics::Color{r: 1.0, g: 1.0, b: 1.0, a: 0.25})?;
+            graphics::draw_ex(
+                ctx,
+                backdrop,
+                p,
+            )?;
+        }
+
+        match self.mode {
+            Mode::Sector => {
+                let backdrop = data.backdrops.get(&BackdropId::MapSector);
+                if let Some(backdrop) = backdrop {
+                    let mut p = graphics::DrawParam {
+                        ..Default::default()
+                    };
+                    p.scale = graphics::Point2::new(8.0, 8.0);
+                    graphics::set_color(ctx, graphics::WHITE)?;
+                    graphics::draw_ex(
+                        ctx,
+                        backdrop,
+                        p,
+                    )?;
+                }
+
+                let mut stations = false;
+                for station in data.universe.stations.iter() {
+                    if station.position == self.cursor {
+                        stations = true;
+                    }
+                }
+                if stations {
+                    let backdrop = data.backdrops.get(&BackdropId::MapStation);
+                    if let Some(backdrop) = backdrop {
+                        let mut p = graphics::DrawParam {
+                            ..Default::default()
+                        };
+                        p.scale = graphics::Point2::new(8.0, 8.0);
+                        graphics::set_color(ctx, graphics::WHITE)?;
+                        graphics::draw_ex(
+                            ctx,
+                            backdrop,
+                            p,
+                        )?;
+                    }
+                }
+
+                let mut planets = false;
+                for planet in data.universe.planets.iter() {
+                    if planet.position == self.cursor {
+                        planets = true;
+                    }
+                }
+                if planets {
+                    let backdrop = data.backdrops.get(&BackdropId::MapPlanet);
+                    if let Some(backdrop) = backdrop {
+                        let mut p = graphics::DrawParam {
+                            ..Default::default()
+                        };
+                        p.scale = graphics::Point2::new(8.0, 8.0);
+                        graphics::set_color(ctx, graphics::WHITE)?;
+                        graphics::draw_ex(
+                            ctx,
+                            backdrop,
+                            p,
+                        )?;
+                    }
+                }
+                match self.feature {
+                    MapFeature::Navigate => {
                         let sector_description = format!("Navigation Sector {}", self.cursor.to_string());
                         draw_input_state(&sector_description, ctx)?
                     },
-                }
-            },
-            MapFeature::View => {
-                match self.mode {
-                    Mode::Universe => draw_input_state("Map Universe", ctx)?,
-                    Mode::Sector => {
+                    MapFeature::View => {
                         let sector_description = format!("Map Sector {}", self.cursor.to_string());
                         draw_input_state(&sector_description, ctx)?
                     },
                 }
+                draw_selection(&self.map_selection, ctx, false, false)?;
             },
-        }
+            Mode::Universe => {
+                match self.feature {
+                    MapFeature::Navigate => {
+                        draw_input_state("Navigation Universe", ctx)?;
+                    },
+                    MapFeature::View => {
+                        draw_input_state("Map Universe", ctx)?;
+                    },
+                }
 
-        graphics::set_color(ctx, graphics::WHITE)?;
-        match self.mode {
-            Mode::Sector => draw_selection(&self.map_selection, ctx, false, false)?,
-            Mode::Universe => draw_selection(&self.map_info_selection, ctx, false, false)?
-        }
+                graphics::set_color(ctx, graphics::WHITE)?;
+                draw_selection(&self.map_info_selection, ctx, false, false)?;
 
-        for sector in data.universe.sectors.iter() {
-            let p = get_tile_params(ctx, sector.position, data.camera, None);
-            add_sprite(&mut data.sprites, SpriteId::MapSector, p);
-        }
-        for station in data.universe.stations.iter() {
-            let p = get_tile_params(ctx, station.position, data.camera, None);
-            add_sprite(&mut data.sprites, SpriteId::MapStation, p);
-        }
-        for ship in data.universe.ships.iter() {
-            let p = get_tile_params(ctx, ship.position, data.camera, None);
-            add_sprite(&mut data.sprites, SpriteId::MapShip, p);
-        }
-        draw_spritebatch(ctx, &mut data.sprites, SpriteId::MapSector)?;
-        draw_spritebatch(ctx, &mut data.sprites, SpriteId::MapShip)?;
-        draw_spritebatch(ctx, &mut data.sprites, SpriteId::MapStation)?;
+                for sector in data.universe.sectors.iter() {
+                    let p = get_tile_params(ctx, sector.position, data.camera, None);
+                    add_sprite(&mut data.sprites, SpriteId::MapSector, p);
+                }
+                for station in data.universe.stations.iter() {
+                    let p = get_tile_params(ctx, station.position, data.camera, None);
+                    add_sprite(&mut data.sprites, SpriteId::MapStation, p);
+                }
+                for ship in data.universe.ships.iter() {
+                    let p = get_tile_params(ctx, ship.position, data.camera, None);
+                    add_sprite(&mut data.sprites, SpriteId::MapShip, p);
+                }
+                draw_spritebatch(ctx, &mut data.sprites, SpriteId::MapSector)?;
+                draw_spritebatch(ctx, &mut data.sprites, SpriteId::MapShip)?;
+                draw_spritebatch(ctx, &mut data.sprites, SpriteId::MapStation)?;
 
-        graphics::set_color(ctx, graphics::Color{r: 0.2, g: 0.8, b: 0.2, a: 1.0,})?;
-        let viewport_pos = self.cursor.viewport(data.camera);
-        let sceen_horizontal_center = get_screen_coordinates(ctx).w / 2.0 - (GRID_SIZE / 2) as f32;
-        let sceen_vertical_center = get_screen_coordinates(ctx).h / 2.0 - (GRID_SIZE / 2) as f32;
-        let cursor = graphics::Rect::new(
-            viewport_pos.x as f32 + sceen_horizontal_center,
-            viewport_pos.y as f32 + sceen_vertical_center,
-            GRID_SIZE as f32,
-            GRID_SIZE as f32
-        );
-        graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), cursor)?;
+                graphics::set_color(ctx, graphics::Color{r: 0.2, g: 0.8, b: 0.2, a: 1.0,})?;
+                let viewport_pos = self.cursor.viewport(data.camera);
+                let sceen_horizontal_center = get_screen_coordinates(ctx).w / 2.0 - (GRID_SIZE / 2) as f32;
+                let sceen_vertical_center = get_screen_coordinates(ctx).h / 2.0 - (GRID_SIZE / 2) as f32;
+                let cursor = graphics::Rect::new(
+                    viewport_pos.x as f32 + sceen_horizontal_center,
+                    viewport_pos.y as f32 + sceen_vertical_center,
+                    GRID_SIZE as f32,
+                    GRID_SIZE as f32
+                );
+                graphics::rectangle(ctx, graphics::DrawMode::Line(1.0), cursor)?;
+            }
+        }
 
         Ok(())
     }

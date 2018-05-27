@@ -124,6 +124,7 @@ pub fn load_location(world: &mut WorldData, location: &Location) {
                 }
             },
             Location::Space => static_levels::empty(world),
+            Location::Planet(_) => static_levels::empty(world),
         }
     }
 

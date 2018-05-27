@@ -8,11 +8,17 @@ use player::*;
 use storage::*;
 use objects::*;
 use misc::*;
-use app::SpriteId;
+use app::{SpriteId, BackdropId};
 use savegame;
 
 #[derive(Serialize, Deserialize)]
 pub struct Station {
+    pub id: String,
+    pub position: Position
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct Planet {
     pub id: String,
     pub position: Position
 }
@@ -52,6 +58,7 @@ pub struct Universe {
     pub sectors: Vec<Sector>,
     pub stations: Vec<Station>,
     pub ships: Vec<Ship>,
+    pub planets: Vec<Planet>,
     pub player_location: Location
 }
 
@@ -63,6 +70,7 @@ pub struct WorldData {
     pub insight_view: bool,
     pub overlay: bool,
     pub sprites: HashMap<SpriteId, SpriteBatch>,
+    pub backdrops: HashMap<BackdropId, Image>,
     pub levels: HashMap<Location, Level>,
     pub camera: Position
 }
@@ -99,6 +107,12 @@ impl WorldData {
         let storages = <PositionLevelStorage<Storage>>::new();
         
         let receipes = Vec::new();
+
+        let mut backdrops = HashMap::new();
+        backdrops.insert(BackdropId::MapSector, Image::new(ctx, "/window-backdrop-sector.png").unwrap());
+        backdrops.insert(BackdropId::MapPlanet, Image::new(ctx, "/window-backdrop-planet.png").unwrap());
+        backdrops.insert(BackdropId::MapStation, Image::new(ctx, "/window-backdrop-station.png").unwrap());
+        backdrops.insert(BackdropId::Location(Location::Ship("Tech 2.1".to_string())), Image::new(ctx, "/tech-2-1.png").unwrap());
 
         let mut sprites = HashMap::new();
         sprites.insert(SpriteId::Wall, SpriteBatch::new(Image::new(ctx, "/wall.png").unwrap()));
@@ -144,6 +158,7 @@ impl WorldData {
             insight_view: false,
             overlay: false,
             sprites,
+            backdrops,
             levels: HashMap::new(),
             camera: Position { x: 0, y: 0}
         }

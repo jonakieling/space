@@ -118,22 +118,22 @@ impl GameState for Handler {
             data.camera = data.level.player.position;
             if data.level.backdrop != "" {
                 graphics::set_color(ctx, graphics::Color{r: 1.0, g: 1.0, b: 1.0, a: 0.25})?;
-                let mut backdrop = graphics::Image::new(ctx, &data.level.backdrop)?;
-                backdrop.set_filter(graphics::FilterMode::Nearest);
-
-                // this is a convention for levels now (got stuck when setting up static levels via functions)
-                let backdrop_pos = Position {
-                    x: 1,
-                    y: 1
-                };
-                let mut p = get_tile_params(ctx, backdrop_pos, data.camera, None);
-                // override with grid size scaling since backdrops are smaller scale (1 pixel = 1 tile)
-                p.scale = graphics::Point2::new(GRID_SIZE as f32, GRID_SIZE as f32);
-                graphics::draw_ex(
-                    ctx,
-                    &backdrop,
-                    p,
-                )?;
+                let backdrop = data.backdrops.get(&BackdropId::Location(data.level.location.clone()));
+                if let Some(backdrop) = backdrop {
+                    // this is a convention for levels now (got stuck when setting up static levels via functions)
+                    let backdrop_pos = Position {
+                        x: 1,
+                        y: 1
+                    };
+                    let mut p = get_tile_params(ctx, backdrop_pos, data.camera, None);
+                    // override with grid size scaling since backdrops are smaller scale (1 pixel = 1 tile)
+                    p.scale = graphics::Point2::new(GRID_SIZE as f32, GRID_SIZE as f32);
+                    graphics::draw_ex(
+                        ctx,
+                        backdrop,
+                        p,
+                    )?;
+                }
             }
 
             graphics::set_color(ctx, graphics::BLACK)?;

@@ -68,6 +68,14 @@ pub enum SpriteId {
     MapShip
 }
 
+#[derive(Hash, PartialEq, Eq)]
+pub enum BackdropId {
+    MapSector,
+    MapPlanet,
+    MapStation,
+    Location(Location)
+}
+
 pub fn draw_dialog(dialog: &Node<DialogItem>, ctx: &mut Context) -> GameResult<()> {
     let font = graphics::Font::new(ctx, "/04B_03.TTF", 12).unwrap();
     let text = graphics::Text::new(ctx, &dialog.value.response, &font)?;

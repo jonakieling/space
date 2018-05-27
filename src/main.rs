@@ -25,7 +25,10 @@ use std::io::Write;
 use ggez::{graphics, Context, conf, event::*};
 
 fn main() {
-    let c = conf::Conf::new();
+    let mut c = conf::Conf::new();
+    c.window_mode.dimensions(768, 512);
+    c.window_mode.fullscreen_type(conf::FullscreenType::Desktop);
+    c.window_setup = c.window_setup.title("space");
     let mut ctx = &mut Context::load_from_conf("Space", "Jonathan Kieling", c).unwrap();
     graphics::set_background_color(ctx, graphics::BLACK);
     graphics::set_default_filter(ctx, graphics::FilterMode::Nearest);

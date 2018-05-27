@@ -5,7 +5,7 @@ use savegame::static_npc::*;
 use storage::{Node, SelectionStorage};
 use dialog::*;
 use feature::map::MapFeature;
-use world::{Universe, Sector, Ship, Station};
+use world::{Universe, Sector, Ship, Station, Planet};
 
 pub fn empty(data: &mut WorldData) {
     data.level.clear();
@@ -318,6 +318,15 @@ pub fn default_universe() -> Universe {
         stations: vec![
             Station {
                 id: "Mun".to_string(),
+                position: Position {
+                    x: -3,
+                    y: -2
+                }
+            }
+        ],
+        planets: vec![
+            Planet {
+                id: "Earth".to_string(),
                 position: Position {
                     x: -3,
                     y: -2
