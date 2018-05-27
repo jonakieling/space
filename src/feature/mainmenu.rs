@@ -4,7 +4,7 @@ use storage::SelectionStorage;
 use savegame;
 use game::GameState;
 use world::WorldData;
-use app::draw_selection;
+use app::{draw_selection, BackdropId, draw_backdrop};
 
 pub struct Handler {
 	saves: SelectionStorage<SaveType>,
@@ -81,7 +81,9 @@ impl GameState for Handler {
 	    }
     }
 
-    fn draw(&mut self, ctx: &mut Context, _world_data: &mut WorldData) -> GameResult<()> {
+    fn draw(&mut self, ctx: &mut Context, data: &mut WorldData) -> GameResult<()> {
+        draw_backdrop(ctx, &data.backdrops, &BackdropId::MapSector)?;
+
         draw_selection(&self.saves, ctx, true, false)
     }
 }

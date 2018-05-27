@@ -236,31 +236,18 @@ impl GameState for Handler {
     fn draw(&mut self, ctx: &mut Context, data: &mut WorldData) -> GameResult<()> {
         data.camera = self.cursor;
 
-        let backdrop = data.backdrops.get(&BackdropId::MapSector);
-        if let Some(backdrop) = backdrop {
-            graphics::set_color(ctx, graphics::Color{r: 1.0, g: 1.0, b: 1.0, a: 0.25})?;
-            draw_backdrop(ctx, backdrop)?;
-        }
+        draw_backdrop(ctx, &data.backdrops, &BackdropId::MapSector)?;
 
         match self.mode {
             Mode::Sector => {
-                let backdrop = data.backdrops.get(&BackdropId::MapSector);
-                if let Some(backdrop) = backdrop {
-                    draw_backdrop(ctx, backdrop)?;
-                }
+                draw_backdrop(ctx, &data.backdrops, &BackdropId::MapSector)?;
 
                 if data.universe.has_stations(&self.cursor) {
-                    let backdrop = data.backdrops.get(&BackdropId::MapStation);
-                    if let Some(backdrop) = backdrop {
-                        draw_backdrop(ctx, backdrop)?;
-                    }
+                    draw_backdrop(ctx, &data.backdrops, &BackdropId::MapStation)?;
                 }
 
                 if data.universe.has_planets(&self.cursor) {
-                    let backdrop = data.backdrops.get(&BackdropId::MapPlanet);
-                    if let Some(backdrop) = backdrop {
-                        draw_backdrop(ctx, backdrop)?;
-                    }
+                    draw_backdrop(ctx, &data.backdrops, &BackdropId::MapPlanet)?;
                 }
                 match self.feature {
                     MapFeature::Navigate => {

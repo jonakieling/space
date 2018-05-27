@@ -237,15 +237,20 @@ pub fn add_sprite(sprites: &mut HashMap<SpriteId, SpriteBatch>, sprite_id: Sprit
     }
 }
 
-pub fn draw_backdrop(ctx: &mut Context, backdrop: &graphics::Image) -> GameResult<()> {
-    let mut p = graphics::DrawParam {
-        ..Default::default()
-    };
-    p.scale = graphics::Point2::new(8.0, 8.0);
-    graphics::set_color(ctx, graphics::WHITE)?;
-    graphics::draw_ex(
-        ctx,
-        backdrop,
-        p,
-    )
+pub fn draw_backdrop(ctx: &mut Context, backdrops: &HashMap<BackdropId, graphics::Image>, backdrop_id: &BackdropId) -> GameResult<()> {
+    let backdrop = backdrops.get(backdrop_id);
+    if let Some(backdrop) = backdrop {
+        let mut p = graphics::DrawParam {
+            ..Default::default()
+        };
+        p.scale = graphics::Point2::new(8.0, 8.0);
+        graphics::set_color(ctx, graphics::WHITE)?;
+        graphics::draw_ex(
+            ctx,
+            backdrop,
+            p,
+        )?;
+    }
+
+    Ok(())
 }
