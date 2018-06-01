@@ -1,10 +1,12 @@
 extern crate ggez;
 extern crate serde;
-extern crate serde_yaml;
 #[macro_use]
 extern crate serde_derive;
 extern crate bincode;
 extern crate tar;
+extern crate specs;
+#[macro_use]
+extern crate specs_derive;
 
 mod savegame;
 mod game;
@@ -17,6 +19,7 @@ mod feature;
 mod dialog;
 mod app;
 mod world;
+mod components;
 
 use std::env;
 use std::path;
