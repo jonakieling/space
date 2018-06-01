@@ -20,6 +20,7 @@ mod dialog;
 mod app;
 mod world;
 mod components;
+mod systems;
 
 use std::env;
 use std::path;
