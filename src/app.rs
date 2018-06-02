@@ -49,7 +49,7 @@ impl EventHandler for AppContainer {
     }
 }
 
-#[derive(Hash, PartialEq, Eq)]
+#[derive(Hash, PartialEq, Eq, Clone)]
 pub enum SpriteId {
     Wall,
     Corner,
@@ -68,7 +68,7 @@ pub enum SpriteId {
     MapShip
 }
 
-#[derive(Hash, PartialEq, Eq)]
+#[derive(Hash, PartialEq, Eq, Clone)]
 pub enum BackdropId {
     MapSector,
     MapPlanet,
@@ -161,13 +161,13 @@ pub fn draw_selection_with_parameters<T: Clone + ToString>(selection: &Selection
     Ok(())
 }
 
-pub fn draw_spritebatch(ctx: &mut Context, sprites: &mut HashMap<SpriteId, SpriteBatch>, sprite_id: SpriteId) -> GameResult<()> {
+pub fn draw_spritebatch(ctx: &mut Context, sprites: &mut HashMap<SpriteId, SpriteBatch>, sprite_id: &SpriteId) -> GameResult<()> {
     graphics::set_color(ctx, graphics::WHITE)?;
     let params = graphics::DrawParam {
         dest: graphics::Point2::new(0.0, 0.0),
         ..Default::default()
     };
-    if let Some(spritebatch) = sprites.get_mut(&sprite_id) {
+    if let Some(spritebatch) = sprites.get_mut(sprite_id) {
         graphics::draw_ex(ctx, spritebatch, params)?;
         spritebatch.clear();
     }
@@ -231,8 +231,8 @@ pub fn draw_tile(ctx: &mut Context, tile_src: &str, pos: i32, camera: Position, 
     Ok(())
 }
 
-pub fn add_sprite(sprites: &mut HashMap<SpriteId, SpriteBatch>, sprite_id: SpriteId, params: graphics::DrawParam) {
-    if let Some(spritebatch) = sprites.get_mut(&sprite_id) {
+pub fn add_sprite(sprites: &mut HashMap<SpriteId, SpriteBatch>, sprite_id: &SpriteId, params: graphics::DrawParam) {
+    if let Some(spritebatch) = sprites.get_mut(sprite_id) {
         spritebatch.add(params);
     }
 }

@@ -1,7 +1,7 @@
 use std::ops::{Add, Sub};
 use constants::{GRID_SIZE, LEVEL_SIZE};
 
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Serialize, Deserialize, Default, Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Position {
     pub x: i32,
     pub y: i32

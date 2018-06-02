@@ -1,10 +1,10 @@
 use specs::{VecStorage, DenseVecStorage};
-use ggez::graphics::Image;
 
 use storage::{SelectionStorage, Node};
 use dialog::DialogItem;
 use misc::Direction;
 use objects::Item;
+use app::SpriteId;
 
 #[derive(Component, Debug)]
 #[storage(VecStorage)]
@@ -37,8 +37,8 @@ pub struct Dialog {
     pub tree: Node<DialogItem>
 }
 
-#[derive(Component, Debug)]
+#[derive(Component)]
 #[storage(VecStorage)]
 pub struct Tile {
-    pub image: Image
+    pub sprite: SpriteId
 }

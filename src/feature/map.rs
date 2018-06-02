@@ -276,19 +276,19 @@ impl GameState for Handler {
 
                 for sector in data.universe.sectors.iter() {
                     let p = get_tile_params(ctx, sector.position, data.camera, None);
-                    add_sprite(&mut data.sprites, SpriteId::MapSector, p);
+                    add_sprite(&mut data.sprites, &SpriteId::MapSector, p);
                 }
                 for station in data.universe.stations.iter() {
                     let p = get_tile_params(ctx, station.position, data.camera, None);
-                    add_sprite(&mut data.sprites, SpriteId::MapStation, p);
+                    add_sprite(&mut data.sprites, &SpriteId::MapStation, p);
                 }
                 for ship in data.universe.ships.iter() {
                     let p = get_tile_params(ctx, ship.position, data.camera, None);
-                    add_sprite(&mut data.sprites, SpriteId::MapShip, p);
+                    add_sprite(&mut data.sprites, &SpriteId::MapShip, p);
                 }
-                draw_spritebatch(ctx, &mut data.sprites, SpriteId::MapSector)?;
-                draw_spritebatch(ctx, &mut data.sprites, SpriteId::MapShip)?;
-                draw_spritebatch(ctx, &mut data.sprites, SpriteId::MapStation)?;
+                draw_spritebatch(ctx, &mut data.sprites, &SpriteId::MapSector)?;
+                draw_spritebatch(ctx, &mut data.sprites, &SpriteId::MapShip)?;
+                draw_spritebatch(ctx, &mut data.sprites, &SpriteId::MapStation)?;
 
                 graphics::set_color(ctx, graphics::Color{r: 0.2, g: 0.8, b: 0.2, a: 1.0,})?;
                 let viewport_pos = self.cursor.viewport(data.camera);
