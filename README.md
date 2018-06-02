@@ -7,6 +7,8 @@ A good start → [The Rust Programming Language](https://doc.rust-lang.org/book/
 
 The game framework in use → [ggez](http://ggez.rs/ "ggez game framework")
 
+Currently the engine is reworked to use [specs](https://slide-rs.github.io/specs/ "entity component system") as an entity component system for all the things.
+
 setup
 -----
 
