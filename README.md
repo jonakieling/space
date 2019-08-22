@@ -3,7 +3,7 @@ space
 
 This little game startet out as a means to learn Rust. Keeping things simple has proven to be very engaging and productive. Although there might the occasional small commit out of line :smiley face:
 
-A good start → [The Rust Programming Language](https://doc.rust-lang.org/book/second-edition/index.html "The Rust Programming Language")
+A good start → [The Rust Programming Language](https://doc.rust-lang.org/book/foreword.html "The Rust Programming Language")
 
 The game framework in use → [ggez](http://ggez.rs/ "ggez game framework")
 
