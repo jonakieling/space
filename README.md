@@ -1,3 +1,8 @@
+Outdated
+========
+
+It has been a while since I took care of this repository. A lot has changed since. If you are looking for a good start with Rust check the links in the section below.
+
 space
 =====
 
